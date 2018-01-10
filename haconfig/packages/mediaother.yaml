@@ -1,0 +1,389 @@
+
+#################################################################
+## Groups
+#################################################################
+
+group:
+  plankton_main:
+    entities:
+      - media_player.plankton
+  gir_main:
+    entities:
+      - media_player.gir
+  kermit_main:
+    entities:
+      - media_player.kermit
+  johnny_2x4_main:
+    entities:
+      - media_player.johnny_2x4
+
+ # climetecontrol:
+ #   name: Climate Control
+ #   entities:
+ #     - climate.dining_room
+ #     - sensor.dark_sky_temperature
+
+  weather:
+    name: Weather
+    entities:
+      - sensor.pws_weather_1d
+      - sensor.pws_temp_f
+      - sensor.pws_feelslike_f
+      - sensor.pws_temp_high_1d_f
+      - sensor.pws_precip_1d
+      - sensor.pws_relative_humidity
+      - sensor.pws_alerts
+
+#################################################################
+## Sensors
+#################################################################
+sensor:
+  - platform: wunderground
+    api_key: REDACTED
+    monitored_conditions:
+      - weather_1d
+      - temp_f
+      - temp_high_1d_f
+      - feelslike_f
+      - precip_1d
+      - relative_humidity
+      - alerts
+
+#  - platform: darksky
+#    api_key: REDACTED
+
+#################################################################
+## Scripts
+#################################################################
+
+script:
+  vizio_tv_volup:
+    sequence:
+      service: shell_command.vizio_tv_volup
+
+  vizio_tv_voldown:
+    sequence:
+      service: shell_command.vizio_tv_voldown
+
+  vizio_tv_input:
+    sequence:
+      service: shell_command.vizio_tv_input
+
+  nad_poweron:
+    sequence:
+      service: homeassistant.turn_on
+      entity_id: switch.nad_power
+
+  nad_poweroff:
+    sequence:
+      service: homeassistant.turn_off
+      entity_id: switch.nad_power
+
+  nad_volup:
+    sequence:
+      service: homeassistant.turn_on
+      entity_id: switch.nad_volume
+
+  nad_voldown:
+    sequence:
+      service: homeassistant.turn_off
+      entity_id: switch.nad_volume
+
+  nad_ccinput:
+    sequence:
+      service: homeassistant.turn_on
+      entity_id: switch.nad_ccinput
+
+  roomba_on:
+    sequence:
+      service: homeassistant.turn_on
+      entity_id: switch.roomba
+
+  castnprgir:
+    sequence:
+      - service: media_player.play_media
+        data:
+          entity_id: media_player.gir
+          media_content_id: REDACTED
+          media_content_type: 'audio/mp4'
+
+#################################################################
+## Switches
+#################################################################
+
+switch:
+# Vizio TV curl to API
+  - platform: command_line
+    switches:
+      vizio_tv_power:
+        command_on: "curl -k -H \"Content-Type: application/json\" -H \"AUTH: REDACTED\" -X PUT -d '{\"KEYLIST\": [{\"CODESET\": 11,\"CODE\": 1,\"ACTION\":\"KEYPRESS\"}]}' https://REDACTED.234:9000/key_command/"
+        command_off: "curl -k -H \"Content-Type: application/json\" -H \"AUTH: REDACTED\" -X PUT -d '{\"KEYLIST\": [{\"CODESET\": 11,\"CODE\": 0,\"ACTION\":\"KEYPRESS\"}]}' https://REDACTED.234:9000/key_command/"
+        command_state: "curl -k -H \"Content-Type: application/json\" -H \"AUTH: REDACTED\" -X GET https://REDACTED.234:9000/state/device/power_mode"
+        value_template: >
+          {% if value_json.ITEMS.0.VALUE == 1 %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+# Broadlink IR Blaster
+  - platform: broadlink
+    host: REDACTED.239
+    mac: 'REDACTED'
+    type: rm_mini
+    timeout: 15
+    switches:
+      nad_power:
+        command_on: 'JgBgAAABI5YQORI3FDYSFA4XDxYQFBM1FRMSEw45EDgSOxA5EjcTExI3EhMOOhEWDxYQORITERQOFw86ERUSNhA5ERYQOBM2FAAE9QABJ0kUAAxKAAEmSxMADEoAASVMEQANBQAAAAAAAAAA'
+        command_off: 'JgBYAAABJJcQORI4EzUUExEUDhcQFBM2FBITEhI4EjYUNRU1EzYTEw8WDxcQFRE4EhMSExM3EjcOOhA6EDkSFBI3EjgOFw8WEQAE9wABK0gSAAxLAAEoRRQADQU='
+      nad_volume:
+        command_on: 'JgBYAAABJZUVMxQ2EzYSFBQRFRATERI4ExISFBQ1FTQSOBUzEzgRFBAUExQSEhkvFxATEhEUEDgWNBQ2ETcRFRA6FDQWMxQTFAAE9QABIk0VAAxGAAEpShIADQU='
+        command_off: 'JgBYAAABKJETNhU1FDIXEg4XDxYQFRA4ERUUERUzFTUTNxM2ETkRFBURFBEUNBQ1FRERFBEVEDkQORM2FhAUERI2EToQORAVEAAE9AABKkoSAAxMAAEoSRQADQU='
+      nad_ccinput:
+        command_on: 'JgBYAAABKJASOBYzEDoVEBQREhQRFBQ0FREUERI3EjgOOxE5FDYSEhIUEBURFRQRFRATERI4EjcUNRI4EDkRORE4FDYVDxIUEwAE8wABK0cUAAxKAAEnSRMADQU='
+      roomba:
+        command_on: 'JgD8AGEgIV8gXyBfXCIhXyBfIAACoGIfIGAfYB9gXSIfYR5hHgACol8iHmIdYh1iXCIfYR5hHgACo2EgHmEfYR1iXCIeYh1iHQACq2AhH2EeYR9gXCMfYB9gHwAComAhH2AfYR9gXCIgYB9gHwACoWAiH2AfYB9gXCMfYB9hHgAComAhH2EeYR5hXCIgYCBfIAACoGEgIGAfYB9gXSIfYR5hHgACql8jHWIdYh1iXCMeYR5hHgACo18iHmEeYh1iXCIeYh1iHQACo18jHWIdYh5hXSIeYh1iHQACo18jHWIdYh1iXCIfYR5hHgACq18iHmEeYh1iXCIeYh1iHgANBQAAAAAAAAAAAAAAAA=='
+        command_off: 'JgCQAGAhHmIfYB9gH2BdIh5iXAACbGAhHmIeYR5hH2BdIh5iXAACZGAhHmIeYR5hH2BdIh5iXAACZGEhH2AfYB9gIF9eISBgXgACYl8iIGAfYB9gH2BfICBgXgACamEhH2AfYB9gH2BfICBgXgACYmEgIGAfYCBfIF9cIx9hXAACZGAhHmIeYR5hH2BdIh5iXAANBQAAAAAAAAAA'
+
+#################################################################
+## Shell Commands
+#################################################################
+
+shell_command:
+  vizio_tv_volup: "curl -k -H \"Content-Type: application/json\" -H \"AUTH: REDACTED\" -X PUT -d '{\"KEYLIST\": [{\"CODESET\": 5,\"CODE\": 1,\"ACTION\":\"KEYPRESS\"}]}' https://REDACTED.234:9000/key_command/"
+  vizio_tv_voldown: "curl -k -H \"Content-Type: application/json\" -H \"AUTH: REDACTED\" -X PUT -d '{\"KEYLIST\": [{\"CODESET\": 5,\"CODE\": 0,\"ACTION\":\"KEYPRESS\"}]}' https://REDACTED.234:9000/key_command/"
+  vizio_tv_input: "curl -k -H \"Content-Type: application/json\" -H \"AUTH: REDACTED\" -X PUT -d '{\"KEYLIST\": [{\"CODESET\": 7,\"CODE\": 1,\"ACTION\":\"KEYPRESS\"}]}' https://REDACTED.234:9000/key_command/"
+
+
+#################################################################
+## Other Automations
+#################################################################
+
+automation:
+
+  # Notify when HA update is availavle
+  - alias: 'Update Available Notifications'
+
+    trigger:
+      platform: state
+      entity_id: updater.updater
+
+    action:
+      service: notify.pushbullet
+      data:
+        message: "Update for Home Assistant is available."
+
+  # Set HA theme on startup
+  - alias: 'Set theme at startup'
+    initial_state: 'on'
+    trigger:
+     - platform: homeassistant
+       event: start
+    action:
+      service: frontend.set_theme
+      data:
+        name: dark
+
+  # Espresso Notify
+  - alias: Espresso Notify
+
+    trigger:
+      platform: state
+      entity_id: switch.kitchen_outlet_switch
+      to: 'on'
+      for:
+        minutes: 30
+
+    action:
+      service: notify.pushbullet
+      data:
+        message: "Espresso machine is warmed up"
+
+  # Sceduled Roobma!!
+  - alias: Roomba On Weekdays
+
+    trigger:
+      - platform: time
+        at: '10:00:00'
+
+    condition:
+      - condition: time
+        weekday:
+          - mon
+          - tue
+          - wed
+          - thu
+          - fri
+
+    action:
+      - service: script.roomba_on
+
+
+#################################################################
+## Media Automation
+#################################################################
+
+  # Turn on Nad and change input when Gir is active
+  - alias: nad on with gir
+
+    trigger:
+      - platform: state
+        entity_id: media_player.gir
+        from: 'off'
+        to: 'paused'
+      - platform: state
+        entity_id: media_player.gir
+        from: 'off'
+        to: 'idle'
+
+    action:
+      - service: homeassistant.turn_on
+        entity_id: switch.nad_power
+      - service: homeassistant.turn_on
+        entity_id: switch.nad_ccinput
+
+  # Turn off Gir when NAD powered off
+  - alias: gir off with nad
+
+    trigger:
+      - platform: state
+        entity_id: switch.nad_power
+        to: 'off'
+
+    condition:
+      - condition: template
+        value_template: "{{ not is_state('media_player.gir', 'off') }}"
+
+    action:
+      - service: homeassistant.turn_off
+        entity_id: media_player.gir
+
+
+  # Turn off Plankton when Vizio powered off
+  - alias: plankton off with vizio
+
+    trigger:
+      - platform: state
+        entity_id: switch.vizio_tv_power
+        to: 'off'
+
+    condition:
+      - condition: template
+        value_template: "{{ not is_state('media_player.plankton', 'off') }}"
+
+    action:
+      - service: homeassistant.turn_off
+        entity_id: media_player.plankton
+
+  ##### Media Player Visibilty ######
+  # Plankton Visable
+  - alias: plankton visable true
+
+    trigger:
+      platform: template
+      value_template: "{{ not is_state('media_player.plankton', 'off') }}"
+
+    action:
+      service: group.set_visibility
+      entity_id: group.plankton_main
+      data:
+        visible: True
+
+  - alias: plankton visable false
+
+    trigger:
+      - platform: homeassistant
+        event: start
+      - platform: state
+        entity_id: media_player.plankton
+        to: 'off'
+
+    action:
+      service: group.set_visibility
+      entity_id: group.plankton_main
+      data:
+        visible: False
+
+  # Gir Visable
+  - alias: gir visable true
+
+    trigger:
+      platform: template
+      value_template: "{{ not is_state('media_player.gir', 'off') }}"
+
+    action:
+      service: group.set_visibility
+      entity_id: group.gir_main
+      data:
+        visible: True
+
+  - alias: gir visable false
+
+    trigger:
+      - platform: homeassistant
+        event: start
+      - platform: state
+        entity_id: media_player.gir
+        to: 'off'
+
+    action:
+      service: group.set_visibility
+      entity_id: group.gir_main
+      data:
+        visible: False
+
+  # Kermit Visable
+  - alias: kermit visable true
+
+    trigger:
+      platform: template
+      value_template: "{{ not is_state('media_player.kermit', 'off') }}"
+
+    action:
+      service: group.set_visibility
+      entity_id: group.kermit_main
+      data:
+        visible: True
+
+  - alias: kermit visable false
+
+    trigger:
+      - platform: homeassistant
+        event: start
+      - platform: state
+        entity_id: media_player.kermit
+        to: 'off'
+
+    action:
+      service: group.set_visibility
+      entity_id: group.kermit_main
+      data:
+        visible: False
+
+  # Johnny_2x4 Visable
+  - alias: johnny_2x4 visable true
+
+    trigger:
+      platform: template
+      value_template: "{{ not is_state('media_player.johnny_2x4', 'off') }}"
+
+    action:
+      service: group.set_visibility
+      entity_id: group.johnny_2x4_main
+      data:
+        visible: True
+
+  - alias: johnny_2x4 visable false
+
+    trigger:
+      - platform: homeassistant
+        event: start
+      - platform: state
+        entity_id: media_player.johnny_2x4
+        to: 'off'
+
+    action:
+      service: group.set_visibility
+      entity_id: group.johnny_2x4_main
+      data:
+        visible: False

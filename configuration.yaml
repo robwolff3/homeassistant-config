@@ -1,0 +1,208 @@
+
+#################################################################
+## Home Assistant
+#################################################################
+
+homeassistant:
+  name: Home
+  latitude: REDACTED
+  longitude: REDACTED
+  elevation: 250
+  unit_system: imperial
+  time_zone: REDACTED
+  customize: !include haconfig/customize.yaml
+  packages: !include_dir_named haconfig/packages/
+
+group: !include haconfig/groups.yaml
+
+frontend:
+  javascript_version: es5
+  extra_html_url:
+    - /local/custom_ui/state-card-custom-ui.html
+    - /local/custom_ui/state-card-tiles.html
+  extra_html_url_es5:
+    - /local/custom_ui/state-card-custom-ui-es5.html
+    - /local/custom_ui/state-card-tiles.html
+  themes:
+    dark:
+      primary-color: '#36454f'
+
+config:
+
+http:
+  server_port: REDACTED
+  api_password: REDACTED
+  base_url: REDACTED
+  trusted_networks:
+    - REDACTED
+  ip_ban_enabled: true
+  login_attempts_threshold: 5
+
+updater:
+  reporting: False
+
+discovery:
+  ignore:
+    - google_cast
+    - plex_mediaserver
+
+history:
+  include:
+    domains:
+      - alarm_control_panel
+      - binary_sensor
+      - device_tracker
+      - input_boolean
+      - light
+      - media_player
+      - switch
+logbook:
+  include:
+    domains:
+      - alarm_control_panel
+      - binary_sensor
+      - device_tracker
+      - input_boolean
+      - light
+      - media_player
+      - switch
+recorder:
+  purge_interval: 1
+  purge_keep_days: 7
+
+  include:
+    domains:
+      - alarm_control_panel
+      - binary_sensor
+      - device_tracker
+      - input_boolean
+      - light
+      - media_player
+      - switch
+
+#################################################################
+## Components
+#################################################################
+
+customizer:
+  hide_attributes:
+    - node_id
+    - value_index
+    - value_instance
+    - value_id
+    - old_entity_id
+    - new_entity_id
+    - google_assistant
+    - google_assistant_name
+
+ios:
+
+zone:
+  name: Home
+  latitude: REDACTED
+  longitude: REDACTED
+  radius: 200
+  icon: mdi:account-multiple
+
+light:
+  - platform: hue
+    host: REDACTED.240
+    allow_unreachable: true
+    allow_hue_groups: true
+
+#nest:
+#  client_id: REDACTED
+#  client_secret: REDACTED
+
+twilio:
+  account_sid: REDACTED
+  auth_token: REDACTED
+
+notify:
+  - name: pushbullet
+    platform: pushbullet
+    api_key: REDACTED
+  - name: twilio_call
+    platform: twilio_call
+    from_number: REDACTED
+
+device_tracker:
+  - platform: asuswrt
+    host: REDACTED.250
+    username: REDACTED
+    password: REDACTED
+    protocol: ssh
+    port: REDACTED
+    mode: ap
+    interval_seconds: 12
+    new_device_defaults:
+      track_new_devices: False
+  - platform: asuswrt
+    host: REDACTED.236
+    username: REDACTED
+    password: REDACTED
+    protocol: ssh
+    port: REDACTED
+    mode: ap
+    interval_seconds: 12
+    new_device_defaults:
+      track_new_devices: False
+
+google_assistant:
+  expose_by_default: false
+  project_id: REDACTED
+  client_id: REDACTED
+  access_token: REDACTED
+  api_key: REDACTED
+  agent_user_id: REDACTED
+
+ifttt:
+  key: REDACTED
+
+media_player:
+  - platform: cast
+    host: REDACTED.230 #Plankton
+  - platform: cast
+    host: REDACTED.231 #Gir
+  - platform: cast
+    host: REDACTED.232 #Jonny 2x4
+  - platform: cast
+    host: REDACTED.233 #Kermit
+  - platform: cast
+    host: REDACTED.229 #Muffin Stuffin
+
+camera:
+  - platform: ffmpeg
+    name: Frontdoor
+    input: rtsp://REDACTED@REDACTED.252:554/Streaming/Channels/2
+    extra_arguments: -vf scale=640:360
+  - platform: ffmpeg
+    name: Backdoor
+    input: rtsp://REDACTED@REDACTED.251:554/Streaming/Channels/2
+    extra_arguments: -vf scale=640:360
+  - platform: generic
+    still_image_url: https://icons.wxug.com/data/weather-maps/radar/united-states/cadillac-michigan-region-current-radar-animation.gif
+    name: Midwest Radar
+
+zwave:
+  usb_path: "/dev/ttyACM0"
+  polling_interval: 10000
+  device_config:
+    light.livingroom_light_level:
+      polling_intensity: 1
+      delay: 3
+    light.kitchen_light_level:
+      polling_intensity: 1
+      delay: 3
+    light.diningroom_light_level:
+      polling_intensity: 1
+      delay: 3
+    light.bedroom_light_level:
+      polling_intensity: 1
+      delay: 3
+    light.bathroom_light_level:
+      polling_intensity: 1
+      delay: 3
+    light.hallway_light_level:
+      polling_intensity: 1
+      delay: 3

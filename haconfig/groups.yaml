@@ -1,0 +1,57 @@
+
+#################################################################
+## Groups
+#################################################################
+
+## Default View
+  default_view:
+    view: yes
+    name: Home
+    entities:
+      - group.lights
+#      - group.climetecontrol
+      - group.devices
+      - group.vizio_remote
+      - group.nad_remote
+      - group.plankton_main
+      - group.gir_main
+      - group.kermit_main
+      - group.johnny_2x4_main
+      - group.weather
+      - camera.midwest_radar
+
+## Security
+  security:
+    name: Security
+    view: yes
+    entities:
+      - group.alarmcontrol
+      - group.sensorsinfo
+      - group.presence_detection
+      - camera.frontdoor
+      - camera.backdoor
+
+## Override
+  override:
+    name: Override
+    view: yes
+    entities:
+      - group.overridechild
+      - group.alarmclock
+      - media_player.plankton
+      - media_player.gir
+      - media_player.kermit
+      - media_player.johnny_2x4
+      - media_player.muffin_stuffin
+
+  overridechild:
+    name: Override
+    control: hidden
+    entities:
+      - automation.motion_bathroom_lights_on_20min
+      - automation.motion_hallway_lights_on_15min
+      - automation.dark_arrive_home_lights
+      - automation.no_freeze_bathroom_heater
+      - automation.roomba_on_weekdays
+      - switch.bedroom_outlet_switch_2
+      - switch.livingroom_outlet_switch_2

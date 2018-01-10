@@ -1,0 +1,232 @@
+
+#################################################################
+## Groups
+#################################################################
+
+group:
+  lights:
+    name: Lights
+    control: hidden
+    entities:
+      - light.livingroom_light_level
+      - light.kitchen_light_level
+      - light.diningroom_light_level
+      - light.bedroom_light_level
+      - light.bathroom_light_level
+      - light.hallway_light_level
+      - group.nightstands
+      - script.light_remote
+
+  nightstands:
+    name: Nightstands
+    entities:
+      - light.nightstand1 
+      - light.nightstand2
+
+
+#################################################################
+## Automations
+#################################################################
+
+automation:
+  # Bathroom lights on with motion
+  - alias: Motion Bathroom Lights On 20min
+
+    trigger:
+      platform: state
+      entity_id: binary_sensor.bathroom_motion_sensor
+      to: 'on'
+
+    condition:
+      condition: state
+      entity_id: light.bathroom_light_level
+      state: 'off'
+
+    action:
+      service: homeassistant.turn_on
+      entity_id: light.bathroom_light_level
+      data_template:
+        brightness: >
+          {%- if now().strftime('%H')| int >= 23 %}
+            40
+          {%- elif now().strftime('%H')| int < 7 %}
+            40
+          {%- elif now().strftime('%H')| int >= 7 %}
+            253
+          {%- endif %}
+
+  - alias: Bathroom Lights Off After 20min
+
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.bathroom_motion_sensor
+        to: 'off'
+        for:
+          minutes: 21
+
+    action:
+      service: homeassistant.turn_off
+      entity_id: light.bathroom_light_level
+
+
+  # Hallway lights on from motion or door
+  - alias: Motion Hallway Lights On 15min
+
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.hallway_motion1_sensor, binary_sensor.hallway_motion2_sensor
+        to: 'on'
+      - platform: state
+        entity_id: sensor.backdoor_contact
+        to: 'open'
+
+    condition:
+      condition: state
+      entity_id: light.hallway_light_level
+      state: 'off'
+      for:
+        minutes: 1
+
+    action:
+      service: homeassistant.turn_on
+      entity_id: light.hallway_light_level
+      data:
+        brightness: 150
+
+  - alias: Hallway Lights Off After 15min
+
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.hallway_motion1_sensor, binary_sensor.hallway_motion2_sensor
+        to: 'off'
+        for:
+          minutes: 11
+
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: sensor.backdoor_contact
+          state: 'closed'
+        - condition: state
+          entity_id: binary_sensor.hallway_motion1_sensor
+          state: 'off'
+        - condition: state
+          entity_id: binary_sensor.hallway_motion2_sensor
+          state: 'off'
+
+    action:
+      service: homeassistant.turn_off
+      entity_id: light.hallway_light_level
+
+
+  # Dark arrive home lights
+  - alias: Dark Arrive Home Lights
+
+    trigger:
+      platform: state
+      entity_id: sensor.backdoor_contact
+      to: 'open'
+
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: binary_sensor.hallway_motion1_sensor
+          state: 'off'
+        - condition: state
+          entity_id: light.livingroom_light_level
+          state: 'off'
+        - condition: state
+          entity_id: light.kitchen_light_level
+          state: 'off'
+        - condition: state
+          entity_id: light.diningroom_light_level
+          state: 'off'
+        ## Add condition for after sunset and before sunrise
+
+    action:
+      - service: homeassistant.turn_on
+        entity_id: light.kitchen_light_level
+        data:
+          brightness: 200
+      - service: homeassistant.turn_on
+        entity_id: light.diningroom_light_level
+        data:
+          brightness: 120
+      - service: homeassistant.turn_on
+        entity_id: light.nightstand1
+        data:
+          brightness: 120
+      - service: homeassistant.turn_on
+        entity_id: light.nightstand2
+        data:
+          brightness: 120
+
+
+#################################################################
+## Scripts
+#################################################################
+
+script:
+  scene_everything_off:
+    sequence:
+      - service: homeassistant.turn_on
+        entity_id: scene.everything_off
+  scene_nighttime:
+    sequence:
+      - service: homeassistant.turn_on
+        entity_id: scene.nighttime
+  scene_doglights:
+    sequence:
+      - service: homeassistant.turn_on
+        entity_id: scene.doglights
+
+
+#################################################################
+## Scenes
+#################################################################
+
+scene:
+  - name: everything_off
+    entities:
+      light.livingroom_light_level: off
+      light.kitchen_light_level: off
+      light.diningroom_light_level: off
+      light.bedroom_light_level: off
+      light.nightstand1: off
+      light.nightstand2: off
+      light.hallway_light_level: off
+      switch.vizio_tv_power: off
+      switch.nad_power: off
+      media_player.kermit: off
+      switch.bedroom_outlet_switch_3: off
+
+  - name: nighttime
+    entities:
+      switch.bedroom_outlet_switch_3: on
+      light.nightstand1:
+        state: on
+        brightness: 130
+      light.nightstand2:
+        state: on
+        brightness: 130
+      light.livingroom_light_level: off
+      light.kitchen_light_level: off
+      light.diningroom_light_level: off
+      light.bedroom_light_level: off
+      switch.vizio_tv_power: off
+      switch.nad_power: off
+
+  - name: doglights
+    entities:
+      light.kitchen_light_level:
+        state: on
+        brightness: 150
+      light.nightstand1: off
+      light.nightstand2: off
+      light.bedroom_light_level: off
+      light.livingroom_light_level: off
+      light.diningroom_light_level: off
+      switch.bedroom_outlet_switch_3: off
+      media_player.kermit: off

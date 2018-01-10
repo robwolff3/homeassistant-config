@@ -1,0 +1,155 @@
+#################################################
+## Customize
+##################################################
+
+homeassistant:
+  customize:
+
+    script.devices:
+      custom_ui_state_card: state-card-tiles
+      config:
+        columns: 3
+        row_height: 50px
+        column_width: 62px
+        gap: 15px
+        color: '#555B65'
+        color_on: '#D5D619'
+        color_off: '#BBBEC2'
+        entities:
+          - entity: switch.bedroom_outlet_switch_3
+            icon: mdi:fan
+            column: 1
+            row: 1
+          - entity: switch.kitchen_outlet_switch
+            icon: mdi:coffee
+            column: 2
+            row: 
+          - entity: script.roomba_on
+            icon: mdi:roomba
+            column: 3
+            row: 1
+
+    script.vizio_remote:
+      custom_ui_state_card: state-card-tiles
+      config:
+        columns: 4
+        row_height: 50px
+        column_width: 62px
+        gap: 15px
+        color: '#555B65'
+        color_on: '#D5D619'
+        color_off: '#BBBEC2'
+        entities:
+          - entity: switch.vizio_tv_power
+            icon: mdi:monitor
+            column: 1
+            row: 1
+          - entity: script.vizio_tv_input
+            icon: mdi:video-input-component
+            column: 2
+            row: 1
+          - entity: script.vizio_tv_voldown
+            icon: mdi:volume-medium
+            column: 3
+            row: 1            
+          - entity: script.vizio_tv_volup
+            icon: mdi:volume-high
+            column: 4
+            row: 1
+
+    script.nad_remote:
+      custom_ui_state_card: state-card-tiles
+      config:
+        columns: 4
+        row_height: 50px
+        column_width: 62px
+        gap: 15px
+        color: '#555B65'
+        color_on: '#D5D619'
+        color_off: '#BBBEC2'
+        entities:
+          - entity: script.nad_poweron
+            icon: mdi:speaker
+            column: 1
+            row: 1
+          - entity: script.nad_poweroff
+            icon: mdi:speaker-off
+            column: 2
+            row: 1
+          - entity: script.nad_voldown
+            icon: mdi:volume-medium
+            column: 3
+            row: 1            
+          - entity: script.nad_volup
+            icon: mdi:volume-high
+            column: 4
+            row: 1
+          - entity: script.nad_ccinput
+            icon: mdi:cast
+            column: 1
+            row: 2      
+          - entity: script.castnprgir
+            icon: mdi:radio
+            column: 2
+            row: 2
+
+    script.light_remote:
+      custom_ui_state_card: state-card-tiles
+      config:
+        columns: 4
+        row_height: 50px
+        column_width: 62px
+        gap: 15px
+        color: '#555B65'
+        color_on: '#D5D619'
+        color_off: '#BBBEC2'
+        entities:
+          - entity: script.scene_nighttime
+            icon: mdi:hotel
+            column: 1
+            row: 1
+          - entity: script.scene_doglights
+            icon: mdi:paw
+            column: 2
+            row: 1
+          - entity: script.scene_everything_off
+            icon: mdi:flash-off
+            column: 3
+            row: 1
+
+
+##################################################
+## Groups
+##################################################
+
+group:
+  devices:
+    name: Things
+    entities:
+      - script.devices
+  vizio_remote:
+    name: TV
+    entities:
+      - script.vizio_remote
+  nad_remote:
+    name: NAD
+    entities:
+      - script.nad_remote
+  light_remote:
+    name: Lights
+    entities:
+      - script.light_remote
+
+##################################################
+## Scripts
+##################################################
+            
+script:
+  devices:
+    sequence:
+  vizio_remote:
+    sequence:
+  nad_remote:
+    sequence:
+  light_remote:
+    sequence:

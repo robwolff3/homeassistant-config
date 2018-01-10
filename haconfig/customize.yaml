@@ -1,0 +1,213 @@
+
+#################################################################
+## Customize
+#################################################################
+## Lights
+##########
+
+    light.livingroom_light_level:
+      google_assistant: true
+      google_assistant_name: Living Room Lights
+      friendly_name: Living Room
+      icon: mdi:sofa
+      custom_ui_state_card: state-card-custom-ui
+      state_card_mode: break-slider-toggle
+      stretch_slider: true
+      slider_theme:
+       min: 0
+       max: 255
+       pin: true
+       off_when_min: true
+       report_when_not_changed: false
+    light.kitchen_light_level:
+      google_assistant: true
+      google_assistant_name: Kitchen Lights
+      friendly_name: Kitchen
+      icon: mdi:fridge
+      custom_ui_state_card: state-card-custom-ui
+      state_card_mode: break-slider-toggle
+      stretch_slider: true
+      slider_theme:
+       min: 0
+       max: 255
+       pin: true
+       off_when_min: true
+       report_when_not_changed: false
+    light.diningroom_light_level:
+      google_assistant: true
+      google_assistant_name: Dining Room Lights
+      friendly_name: Dining Room
+      icon: mdi:silverware-variant
+      custom_ui_state_card: state-card-custom-ui
+      state_card_mode: break-slider-toggle
+      stretch_slider: true
+      slider_theme:
+       min: 0
+       max: 255
+       pin: true
+       off_when_min: true
+       report_when_not_changed: false
+    light.bedroom_light_level:
+      google_assistant: true
+      google_assistant_name: Bedroom Lights
+      friendly_name: Bedroom
+      icon: mdi:hotel
+      custom_ui_state_card: state-card-custom-ui
+      state_card_mode: break-slider-toggle
+      stretch_slider: true
+      slider_theme:
+       min: 0
+       max: 255
+       pin: true
+       off_when_min: true
+       report_when_not_changed: false
+    light.bathroom_light_level:
+      google_assistant: true
+      google_assistant_name: Bathroom Lights
+      friendly_name: Bathroom
+      icon: mdi:water-pump
+      custom_ui_state_card: state-card-custom-ui
+      state_card_mode: break-slider-toggle
+      stretch_slider: true
+      slider_theme:
+       min: 0
+       max: 255
+       pin: true
+       off_when_min: true
+       report_when_not_changed: false
+    light.hallway_light_level:
+      google_assistant: true
+      google_assistant_name: Hallway Lights
+      friendly_name: Hallway
+      icon: mdi:ceiling-light
+      custom_ui_state_card: state-card-custom-ui
+      state_card_mode: break-slider-toggle
+      stretch_slider: true
+      slider_theme:
+       min: 0
+       max: 255
+       pin: true
+       off_when_min: true
+       report_when_not_changed: false
+
+    group.nightstands:
+      google_assistant: true
+      google_assistant_type: group
+      friendly_name: Nightstands
+      aliases:
+        - Nightstand Lights
+      icon: mdi:lamp
+    light.nightstand1:
+      google_assistant: true
+      friendly_name: USER1's Nightstand
+      icon: mdi:lamp
+      custom_ui_state_card: state-card-custom-ui
+      state_card_mode: break-slider
+      stretch_slider: true
+      slider_theme:
+       min: 0
+       max: 255
+       pin: true
+       off_when_min: true
+    light.nightstand2:
+      google_assistant: true
+      friendly_name: USER2's Nightstand
+      icon: mdi:lamp
+      custom_ui_state_card: state-card-custom-ui
+      state_card_mode: break-slider
+      stretch_slider: true
+      slider_theme:
+       min: 0
+       max: 255
+       pin: true
+       off_when_min: true
+
+###########
+## Security
+###########
+
+    alarm_control_panel.main:
+      friendly_name: Status
+      icon: mdi:shield
+
+    device_tracker.USER2_iphone:
+      friendly_name: USER2
+    device_tracker.USER1_pixel:
+      friendly_name: USER1
+    device_tracker.USER3_pixel:
+      friendly_name: USER3
+    device_tracker.USER4_galaxy:
+      friendly_name: USER4
+
+    binary_sensor.bathroom_motion_sensor:
+      friendly_name: Bathroom Motion
+      icon: mdi:run
+    binary_sensor.hallway_motion1_sensor:
+      friendly_name: Hallway 1 Motion
+      icon: mdi:run
+    binary_sensor.hallway_motion2_sensor:
+      friendly_name: Hallway 2 Motion
+      icon: mdi:run
+    binary_sensor.uplivingroom_motion_sensor:
+      friendly_name: Up Livingroom Motion
+      icon: mdi:run
+    binary_sensor.upoffice_motion_sensor:
+      friendly_name: Up Office Motion
+      icon: mdi:run
+    sensor.frontdoor_contact:
+      device_class: opening
+      icon: mdi:door
+    sensor.sidedoor_contact:
+      device_class: opening
+      icon: mdi:door
+    sensor.backdoor_contact:
+      device_class: opening
+      icon: mdi:door
+
+    camera.frontdoor:
+      friendly_name: Frontdoor Camera
+    camera.backdoor:
+      friendly_name: Backdoor Camera
+
+##############
+## Media Other
+##############
+
+    switch.vizio_tv_power:
+      google_assistant: true
+      friendly_name: TV
+    switch.nad_power:
+      google_assistant: true
+      friendly_name: Amplifier
+      aliases:
+        - Stereo
+        - NAD
+
+    switch.bedroom_outlet_switch_3:
+      google_assistant: true
+      google_assistant_type: fan
+      friendly_name: Fan
+      aliases:
+        - Bedroom Fan
+    switch.kitchen_outlet_switch:
+      google_assistant: true
+      friendly_name: Espresso Machine
+      aliases:
+        - Coffee Machine
+
+    switch.bedroom_outlet_switch_2:
+      friendly_name: Bedroom Outlet Left
+    switch.livingroom_outlet_switch_2:
+      friendly_name: Bathroom Outlet Left
+
+#    climate.dining_room:
+#      friendly_name: Nest
+
+    media_player.plankton:
+      friendly_name: Plankton - Chromecast Ultra
+    media_player.gir:
+      friendly_name: Gir - Chromecast Audio
+    media_player.kermit:
+      friendly_name: Kermit - Vizio Speaker
+    media_player.johnny_2x4:
+      friendly_name: Johnny 2x4 - Google Home

@@ -1,0 +1,425 @@
+
+#################################################################
+## Groups
+#################################################################
+
+group:
+
+  presence_detection:
+    name: Presence Detection
+    entities:
+      - device_tracker.USER2_iphone
+      - device_tracker.USER1_pixel
+      - device_tracker.USER3_pixel
+      - device_tracker.USER4_galaxy
+
+  sensorsinfo:
+    name: Sensors
+    entities:
+      - sensor.frontdoor_contact
+      - sensor.sidedoor_contact
+      - sensor.backdoor_contact
+      - binary_sensor.uplivingroom_motion_sensor
+      - binary_sensor.upoffice_motion_sensor
+      - binary_sensor.hallway_motion1_sensor
+      - binary_sensor.hallway_motion2_sensor
+      - binary_sensor.bathroom_motion_sensor
+
+  alarmcontrol:
+    name: Alarm Control
+    control: hidden
+    entities:
+      - alarm_control_panel.main
+      - input_boolean.enable_alarm_system
+      - input_boolean.enable_armed_home
+      - input_boolean.enable_armed_away
+      - input_boolean.manual_armed_home
+      - input_boolean.manual_armed_away
+
+#################################################################
+## Sensors
+#################################################################
+
+sensor: 
+#Sensative Strips BS
+  - platform: template
+    sensors:
+      frontdoor_contact:
+        friendly_name: Frontdoor Contact
+        value_template: >-
+          {% if is_state("sensor.frontdoor_contact_access_control", "22") %}
+          open
+          {% else %}
+          closed
+          {% endif %}
+  - platform: template
+    sensors:
+      sidedoor_contact:
+        friendly_name: Sidedoor Contact
+        value_template: >-
+          {% if is_state("sensor.sidedoor_contact_access_control", "22") %}
+          open
+          {% else %}
+          closed
+          {% endif %}
+  - platform: template
+    sensors:
+      backdoor_contact:
+        friendly_name: Backdoor Contact
+        value_template: >-
+          {% if is_state("sensor.backdoor_contact_access_control", "22") %}
+          open
+          {% else %}
+          closed
+          {% endif %}
+
+#################################################################
+#################################################################
+## Alarm Control Panel
+#################################################################
+#################################################################
+
+alarm_control_panel:
+  platform: manual
+  name: Main
+  pending_time: 0
+  trigger_time: 99999999
+
+#################################################################
+## Automations
+#################################################################
+automation:
+
+# Auto set status for Armed Home
+  - alias: Auto Status - Armed Home
+
+    trigger:
+      - platform: time
+        at: '00:00:01'
+
+    condition:
+      condition: and
+      conditions:
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: device_tracker.USER2_iphone
+              state: 'home'
+            - condition: state
+              entity_id: device_tracker.USER1_pixel
+              state: 'home'
+            - condition: state
+              entity_id: device_tracker.USER3_pixel
+              state: 'home'
+            - condition: state
+              entity_id: device_tracker.USER4_galaxy
+              state: 'home'
+        - condition: state
+          entity_id: alarm_control_panel.main
+          state: disarmed
+        - condition: state
+          entity_id: input_boolean.enable_alarm_system
+          state: 'on'
+        - condition: state
+          entity_id: input_boolean.enable_armed_home
+          state: 'on'
+
+    action:
+      service: alarm_control_panel.alarm_arm_home
+      entity_id: alarm_control_panel.main
+
+# Manual set status for Armed Home
+  - alias: Manual Status - Armed Home
+
+    trigger:
+      - platform: state
+        entity_id: input_boolean.manual_armed_home
+        from: 'off'
+        to: 'on'
+
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.enable_alarm_system
+          state: 'on'
+        - condition: state
+          entity_id: input_boolean.enable_armed_home
+          state: 'on'
+
+    action:
+      - service: alarm_control_panel.alarm_arm_home
+        entity_id: alarm_control_panel.main
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.manual_armed_home
+
+# Trigger for Alarm Home
+  - alias: Alarm - Armed Home
+
+    trigger:
+      - platform: state
+        entity_id: sensor.frontdoor_contact, sensor.sidedoor_contact, sensor.backdoor_contact
+        from: 'closed'
+        to: 'open'
+
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.enable_alarm_system
+          state: 'on'
+        - condition: state
+          entity_id: input_boolean.enable_armed_home
+          state: 'on'
+        - condition: state
+          entity_id: alarm_control_panel.main
+          state: armed_home
+
+    action:
+      service: alarm_control_panel.alarm_trigger
+      entity_id: alarm_control_panel.main
+
+
+# Auto rearm for Armed Home (when someone comes home)
+  - alias: Auto Status - Rearm Home
+
+    trigger:
+      - platform: state
+        entity_id: device_tracker.USER2_iphone, device_tracker.USER1_pixel, device_tracker.USER3_pixel, device_tracker.USER4_galaxy
+        from: 'not_home'
+        to: 'home'
+
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: alarm_control_panel.main
+          state: armed_home
+        - condition: state
+          entity_id: input_boolean.enable_alarm_system
+          state: 'on'
+        - condition: state
+          entity_id: input_boolean.enable_armed_home
+          state: 'on'
+
+    action:
+      - service: alarm_control_panel.alarm_disarm
+        entity_id: alarm_control_panel.main
+      - delay: '00:10:00'
+      - service: alarm_control_panel.alarm_arm_home
+        entity_id: alarm_control_panel.main
+
+# Auto Disarm for Armed Home
+  - alias: Auto Status - Disarm Home
+
+    trigger:
+      - platform: time
+        at: '06:00:00'
+
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: alarm_control_panel.main
+          state: armed_home
+        - condition: state
+          entity_id: input_boolean.enable_alarm_system
+          state: 'on'
+        - condition: state
+          entity_id: input_boolean.enable_armed_home
+          state: 'on'
+
+    action:
+      - service: alarm_control_panel.alarm_disarm
+        entity_id: alarm_control_panel.main
+
+
+# Auto set status for Armed Away
+  - alias: Auto Status - Armed Away
+
+    trigger:
+      - platform: state
+        entity_id: device_tracker.USER2_iphone, device_tracker.USER1_pixel, device_tracker.USER3_pixel, device_tracker.USER4_galaxy
+        from: 'home'
+        to: 'not_home'
+
+    condition:
+      condition: and
+      conditions:
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: alarm_control_panel.main
+              state: disarmed
+            - condition: state
+              entity_id: alarm_control_panel.main
+              state: armed_home
+        - condition: state
+          entity_id: device_tracker.USER2_iphone
+          state: 'not_home'
+        - condition: state
+          entity_id: device_tracker.USER1_pixel
+          state: 'not_home'
+        - condition: state
+          entity_id: device_tracker.USER3_pixel
+          state: 'not_home'
+        - condition: state
+          entity_id: device_tracker.USER4_galaxy
+          state: 'not_home'
+        - condition: state
+          entity_id: input_boolean.enable_alarm_system
+          state: 'on'
+        - condition: state
+          entity_id: input_boolean.enable_armed_away
+          state: 'on'
+
+    action:
+      service: alarm_control_panel.alarm_arm_away
+      entity_id: alarm_control_panel.main
+
+# Manual set status for Armed Away
+  - alias: Manual Status - Armed Away
+
+    trigger:
+      - platform: state
+        entity_id: input_boolean.manual_armed_away
+        from: 'off'
+        to: 'on'
+
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.enable_alarm_system
+          state: 'on'
+        - condition: state
+          entity_id: input_boolean.enable_armed_away
+          state: 'on'
+
+    action:
+      - service: alarm_control_panel.alarm_arm_away
+        entity_id: alarm_control_panel.main
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.manual_armed_away
+
+# Trigger for Alarm Away
+  - alias: Alarm - Armed Away
+
+    trigger:
+      - platform: state
+        entity_id: sensor.frontdoor_contact, sensor.sidedoor_contact, sensor.backdoor_contact
+        from: 'closed'
+        to: 'open'
+      - platform: state
+        entity_id: binary_sensor.hallway_motion1_sensor, binary_sensor.hallway_motion2_sensor, binary_sensor.uplivingroom_motion_sensor, binary_sensor.upoffice_motion_sensor
+        from: 'off'
+        to: 'on'
+
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.enable_alarm_system
+          state: 'on'
+        - condition: state
+          entity_id: input_boolean.enable_armed_away
+          state: 'on'
+        - condition: state
+          entity_id: alarm_control_panel.main
+          state: armed_away
+
+    action:
+      service: alarm_control_panel.alarm_trigger
+      entity_id: alarm_control_panel.main
+ 
+
+# Auto disarm for Armed Away
+  - alias: Auto Status - Disarmed Away
+
+    trigger:
+      - platform: state
+        entity_id: device_tracker.USER2_iphone, device_tracker.USER1_pixel, device_tracker.USER3_pixel, device_tracker.USER4_galaxy
+        from: 'not_home'
+        to: 'home'
+
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.enable_alarm_system
+          state: 'on'
+        - condition: state
+          entity_id: input_boolean.enable_armed_away
+          state: 'on'
+        - condition: state
+          entity_id: alarm_control_panel.main
+          state: armed_away
+
+    action:
+      - service: alarm_control_panel.alarm_disarm
+        entity_id: alarm_control_panel.main
+
+
+# Disable and reset alarm
+  - alias: Disable Alarm System
+
+    trigger:
+      - platform: state
+        entity_id: input_boolean.enable_alarm_system
+        from: 'on'
+        to: 'off'
+
+    action:
+      - service: alarm_control_panel.alarm_disarm
+        entity_id: alarm_control_panel.main
+
+
+# Notification
+  - alias: Notify when alarm is triggered
+
+    trigger:
+      - platform: state
+        entity_id: alarm_control_panel.main
+        from: 'armed_home'
+        to: 'triggered'
+      - platform: state
+        entity_id: alarm_control_panel.main
+        from: 'armed_away'
+        to: 'triggered'
+
+    action:
+      - service: notify.pushbullet
+        data:
+          message: "ALARM! Your HomeAssistant security alarm has been triggered."
+      - service: notify.twilio_call
+        data:
+          message: "Your home assistant security alarm has been triggered."
+          target: REDACTED
+
+##################################################
+## Inputs
+##################################################
+
+input_boolean:
+  enable_alarm_system:
+    name: Alarm System Enabled
+    initial: on
+    icon: mdi:toggle-switch
+  enable_armed_home:
+    name: Home Armed Active
+    initial: on
+    icon: mdi:bell-ring
+  enable_armed_away:
+    name: Away Armed Active
+    initial: on
+    icon: mdi:bell-ring
+  manual_armed_home:
+    name: Manual Armed Home
+    initial: off
+    icon: mdi:play
+  manual_armed_away:
+    name: Manual Armed Away
+    initial: off
+    icon: mdi:play
