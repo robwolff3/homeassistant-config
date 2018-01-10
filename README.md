@@ -26,7 +26,7 @@ Here is my home automation project Ive been improving since mid 2017. At that ti
 * I would like to be able to click button start casting a Spotify playlist from HA. Spotify currently doesn't support this functionality due to a cast device discovery limitation, so I do a voice command through Google Assistant instead.
 * I'd like to use a power consumption meter Z-Wave outlet to assume states of devices. Being able to monitor the power draw of a device allows you to be able to identify power usage patterns that allow you to assume device state. Considering this for non smart devices: Roomba dock, dishwasher, laundry washer & dryer, etc.
 * Getting a Wifi enabled robot vacuum for native compatibility.
-* When I own a residence I would like to monitor, operate, and use sensors from deadbolts/doors, smart doorbell, exterior lights, garage door opener, etc from HA.
+* When I own a residence I would like to monitor, operate, and use sensors from smarr deadbolts/doors handles, smart smoke carbon monoxide detector, smart doorbell, exterior lights, garage door opener, etc from HA.
 * Getting rid of Hue things in favor of full Z-Wave consistency. I've gone all in on Z-Wave.
 
 ## Devices
