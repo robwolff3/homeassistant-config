@@ -65,5 +65,5 @@ Here is my home automation project Ive been improving since mid 2017. At that ti
 ![UI](images/ha_home.jpg)
 ![UI](images/ha_security.jpg)
 ![UI](images/ha_override.jpg)
-![UI](images/ha_mhome.png =700x)
-![UI](images/ha_msecurity.png =700x)
+<img src="images/ha_mhome.png" width="700">
+<img src="images/ha_msecurity.png" width="700">
