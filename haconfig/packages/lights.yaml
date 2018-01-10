@@ -230,3 +230,4 @@ scene:
       light.diningroom_light_level: off
       switch.bedroom_outlet_switch_3: off
       media_player.kermit: off
+      switch.nad_power: off
