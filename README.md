@@ -20,13 +20,13 @@ Here is my home automation project Ive been improving since mid 2017. At that ti
 * Remote custom icon layout - This is how I front end my media and other devices with buttons instead of the horizontal switch layout. I wanted this functionality for a while as it was the last thing holding my UI back from looking right for media remotes. Big thanks to [eddi89](https://community.home-assistant.io/u/eddi89) and [mviezzer](https://community.home-assistant.io/u/mviezzer/summary)! [state-card-tiles](https://github.com/maattdiy/home-assistant-config)
 * Roomba 650 IR control - My Roomba doesn't have Wifi so I use my IR blaster to automate a schedule and start it (future consideration below). [Originated here](https://community.home-assistant.io/t/irobot-roomba/6288/9) on the community forum from [davejcameron](https://community.home-assistant.io/u/davejcameron), thanks!
 * Vizio TV API - There is a native component for Vizio TVs, but I had issues with it early on and switched to shell commands. I found it to be more stable, and I haven't tried to switch back. [Can be found here](https://community.home-assistant.io/t/vizio-smartcast/14987) on the community forum, thanks [exiva](https://github.com/exiva)!
-* [geekofweek](https://github.com/geekofweek/homeassistant) Repository - When I was getting started I pulled a lot of ideas and config examples from geekofweek. Many thanks to this guy!
+* [geekofweek](https://github.com/geekofweek/homeassistant) Repository - When I was getting started I pulled a lot of ideas and config examples from [geekofweek](https://community.home-assistant.io/u/geekoftheweek). Many thanks to this guy!
 
 ### Future Considerations
 * I would like to be able to click button start casting a Spotify playlist from HA. Spotify currently doesn't support this functionality due to a cast device discovery limitation, so I do a voice command through Google Assistant instead.
 * I'd like to use a power consumption meter Z-Wave outlet to assume states of devices. Being able to monitor the power draw of a device allows you to be able to identify power usage patterns that allow you to assume device state. Considering this for non smart devices: Roomba dock, dishwasher, laundry washer & dryer, etc.
 * Getting a Wifi enabled robot vacuum for native compatibility.
-* When I own a residence I would like to monitor, operate, and use sensors from deadbolts/doors and a garage door opener from HA.
+* When I own a residence I would like to monitor, operate, and use sensors from deadbolts/doors, smart doorbell, exterior lights, garage door opener, etc from HA.
 * Getting rid of Hue things in favor of full Z-Wave consistency. I've gone all in on Z-Wave.
 
 ## Devices
