@@ -1,11 +1,11 @@
 # Home Assistant
-My personal example [Home Assistant](https://home-assistant.io) configs. Version: 0.60.1
+My personal implantation of [Home Assistant](https://home-assistant.io) (version: 0.60.1)
 
-# Overview
+## Overview
 
 Here is my home automation project Ive been improving on since mid 2017. At that time I had switched from Samsung SmartThings and I could not be more happy with my decision. I take a firm minimalism approach to my layout, hence why the number of things are essential and concise. Also, some areas and ideas of improvement have been limited due to leasing my dwelling but that situation will be changing soon.
 
-### In front of Home Assistant
+### In-front of Home Assistant
 * HA is running in a Virtual Environment on Raspberry Pi 3 running Debian Stretch. I tried Hassbian and other deployment methods but wasn't satisfied with the level of control for the things I list below until I put HA on top of my own deployed OS. 
 * To connect to HA externally I use my own domain through Google Domains with a Dynamic DNS record setup on a sub domain. To solve the internal/external connecting problem I have a Host Override setup on my pfSense router that forwards my HA sub domain to the local IP address of HA when I'm on my local network.
 * To secure HA I have an Nginx reverse proxy setup on the RaspberryPi that forwards requests to HA. In my Nginx config I have a certificate setup through [Let's Encrypt](https://letsencrypt.org/)
@@ -21,21 +21,17 @@ Here is my home automation project Ive been improving on since mid 2017. At that
 * Vizio TV API - There is a native component for Vizio TVs but I had issues with it early on and switched to shell commands. [Can be found here](https://community.home-assistant.io/t/vizio-smartcast/14987)
 * [geekofweek](https://github.com/geekofweek/homeassistant) - When I was getting started I pulled ideas and config examples from this repo. Props to this guy.
 
-###  - Future considerations
+### Future Considerations
 * I would like to be able to click button start casting a Spotify playlist. Spotify currently doesn't support this functionality and do a voice command through Google Assistant.
 * Use a consumption meeter Z-Wave outlet to assume states of devices. Being able to monitor the power draw of a device you can assume its state. For non smart devices, Roomba dock, dishwasher, laundry washer & drier.
 * When I own a residence id like to monitor and operate deadbolts/doors and a garage door opener from HA.
+* Getting rid of Hue things for full Z-Wave consistency.
 
-# Devices
-
+## Devices
 * Raspberry Pi 3
 * Aeotec Z-Stick Gen5
 * Pfsense router
 * Asus Router (Set in AP mode) - 2
-
-* Hue Bridge (Deprecating)
-* Hue White A19 - 2
-* Hue Dimmer Switch
 
 ### Z-Wave Devices
 * GE Z-Wave Plus In-wall Smart Dimmer Toggle 14295 - 6
@@ -58,7 +54,12 @@ Here is my home automation project Ive been improving on since mid 2017. At that
 * Broadlink RM Mini Networked IR Blaster
 * Hikvision Cameras - 2
 
-# Interface
+### Deprecating
+* Hue Bridge
+* Hue White A19 - 2
+* Hue Dimmer Switch
+
+## Interface
 ![UI](images/ha_home.png)
 ![UI](images/ha_security.png)
 ![UI](images/ha_override.png)
