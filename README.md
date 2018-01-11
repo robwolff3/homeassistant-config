@@ -62,8 +62,8 @@ Here is my home automation project Ive been improving since mid 2017. At that ti
 * Hue Dimmer Switch
 
 ## Interface
-![UI](images/ha_home.jpg)
-![UI](images/ha_security.jpg)
-![UI](images/ha_override.jpg)
+![UI](images/ha_home.jp#1)
+![UI](images/ha_security.jpg#1)
+![UI](images/ha_override.jpg#1)
 <img src="images/ha_mhome.png" width="300">
 <img src="images/ha_msecurity.png" width="300">
