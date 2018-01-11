@@ -2,7 +2,6 @@
 #################################################################
 ## Groups
 #################################################################
-
 group:
 
   presence_detection:
@@ -39,8 +38,8 @@ group:
 #################################################################
 ## Sensors
 #################################################################
-
 sensor: 
+
 #Sensative Strips BS
   - platform: template
     sensors:
@@ -52,6 +51,7 @@ sensor:
           {% else %}
           closed
           {% endif %}
+
   - platform: template
     sensors:
       sidedoor_contact:
@@ -62,6 +62,7 @@ sensor:
           {% else %}
           closed
           {% endif %}
+
   - platform: template
     sensors:
       backdoor_contact:
@@ -401,24 +402,28 @@ automation:
 ##################################################
 ## Inputs
 ##################################################
-
 input_boolean:
+
   enable_alarm_system:
     name: Alarm System Enabled
     initial: on
     icon: mdi:toggle-switch
+
   enable_armed_home:
     name: Home Armed Active
     initial: on
     icon: mdi:bell-ring
+
   enable_armed_away:
     name: Away Armed Active
     initial: on
     icon: mdi:bell-ring
+
   manual_armed_home:
     name: Manual Armed Home
     initial: off
     icon: mdi:play
+
   manual_armed_away:
     name: Manual Armed Away
     initial: off

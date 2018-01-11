@@ -2,8 +2,8 @@
 #################################################################
 ## Groups
 #################################################################
-
 group:
+
   lights:
     name: Lights
     control: hidden
@@ -27,8 +27,8 @@ group:
 #################################################################
 ## Automations
 #################################################################
-
 automation:
+
   # Bathroom lights on with motion
   - alias: Motion Bathroom Lights On 20min
 
@@ -167,16 +167,18 @@ automation:
 #################################################################
 ## Scripts
 #################################################################
-
 script:
+
   scene_everything_off:
     sequence:
       - service: homeassistant.turn_on
         entity_id: scene.everything_off
+
   scene_nighttime:
     sequence:
       - service: homeassistant.turn_on
         entity_id: scene.nighttime
+
   scene_doglights:
     sequence:
       - service: homeassistant.turn_on
@@ -186,8 +188,8 @@ script:
 #################################################################
 ## Scenes
 #################################################################
-
 scene:
+
   - name: everything_off
     entities:
       light.livingroom_light_level: off
@@ -197,9 +199,9 @@ scene:
       light.nightstand1: off
       light.nightstand2: off
       light.hallway_light_level: off
-      switch.vizio_tv_power: off
-      switch.nad_power: off
+      media_player.viziotv: off
       media_player.kermit: off
+      switch.nad_power: off
       switch.bedroom_outlet_switch_3: off
 
   - name: nighttime
@@ -215,7 +217,7 @@ scene:
       light.kitchen_light_level: off
       light.diningroom_light_level: off
       light.bedroom_light_level: off
-      switch.vizio_tv_power: off
+      media_player.viziotv: off
       switch.nad_power: off
 
   - name: doglights

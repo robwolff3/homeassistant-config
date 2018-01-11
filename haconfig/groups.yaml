@@ -28,6 +28,7 @@
       - group.alarmcontrol
       - group.sensorsinfo
       - group.presence_detection
+      - group.deliveries
       - camera.frontdoor
       - camera.backdoor
 
@@ -38,6 +39,7 @@
     entities:
       - group.overridechild
       - group.alarmclock
+      - media_player.viziotv
       - media_player.plankton
       - media_player.gir
       - media_player.kermit

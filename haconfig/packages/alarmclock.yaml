@@ -3,8 +3,8 @@
 ##################################################
 ## Groups
 ##################################################
-
 group:
+
   alarmclock:
     name: Alarm Clock
     control: hidden
@@ -21,10 +21,12 @@ group:
 ##################################################
 
 input_boolean:
+
   alarmclock_enabled:
     name: Enabled
     initial: on
     icon: mdi:toggle-switch
+
   alarmclock_cancel:
     name: Cancel Alarmclock
     initial: off
@@ -32,6 +34,7 @@ input_boolean:
 
     
 input_number:
+
   alarmclock_hour:
     name: Hour
     icon: mdi:timer
@@ -39,6 +42,7 @@ input_number:
     min: 6
     max: 23
     step: 1
+
   alarmclock_minute:
     name: Minute
     icon: mdi:timer
@@ -51,8 +55,8 @@ input_number:
 ##################################################
 ## Sensors
 ##################################################
-
 sensor:
+
   - platform: template
     sensors:
       alarmclock_time_template:
@@ -63,8 +67,8 @@ sensor:
 ##################################################
 ## Automations
 ##################################################
-
 automation:
+
   # Main Function
   - alias: Alarm Clock
     initial_state: 'on'
@@ -128,8 +132,8 @@ automation:
 ##################################################
 ## Scripts
 ##################################################
-
 script:
+
 # Bedroom lights on over 30 minutes and cast NPR to kermit
   alarmclock_activate:
     sequence:
@@ -174,7 +178,7 @@ script:
       - service: media_player.play_media
         data:
           entity_id: media_player.kermit
-          media_content_id: REDACTED
+          media_content_id: http://17513.live.streamtheworld.com/WUOMFM.mp3
           media_content_type: 'audio/mp4'
 
       # Cancel after 2 hours and disable alarmclock
