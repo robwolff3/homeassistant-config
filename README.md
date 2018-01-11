@@ -18,8 +18,8 @@ Here is my home automation project Ive been improving since mid 2017. At that ti
 * Google Assistant - I'm using the Google Assistant native integration to control lights and switches. For everything else and custom commands I setup the IFTTT integration with HA and Google Assistant, [guide here](https://community.home-assistant.io/t/how-to-integrate-google-assistant-and-home-assistant-api-using-only-ifttt/19269) thanks [fanuch](https://community.home-assistant.io/u/fanuch/summary)!
 * Brightness slider below light switch - This provides the functionality of the dimming slider on the main part of a switch. Thanks [andrey-git](https://github.com/andrey-git)! [state-card-custom-ui](https://github.com/andrey-git/home-assistant-custom-ui) 
 * Remote custom icon layout - This is how I front end my media and other devices with buttons instead of the horizontal switch layout. I wanted this functionality for a while as it was the last thing holding my UI back from looking right for media remotes. Big thanks to [eddi89](https://community.home-assistant.io/u/eddi89) and [mviezzer](https://community.home-assistant.io/u/mviezzer/summary)! [state-card-tiles](https://github.com/maattdiy/home-assistant-config)
-* Roomba 650 IR control - My Roomba doesn't have Wifi so I use my IR blaster to automate a schedule and start it (future consideration below). [Originated here](https://community.home-assistant.io/t/irobot-roomba/6288/9) on the community forum from [davejcameron](https://community.home-assistant.io/u/davejcameron), thanks!
-* Package Tracking - This is a cool idea I am still testing out. As of writing this the USPS component is broken. Took the example from [here](https://github.com/brianjking/homeassistant-config) and [here](https://github.com/home-assistant/home-assistant/issues/7918) contributed by [brianjking](https://github.com/brianjking). thanks!
+* Roomba 650 IR control - My Roomba doesn't have Wifi so I use my IR blaster to automate a schedule and start it (future consideration below). [Originated here](https://community.home-assistant.io/t/irobot-roomba/6288/9) on the community forum. Thanks [davejcameron](https://community.home-assistant.io/u/davejcameron)!
+* Package Tracking - This is a cool idea I am still testing out. As of writing this the USPS component is broken. Took the example from [here](https://github.com/brianjking/homeassistant-config) and [here](https://github.com/home-assistant/home-assistant/issues/7918). Thanks [brianjking](https://github.com/brianjking)!
 * [geekofweek](https://github.com/geekofweek/homeassistant) Repository - When I was getting started I pulled a lot of ideas and config examples from [geekoftheweek](https://community.home-assistant.io/u/geekoftheweek). Many thanks to this guy!
 
 ### Future Considerations
@@ -43,7 +43,7 @@ Here is my home automation project Ive been improving since mid 2017. At that ti
 * Sensative Z-Wave Plus Strips Guard Contact Sensor (Don't recommend) - 3
 
 ### Controlled Devices
-* Vizio 4k TV (Controlled through API)
+* Vizio 4k TV
 * Nad Stereo (Controlled by Broadlink IR Blaster)
 * Roomba 650 (Started by Broadlink IR Blaster)
 
@@ -62,8 +62,8 @@ Here is my home automation project Ive been improving since mid 2017. At that ti
 * Hue Dimmer Switch
 
 ## Interface
-![UI](images/ha_home.jpg#1)
-![UI](images/ha_security.jpg#1)
-![UI](images/ha_override.jpg#1)
+![UI](images/ha_home.jpg)
+![UI](images/ha_security.jpg)
+![UI](images/ha_override.jpg)
 <img src="images/ha_mhome.png" width="300">
 <img src="images/ha_msecurity.png" width="300">
