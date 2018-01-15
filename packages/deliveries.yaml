@@ -1,0 +1,85 @@
+
+#usps:
+#  username: REDACTED
+#  password: 'REDACTED'
+
+#################################################
+## Customize
+homeassistant:
+  customize:
+
+    sensor.packages_in_transit:
+      icon: mdi:truck-fast
+
+    sensor.out_for_delivery:
+      icon: mdi:human-greeting
+
+    sensor.delivered_today:
+      icon: mdi:package-variant
+
+##################################################
+## Groups
+group:
+
+  deliveries:
+    name: Deliveries
+    entities:
+#    - sensor.usps_packages
+    - sensor.ups
+    - sensor.fedex
+    - sensor.packages_in_transit
+    - sensor.out_for_delivery
+    - sensor.delivered_today
+
+#################################################################
+## Sensors
+sensor:
+
+  - platform: ups
+    name: 'UPS'
+    username: REDACTED
+    password: 'REDACTED'
+
+  - platform: fedex
+    name: 'Fedex'
+    username: REDACTED
+    password: 'REDACTED'
+
+  - platform: template
+    sensors:
+
+      packages_in_transit:
+        friendly_name: "Packages in Transit"
+        value_template: >
+          {% macro in_transit(sensor) %}
+            {% if 'in_transit' in sensor.attributes %}
+              {{sensor.attributes.in_transit}}
+            {% else %}
+               0
+            {% endif %}
+          {% endmacro %}
+          {{in_transit(states.sensor.usps_packages)|int + in_transit(states.sensor.ups)|int + in_transit(states.sensor.fedex)|int}}
+
+      out_for_delivery:
+        friendly_name: "Packages Out For Deliery"
+        value_template: >
+          {% macro out_for_delivery(sensor) %}
+            {% if 'out_for_delivery' in sensor.attributes %}
+              {{sensor.attributes.out_for_delivery}}
+            {% else %}
+               0
+            {% endif %}
+          {% endmacro %}
+          {{out_for_delivery(states.sensor.usps_packages)|int + out_for_delivery(states.sensor.ups)|int + out_for_delivery(states.sensor.fedex)|int}}
+
+      delivered_today:
+        friendly_name: "Delivered Today"
+        value_template: >
+          {% macro delivered(sensor) %}
+            {% if 'delivered' in sensor.attributes %}
+              {{sensor.attributes.delivered}}
+            {% else %}
+               0
+            {% endif %}
+          {% endmacro %}
+          {{delivered(states.sensor.usps_packages)|int + delivered(states.sensor.ups)|int + delivered(states.sensor.fedex)|int}}

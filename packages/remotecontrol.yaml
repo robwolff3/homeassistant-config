@@ -1,6 +1,6 @@
+
 #################################################
 ## Customize
-##################################################
 
 homeassistant:
   customize:
@@ -8,7 +8,7 @@ homeassistant:
     script.devices:
       custom_ui_state_card: state-card-tiles
       config:
-        columns: 3
+        columns: 2
         row_height: 50px
         column_width: 62px
         gap: 15px
@@ -23,16 +23,12 @@ homeassistant:
           - entity: switch.kitchen_outlet_switch
             icon: mdi:coffee
             column: 2
-            row: 
-          - entity: script.roomba_on
-            icon: mdi:roomba
-            column: 3
             row: 1
 
     script.vizio_remote:
       custom_ui_state_card: state-card-tiles
       config:
-        columns: 5
+        columns: 3
         row_height: 50px
         column_width: 62px
         gap: 15px
@@ -52,19 +48,11 @@ homeassistant:
             icon: mdi:volume-high
             column: 3
             row: 1
-          - entity: script.vizio_tv_ccinput
-            icon: mdi:cast
-            column: 4
-            row: 1
-          - entity: script.vizio_tv_xbinput
-            icon: mdi:xbox
-            column: 5
-            row: 1
 
     script.nad_remote:
       custom_ui_state_card: state-card-tiles
       config:
-        columns: 5
+        columns: 4
         row_height: 50px
         column_width: 62px
         gap: 15px
@@ -87,10 +75,6 @@ homeassistant:
           - entity: script.nad_volup
             icon: mdi:volume-high
             column: 4
-            row: 1
-          - entity: script.castnprgir
-            icon: mdi:radio
-            column: 5
             row: 1
 
     script.light_remote:
@@ -117,39 +101,71 @@ homeassistant:
             column: 3
             row: 1
 
+    script.playlist_remote:
+      custom_ui_state_card: state-card-tiles
+      config:
+        columns: 4
+        row_height: 50px
+        column_width: 62px
+        gap: 15px
+        color: '#555B65'
+        color_on: '#D5D619'
+        color_off: '#BBBEC2'
+        entities:
+          - entity: script.playlist_action
+            icon: mdi:play
+            column: 1
+            row: 1
+          - entity: script.playlist_stop
+            icon: mdi:stop
+            column: 2
+            row: 1
+          - entity: script.playlist_voldown
+            icon: mdi:volume-medium
+            column: 3
+            row: 1
+          - entity: script.playlist_volup
+            icon: mdi:volume-high
+            column: 4
+            row: 1
+
 
 ##################################################
 ## Groups
-##################################################
 group:
 
-  devices:
+  devices_remote:
     name: Things
     entities:
+      - sensor.dishwasher_status
       - script.devices
+
   vizio_remote:
     name: TV
     entities:
       - script.vizio_remote
+
   nad_remote:
     name: Stereo
     entities:
       - script.nad_remote
-  light_remote:
-    name: Lights
-    entities:
-      - script.light_remote
+
 
 ##################################################
 ## Scripts
-##################################################
 script:
 
   devices:
     sequence:
+
   vizio_remote:
     sequence:
+
   nad_remote:
     sequence:
+
   light_remote:
+    sequence:
+
+  playlist_remote:
     sequence:

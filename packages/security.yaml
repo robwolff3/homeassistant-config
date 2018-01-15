@@ -1,7 +1,99 @@
 
 #################################################################
-## Groups
+## Components
+
+camera:
+  - platform: ffmpeg
+    name: Frontdoor
+    input: rtsp://REDACTED@REDACTED.252:554/Streaming/Channels/2
+    extra_arguments: -vf scale=640:360
+  - platform: ffmpeg
+    name: Backdoor
+    input: rtsp://REDACTED@REDACTED.251:554/Streaming/Channels/2
+    extra_arguments: -vf scale=640:360
+
+device_tracker:
+  - platform: asuswrt
+    host: REDACTED.250
+    username: REDACTED
+    password: REDACTED
+    protocol: ssh
+    port: REDACTED
+    mode: ap
+    interval_seconds: 12
+    new_device_defaults:
+      track_new_devices: False
+  - platform: asuswrt
+    host: REDACTED.236
+    username: REDACTED
+    password: REDACTED
+    protocol: ssh
+    port: REDACTED
+    mode: ap
+    interval_seconds: 12
+    new_device_defaults:
+      track_new_devices: False
+
+zone:
+  name: Home
+  latitude: REDACTED
+  longitude: REDACTED
+  radius: 200
+
 #################################################################
+## Customize
+homeassistant:
+  customize:
+
+    alarm_control_panel.main:
+      friendly_name: Status
+      icon: mdi:shield
+
+    device_tracker.USER2_iphone:
+      friendly_name: USER2
+
+    device_tracker.USER1_pixel:
+      friendly_name: USER1
+
+    device_tracker.USER3_pixel:
+      friendly_name: USER3
+
+    device_tracker.USER4_galaxy:
+      friendly_name: USER4
+
+    binary_sensor.bathroom_motion_sensor:
+      friendly_name: Bathroom Motion
+      icon: mdi:run
+    binary_sensor.hallway_motion1_sensor:
+      friendly_name: Hallway 1 Motion
+      icon: mdi:run
+    binary_sensor.hallway_motion2_sensor:
+      friendly_name: Hallway 2 Motion
+      icon: mdi:run
+    binary_sensor.uplivingroom_motion_sensor:
+      friendly_name: Up Livingroom Motion
+      icon: mdi:run
+    binary_sensor.upoffice_motion_sensor:
+      friendly_name: Up Office Motion
+      icon: mdi:run
+    sensor.frontdoor_contact:
+      device_class: opening
+      icon: mdi:door
+    sensor.sidedoor_contact:
+      device_class: opening
+      icon: mdi:door
+    sensor.backdoor_contact:
+      device_class: opening
+      icon: mdi:door
+
+    camera.frontdoor:
+      friendly_name: Frontdoor Camera
+  
+    camera.backdoor:
+      friendly_name: Backdoor Camera
+
+#################################################################
+## Groups
 group:
 
   presence_detection:
@@ -37,7 +129,6 @@ group:
 
 #################################################################
 ## Sensors
-#################################################################
 sensor: 
 
 #Sensative Strips BS
@@ -75,9 +166,7 @@ sensor:
           {% endif %}
 
 #################################################################
-#################################################################
 ## Alarm Control Panel
-#################################################################
 #################################################################
 
 alarm_control_panel:
@@ -88,7 +177,6 @@ alarm_control_panel:
 
 #################################################################
 ## Automations
-#################################################################
 automation:
 
 # Auto set status for Armed Home
@@ -401,7 +489,6 @@ automation:
 
 ##################################################
 ## Inputs
-##################################################
 input_boolean:
 
   enable_alarm_system:

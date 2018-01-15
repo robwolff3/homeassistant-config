@@ -1,0 +1,67 @@
+
+#################################################################
+## Components
+
+camera:
+  - platform: generic
+    still_image_url: https://icons.wxug.com/data/weather-maps/radar/united-states/cadillac-michigan-region-current-radar-animation.gif
+    name: Midwest Radar
+
+
+#################################################################
+## Groups
+group:
+
+  weather:
+    name: Weather
+    entities:
+      - sensor.pws_weather_1d
+      - sensor.pws_temp_f
+      - sensor.pws_feelslike_f
+      - sensor.pws_temp_high_1d_f
+      - sensor.pws_precip_1d
+      - sensor.pws_relative_humidity
+      - sensor.pws_alerts
+
+
+#################################################################
+## Sensors
+sensor:
+
+  - platform: wunderground
+    api_key: REDACTED
+    monitored_conditions:
+      - weather_1d
+      - temp_f
+      - temp_high_1d_f
+      - feelslike_f
+      - precip_1d
+      - relative_humidity
+      - alerts
+
+#################################################################
+## Automations
+automation:
+
+  # Notify when HA update is availavle
+  - alias: 'Update Available Notifications'
+
+    trigger:
+      platform: state
+      entity_id: updater.updater
+
+    action:
+      service: notify.pushbullet
+      data:
+        message: "Update for Home Assistant is available."
+
+  # Set HA theme on startup
+  - alias: 'Set theme at startup'
+    initial_state: 'on'
+    trigger:
+     - platform: homeassistant
+       event: start
+    action:
+      service: frontend.set_theme
+      data:
+        name: dark

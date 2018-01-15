@@ -1,8 +1,6 @@
 
-
 ##################################################
 ## Groups
-##################################################
 group:
 
   alarmclock:
@@ -18,7 +16,6 @@ group:
 
 ##################################################
 ## Inputs
-##################################################
 
 input_boolean:
 
@@ -31,7 +28,6 @@ input_boolean:
     name: Cancel Alarmclock
     initial: off
     icon: mdi:cancel
-
     
 input_number:
 
@@ -39,7 +35,7 @@ input_number:
     name: Hour
     icon: mdi:timer
     initial: 7
-    min: 6
+    min: 0
     max: 23
     step: 1
 
@@ -54,7 +50,6 @@ input_number:
 
 ##################################################
 ## Sensors
-##################################################
 sensor:
 
   - platform: template
@@ -66,7 +61,6 @@ sensor:
         
 ##################################################
 ## Automations
-##################################################
 automation:
 
   # Main Function
@@ -89,6 +83,9 @@ automation:
             state: 'on'
           - condition: state
             entity_id: light.bedroom_light_level
+            state: 'off'
+          - condition: state
+            entity_id: group.nightstands
             state: 'off'
           - condition: time
             weekday:
@@ -124,17 +121,18 @@ automation:
       - service: light.turn_off
         entity_id: light.diningroom_light_level
       - service: homeassistant.turn_off
-        entity_id: media_player.kermit
+        entity_id: media_player.two_amigos
+      - service: homeassistant.turn_off
+        entity_id: media_player.mopidy
       - service: input_boolean.turn_off
         data:
           entity_id: input_boolean.alarmclock_cancel
 
 ##################################################
 ## Scripts
-##################################################
 script:
 
-# Bedroom lights on over 30 minutes and cast NPR to kermit
+# Bedroom lights on over 30 minutes
   alarmclock_activate:
     sequence:
       - service: light.turn_on
@@ -166,7 +164,6 @@ script:
         entity_id: light.bedroom_light_level
         data:
           brightness: 150
-      - delay: "00:05:00"
       - service: light.turn_on
         entity_id: light.kitchen_light_level
         data:
@@ -175,12 +172,45 @@ script:
         entity_id: light.diningroom_light_level
         data:
           brightness: 100
-      - service: media_player.play_media
+      # Cast NPR to media group
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.playlist_content
+          option: Michigan Radio
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.playlist_source
+          option: Two Amigos
+      - service: script.turn_on
+        entity_id: script.playlist_action
+      # Gradually increase radio volume
+      - delay: "00:00:01"
+      - service: media_player.volume_set
         data:
           entity_id: media_player.kermit
-          media_content_id: http://17513.live.streamtheworld.com/WUOMFM.mp3
-          media_content_type: 'audio/mp4'
-
+          volume_level: 0.1
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.gir
+          volume_level: 0.3
+      - delay: "00:01:00"
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.kermit
+          volume_level: 0.135
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.gir
+          volume_level: 0.5
+      - delay: "00:01:00"
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.kermit
+          volume_level: 0.17
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.gir
+          volume_level: 0.7
       # Cancel after 2 hours and disable alarmclock
       - delay: "02:00:00"
       - condition: and

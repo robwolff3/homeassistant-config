@@ -1,0 +1,180 @@
+
+#################################################################
+## Media Players
+
+media_player:
+  - platform: mpd
+    name: 'Mopidy'
+    host: REDACTED.253
+
+#################################################################
+## Groups
+group:
+
+  mopidy_main:
+    entities:
+      - media_player.mopidy
+
+  playlist_control:
+    name: Playlist 
+    control: hidden
+    entities:
+    - input_select.playlist_content
+    - input_select.playlist_source
+    - script.playlist_remote
+
+#################################################################
+## Inputs
+
+input_select:
+  playlist_content:
+    name: 'Content:'
+    options:
+      - Michigan Radio
+      - Jazz
+      - Chicago Blues
+      - USER1's Saved Songs
+    icon: mdi:playlist-play
+
+  playlist_source:
+    name: 'Source:'
+    options:
+      - Gir
+      - Kermit
+      - Plankton
+      - Two Amigos
+    initial: Gir
+    icon: mdi:speaker-wireless
+
+#################################################################
+## Scripts
+script:
+
+  playlist_action:
+    sequence:
+
+      - service: media_player.play_media
+        data_template:
+          entity_id: media_player.mopidy
+          media_content_type: 'audio/mp4'
+          media_content_id: >
+            {% if is_state("input_select.playlist_content", "Michigan Radio") %} tunein:station:s23407
+            {% elif is_state("input_select.playlist_content", "Jazz") %} REDACTED
+            {% elif is_state("input_select.playlist_content", "Chicago Blues") %} REDACTED
+            {% elif is_state("input_select.playlist_content", "USER1's Saved Songs") %} REDACTED 
+            {% endif %}
+      - delay: "00:00:01"
+      - service: media_player.play_media
+        data_template:
+          media_content_id: 'http://REDACTED.253:8000/mopidy.mp3'
+          media_content_type: 'audio/mp4'
+          entity_id: >
+            {% if is_state("input_select.playlist_source", "Gir") %} media_player.gir
+            {% elif is_state("input_select.playlist_source", "Kermit") %} media_player.kermit
+            {% elif is_state("input_select.playlist_source", "Plankton") %} media_player.plankton
+            {% elif is_state("input_select.playlist_source", "Two Amigos") %} media_player.two_amigos
+            {% endif %}
+
+  playlist_volup:
+    sequence:
+      service: media_player.volume_up
+      data_template:
+        entity_id: >
+          {% if is_state("input_select.playlist_source", "Gir") %} media_player.gir
+          {% elif is_state("input_select.playlist_source", "Kermit") %} media_player.kermit
+          {% elif is_state("input_select.playlist_source", "Plankton") %} media_player.plankton
+          {% elif is_state("input_select.playlist_source", "Two Amigos") %} media_player.two_amigos
+          {% endif %}
+
+  playlist_voldown:
+    sequence:
+      service: media_player.volume_down
+      data_template:
+        entity_id: >
+          {% if is_state("input_select.playlist_source", "Gir") %} media_player.gir
+          {% elif is_state("input_select.playlist_source", "Kermit") %} media_player.kermit
+          {% elif is_state("input_select.playlist_source", "Plankton") %} media_player.plankton
+          {% elif is_state("input_select.playlist_source", "Two Amigos") %} media_player.two_amigos
+          {% endif %}
+
+  playlist_stop:
+    sequence:
+      - service: homeassistant.turn_off
+        entity_id: media_player.mopidy
+      - service: homeassistant.turn_off
+        data_template:
+          entity_id: >
+            {% if is_state("input_select.playlist_source", "Gir") %} media_player.gir
+            {% elif is_state("input_select.playlist_source", "Kermit") %} media_player.kermit
+            {% elif is_state("input_select.playlist_source", "Plankton") %} media_player.plankton
+            {% elif is_state("input_select.playlist_source", "Two Amigos") %} media_player.two_amigos
+            {% endif %}
+
+#################################################################
+## Automations
+automation:
+
+  # Turn off Mopidy when not in use
+  - alias: Mopidy turn off
+
+    trigger:
+      - platform: state
+        entity_id: media_player.gir
+        to: 'off'
+      - platform: state
+        entity_id: media_player.kermit
+        to: 'off'
+      - platform: state
+        entity_id: media_player.plankton
+        to: 'off'
+      - platform: state
+        entity_id: media_player.two_amigos
+        to: 'off'
+
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: media_player.gir
+          state: 'off'
+        - condition: state
+          entity_id: media_player.kermit
+          state: 'off'
+        - condition: state
+          entity_id: media_player.plankton
+          state: 'off'
+        - condition: state
+          entity_id: media_player.two_amigos
+          state: 'off'
+
+    action:
+      - service: homeassistant.turn_off
+        entity_id: media_player.mopidy
+
+  # Mopidy Visable
+  - alias: Mopidy visable true
+
+    trigger:
+      platform: template
+      value_template: "{{ not is_state('media_player.mopidy', 'off') }}"
+
+    action:
+      service: group.set_visibility
+      entity_id: group.mopidy_main
+      data:
+        visible: True
+
+  - alias: Mopidy visable false
+
+    trigger:
+      - platform: homeassistant
+        event: start
+      - platform: state
+        entity_id: media_player.mopidy
+        to: 'off'
+
+    action:
+      service: group.set_visibility
+      entity_id: group.mopidy_main
+      data:
+        visible: False

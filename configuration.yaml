@@ -1,7 +1,6 @@
 
 #################################################################
 ## Home Assistant
-#################################################################
 
 homeassistant:
   name: Home
@@ -10,10 +9,9 @@ homeassistant:
   elevation: 250
   unit_system: imperial
   time_zone: America/Detroit
-  customize: !include haconfig/customize.yaml
-  packages: !include_dir_named haconfig/packages/
+  packages: !include_dir_named packages/
 
-group: !include haconfig/groups.yaml
+group: !include groups.yaml
 
 frontend:
   javascript_version: es5
@@ -35,6 +33,7 @@ http:
   base_url: REDACTED
   trusted_networks:
     - REDACTED
+    - REDACTED
   ip_ban_enabled: true
   login_attempts_threshold: 5
 
@@ -43,38 +42,54 @@ updater:
 
 discovery:
   ignore:
-    - google_cast
     - plex_mediaserver
+
+recorder:
+  purge_interval: 1
+  purge_keep_days: 5
+  include:
+    domains:
+      - alarm_control_panel
+      - device_tracker
+      - binary_sensor
+      - input_boolean
+      - input_select
+      - light
+      - media_player
+      - switch
+    entities:
+      - sensor.backdoor_contact
+      - sensor.delivered_today
+      - sensor.dishwasher_status
+      - sensor.fedex
+      - sensor.frontdoor_contact
+      - sensor.meter_switch_current
+      - sensor.meter_switch_power
+      - sensor.out_for_delivery
+      - sensor.packages_in_transit
+      - sensor.sidedoor_contact
+      - sensor.ups
+
+  exclude:
+    entities:
+      - device_tracker.ipad
+      - binary_sensor.backdoor_contact_sensor
+      - binary_sensor.frontdoor_contact_sensor
+      - binary_sensor.sidedoor_contact_sensor
+      - light.hue_lamp_1
+      - light.hue_lamp_2
+      - light.hue_lamp_3
+      - light.hue_color_lamp_1
+      - light.hue_color_lamp_2
+      - light.hue_color_lamp_3
+      - light.hpmusicgroup
+      - switch.nad_ccinput
+      - switch.nad_power
+      - switch.nad_volume
 
 history:
 
 logbook:
-
-recorder:
-  purge_interval: 1
-  purge_keep_days: 7
-  include:
-    domains:
-      - alarm_control_panel
-      - binary_sensor
-      - device_tracker
-      - input_boolean
-      - light
-      - media_player
-      - switch
-
-#################################################################
-## Components
-#################################################################
-
-zwave:
-  usb_path: "/dev/ttyACM0"
-
-light:
-  - platform: hue
-    host: REDACTED.240
-    allow_unreachable: true
-    allow_hue_groups: true
 
 customizer:
   hide_attributes:
@@ -87,39 +102,7 @@ customizer:
     - google_assistant
     - google_assistant_name
 
-zone:
-  name: Home
-  latitude: REDACTED
-  longitude: REDACTED
-  radius: 200
-
 ios:
-
-device_tracker:
-  - platform: asuswrt
-    host: REDACTED.250
-    username: REDACTED
-    password: REDACTED
-    protocol: ssh
-    port: REDACTED
-    mode: ap
-    interval_seconds: 12
-    new_device_defaults:
-      track_new_devices: False
-  - platform: asuswrt
-    host: REDACTED.236
-    username: REDACTED
-    password: REDACTED
-    protocol: ssh
-    port: REDACTED
-    mode: ap
-    interval_seconds: 12
-    new_device_defaults:
-      track_new_devices: False
-
-#nest:
-#  client_id: REDACTED
-#  client_secret: REDACTED
 
 twilio:
   account_sid: REDACTED
@@ -143,36 +126,3 @@ google_assistant:
 
 ifttt:
   key: REDACTED
-
-#usps:
-#  username: REDACTED
-#  password: 'REDACTED'
-
-media_player:
-  - platform: vizio
-    name: viziotv
-    host: REDACTED.234
-    access_token: REDACTED
-  - platform: cast
-    host: REDACTED.230 #Plankton
-  - platform: cast
-    host: REDACTED.231 #Gir
-  - platform: cast
-    host: REDACTED.232 #Jonny 2x4
-  - platform: cast
-    host: REDACTED.233 #Kermit
-  - platform: cast
-    host: REDACTED.229 #Muffin Stuffin
-
-camera:
-  - platform: ffmpeg
-    name: Frontdoor
-    input: rtsp://REDACTED@REDACTED.252:554/Streaming/Channels/2
-    extra_arguments: -vf scale=640:360
-  - platform: ffmpeg
-    name: Backdoor
-    input: rtsp://REDACTED@REDACTED.251:554/Streaming/Channels/2
-    extra_arguments: -vf scale=640:360
-  - platform: generic
-    still_image_url: https://icons.wxug.com/data/weather-maps/radar/united-states/cadillac-michigan-region-current-radar-animation.gif
-    name: Midwest Radar

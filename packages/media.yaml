@@ -1,0 +1,540 @@
+
+#################################################################
+## Media Players
+
+media_player:
+  - platform: vizio
+    name: viziotv
+    host: REDACTED.234
+    access_token: REDACTED
+  - platform: cast
+    host: REDACTED.230 #Plankton
+  - platform: cast
+    host: REDACTED.231 #Gir
+  - platform: cast
+    host: REDACTED.232 #Jonny 2x4
+  - platform: cast
+    host: REDACTED.233 #Kermit
+  - platform: cast
+    host: REDACTED.229 #Muffin Stuffin
+
+
+#################################################################
+## Customize
+homeassistant:
+  customize:
+
+    switch.nad_power:
+      google_assistant: true
+      friendly_name: Amplifier
+      aliases:
+        - Stereo
+        - NAD
+
+    media_player.viziotv:
+      google_assistant: true
+      friendly_name: TV
+
+    media_player.plankton:
+      friendly_name: Plankton - Chromecast Ultra
+
+    media_player.gir:
+      friendly_name: Gir - Chromecast Audio
+
+    media_player.kermit:
+      friendly_name: Kermit - Vizio Speaker
+
+    media_player.johnny_2x4:
+      friendly_name: Johnny 2x4 - Google Home
+
+    media_player.bedside_mini:
+      friendly_name: Bedside Mini - Google Home Mini
+
+    media_player.two_amigos:
+      friendly_name: Two Amigos - Cast Group
+
+
+#################################################################
+## Groups
+group:
+
+  plankton_main:
+    entities:
+      - media_player.plankton
+
+  gir_main:
+    entities:
+      - media_player.gir
+
+  kermit_main:
+    entities:
+      - media_player.kermit
+
+  johnny_2x4_main:
+    entities:
+      - media_player.johnny_2x4
+
+  bedside_mini_main:
+    entities:
+      - media_player.bedside_mini
+
+  two_amigos_main:
+    entities:
+      - media_player.two_amigos
+
+
+#################################################################
+## Scripts
+script:
+
+  vizio_tv_volup:
+    sequence:
+      service: media_player.volume_up
+      entity_id: media_player.viziotv
+
+  vizio_tv_voldown:
+    sequence:
+      service: media_player.volume_down
+      entity_id: media_player.viziotv
+
+  vizio_tv_ccinput:
+    sequence:
+      service: media_player.select_source
+      entity_id: media_player.viziotv
+      data:
+        source: HDMI-2
+
+  vizio_tv_xbinput:
+    sequence:
+      service: media_player.select_source
+      entity_id: media_player.viziotv
+      data:
+        source: HDMI-4
+
+  nad_poweron:
+    sequence:
+      service: homeassistant.turn_on
+      entity_id: switch.nad_power
+
+  nad_poweroff:
+    sequence:
+      service: homeassistant.turn_off
+      entity_id: switch.nad_power
+
+  nad_volup:
+    sequence:
+      service: homeassistant.turn_on
+      entity_id: switch.nad_volume
+
+  nad_voldown:
+    sequence:
+      service: homeassistant.turn_off
+      entity_id: switch.nad_volume
+
+  nad_ccinput:
+    sequence:
+      service: homeassistant.turn_on
+      entity_id: switch.nad_ccinput
+
+
+#################################################################
+## Switches
+switch:
+
+  # Broadlink IR Blaster
+  - platform: broadlink
+    host: REDACTED.239
+    mac: 'REDACTED'
+    type: rm_mini
+    timeout: 15
+    switches:
+      nad_power:
+        command_on: 'JgBgAAABI5YQORI3FDYSFA4XDxYQFBM1FRMSEw45EDgSOxA5EjcTExI3EhMOOhEWDxYQORITERQOFw86ERUSNhA5ERYQOBM2FAAE9QABJ0kUAAxKAAEmSxMADEoAASVMEQANBQAAAAAAAAAA'
+        command_off: 'JgBYAAABJJcQORI4EzUUExEUDhcQFBM2FBITEhI4EjYUNRU1EzYTEw8WDxcQFRE4EhMSExM3EjcOOhA6EDkSFBI3EjgOFw8WEQAE9wABK0gSAAxLAAEoRRQADQU='
+      nad_volume:
+        command_on: 'JgBYAAABJZUVMxQ2EzYSFBQRFRATERI4ExISFBQ1FTQSOBUzEzgRFBAUExQSEhkvFxATEhEUEDgWNBQ2ETcRFRA6FDQWMxQTFAAE9QABIk0VAAxGAAEpShIADQU='
+        command_off: 'JgBYAAABKJETNhU1FDIXEg4XDxYQFRA4ERUUERUzFTUTNxM2ETkRFBURFBEUNBQ1FRERFBEVEDkQORM2FhAUERI2EToQORAVEAAE9AABKkoSAAxMAAEoSRQADQU='
+      nad_ccinput:
+        command_on: 'JgBYAAABKJASOBYzEDoVEBQREhQRFBQ0FREUERI3EjgOOxE5FDYSEhIUEBURFRQRFRATERI4EjcUNRI4EDkRORE4FDYVDxIUEwAE8wABK0cUAAxKAAEnSRMADQU='
+
+
+#################################################################
+## Automation
+automation:
+
+  ##### Media Power Managment ######
+  # Turn on Nad and change input when Gir is active
+  - alias: nad on with gir
+
+    trigger:
+      - platform: state
+        entity_id: media_player.gir
+        from: 'off'
+      - platform: state
+        entity_id: media_player.two_amigos
+        from: 'off'
+
+    action:
+      - service: homeassistant.turn_on
+        entity_id: switch.nad_power
+      - service: homeassistant.turn_on
+        entity_id: switch.nad_ccinput
+
+  # Turn off Gir when NAD powered off
+  - alias: gir off with nad
+
+    trigger:
+      - platform: state
+        entity_id: switch.nad_power
+        to: 'off'
+
+    condition:
+      - condition: or
+        conditions:
+          - condition: template
+            value_template: "{{ not is_state('media_player.gir', 'off') }}"
+          - condition: template
+            value_template: "{{ not is_state('media_player.two_amigos', 'off') }}"
+
+    action:
+      - service: homeassistant.turn_off
+        entity_id: media_player.gir
+      - service: homeassistant.turn_off
+        entity_id: media_player.two_amigos
+
+  # Turn off Nad when Gir off
+  - alias: nad off with gir
+
+    trigger:
+      - platform: state
+        entity_id: media_player.gir
+        to: 'off'
+        for:
+          minutes: 1
+      - platform: state
+        entity_id: media_player.two_amigos
+        to: 'off'
+        for:
+          minutes: 1
+
+    action:
+      - service: homeassistant.turn_off
+        entity_id: switch.nad_power
+
+  # Turn off Plankton when Vizio powered off
+  - alias: plankton off with vizio
+
+    trigger:
+      - platform: state
+        entity_id: media_player.viziotv
+        to: 'off'
+
+    condition:
+      - condition: template
+        value_template: "{{ not is_state('media_player.plankton', 'off') }}"
+
+    action:
+      - service: homeassistant.turn_off
+        entity_id: media_player.plankton
+
+  ##### Volume setting ######
+  # Set kermit volume when turned on
+  - alias: kermit volume reset
+
+    trigger:
+      - platform: state
+        entity_id: media_player.kermit
+        from: 'off'
+
+    condition:
+      - condition: state
+        entity_id: media_player.kermit
+        state: 'off'
+        for:
+          seconds: 10
+
+    action:
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.kermit
+          volume_level: 0.18
+
+  # Set kermit volume when turned on two_amigos
+  - alias: kermit volume reset two_amigos
+
+    trigger:
+      - platform: state
+        entity_id: media_player.two_amigos
+        from: 'off'
+
+    condition:
+      - condition: state
+        entity_id: media_player.two_amigos
+        state: 'off'
+        for:
+          seconds: 10
+
+    action:
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.kermit
+          volume_level: 0.18
+
+  # Set gir volume when turned on
+  - alias: gir volume reset
+
+    trigger:
+      - platform: state
+        entity_id: media_player.gir
+        from: 'off'
+
+    condition:
+      - condition: state
+        entity_id: media_player.gir
+        state: 'off'
+        for:
+          seconds: 10
+
+    action:
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.gir
+          volume_level: 1.0
+
+  # Set gir volume when turned on two_amigos
+  - alias: gir volume reset two_amigos
+
+    trigger:
+      - platform: state
+        entity_id: media_player.two_amigos
+        from: 'off'
+
+    condition:
+      - condition: state
+        entity_id: media_player.two_amigos
+        state: 'off'
+        for:
+          seconds: 10
+
+    action:
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.gir
+          volume_level: 1.0
+
+
+  # Set plankton volume when turned on
+  - alias: plankton volume reset
+
+    trigger:
+      - platform: state
+        entity_id: media_player.plankton
+        from: 'off'
+
+    condition:
+      - condition: state
+        entity_id: media_player.plankton
+        state: 'off'
+        for:
+          seconds: 10
+
+    action:
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.plankton
+          volume_level: 1.0
+
+  # Reset Johnny2x4 volume everyday
+  - alias: johnny2x4 volume reset
+
+    trigger:
+      - platform: time
+        at: '12:00:00'
+
+    action:
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.johnny_2x4
+          volume_level: 0.5
+
+  # Reset bedside_mini volume everyday
+  - alias: bedside_mini volume reset
+
+    trigger:
+      - platform: time
+        at: '12:00:00'
+
+    action:
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.bedside_mini
+          volume_level: 0.4
+
+  ##### Media Player Visibilty ######
+  # Plankton Visable
+  - alias: plankton visable true
+
+    trigger:
+      platform: template
+      value_template: "{{ not is_state('media_player.plankton', 'off') }}"
+
+    action:
+      service: group.set_visibility
+      entity_id: group.plankton_main
+      data:
+        visible: True
+
+  - alias: plankton visable false
+
+    trigger:
+      - platform: homeassistant
+        event: start
+      - platform: state
+        entity_id: media_player.plankton
+        to: 'off'
+
+    action:
+      service: group.set_visibility
+      entity_id: group.plankton_main
+      data:
+        visible: False
+
+  # Gir Visable
+  - alias: gir visable true
+
+    trigger:
+      platform: template
+      value_template: "{{ not is_state('media_player.gir', 'off') }}"
+
+    action:
+      service: group.set_visibility
+      entity_id: group.gir_main
+      data:
+        visible: True
+
+  - alias: gir visable false
+
+    trigger:
+      - platform: homeassistant
+        event: start
+      - platform: state
+        entity_id: media_player.gir
+        to: 'off'
+
+    action:
+      service: group.set_visibility
+      entity_id: group.gir_main
+      data:
+        visible: False
+
+  # Kermit Visable
+  - alias: kermit visable true
+
+    trigger:
+      platform: template
+      value_template: "{{ not is_state('media_player.kermit', 'off') }}"
+
+    action:
+      service: group.set_visibility
+      entity_id: group.kermit_main
+      data:
+        visible: True
+
+  - alias: kermit visable false
+
+    trigger:
+      - platform: homeassistant
+        event: start
+      - platform: state
+        entity_id: media_player.kermit
+        to: 'off'
+
+    action:
+      service: group.set_visibility
+      entity_id: group.kermit_main
+      data:
+        visible: False
+
+  # Johnny_2x4 Visable
+  - alias: johnny_2x4 visable true
+
+    trigger:
+      platform: template
+      value_template: "{{ not is_state('media_player.johnny_2x4', 'off') }}"
+
+    action:
+      service: group.set_visibility
+      entity_id: group.johnny_2x4_main
+      data:
+        visible: True
+
+  - alias: johnny_2x4 visable false
+
+    trigger:
+      - platform: homeassistant
+        event: start
+      - platform: state
+        entity_id: media_player.johnny_2x4
+        to: 'off'
+
+    action:
+      service: group.set_visibility
+      entity_id: group.johnny_2x4_main
+      data:
+        visible: False
+
+  # Bedside Mini Visable
+  - alias: bedside_mini visable true
+
+    trigger:
+      platform: template
+      value_template: "{{ not is_state('media_player.bedside_mini', 'off') }}"
+
+    action:
+      service: group.set_visibility
+      entity_id: group.bedside_mini_main
+      data:
+        visible: True
+
+  - alias: bedside_mini visable false
+
+    trigger:
+      - platform: homeassistant
+        event: start
+      - platform: state
+        entity_id: media_player.bedside_mini
+        to: 'off'
+
+    action:
+      service: group.set_visibility
+      entity_id: group.bedside_mini_main
+      data:
+        visible: False
+
+  # Two Amigos Visable
+  - alias: two_amigos visable true
+
+    trigger:
+      platform: template
+      value_template: "{{ not is_state('media_player.two_amigos', 'off') }}"
+
+    action:
+      service: group.set_visibility
+      entity_id: group.two_amigos_main
+      data:
+        visible: True
+
+  - alias: two_amigos visable false
+
+    trigger:
+      - platform: homeassistant
+        event: start
+      - platform: state
+        entity_id: media_player.two_amigos
+        to: 'off'
+
+    action:
+      service: group.set_visibility
+      entity_id: group.two_amigos_main
+      data:
+        visible: False
