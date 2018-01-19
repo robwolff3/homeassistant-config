@@ -38,8 +38,6 @@ homeassistant:
   customize:
 
     light.livingroom_light_level:
-      google_assistant: true
-      google_assistant_name: Living Room Lights
       friendly_name: Living Room
       icon: mdi:sofa
       custom_ui_state_card: state-card-custom-ui
@@ -54,8 +52,6 @@ homeassistant:
        report_when_not_changed: false
 
     light.kitchen_light_level:
-      google_assistant: true
-      google_assistant_name: Kitchen Lights
       friendly_name: Kitchen
       icon: mdi:fridge
       custom_ui_state_card: state-card-custom-ui
@@ -69,8 +65,6 @@ homeassistant:
        report_when_not_changed: false
 
     light.diningroom_light_level:
-      google_assistant: true
-      google_assistant_name: Dining Room Lights
       friendly_name: Dining Room
       icon: mdi:silverware-variant
       custom_ui_state_card: state-card-custom-ui
@@ -84,8 +78,6 @@ homeassistant:
        report_when_not_changed: false
 
     light.bedroom_light_level:
-      google_assistant: true
-      google_assistant_name: Bedroom Lights
       friendly_name: Bedroom
       icon: mdi:hotel
       custom_ui_state_card: state-card-custom-ui
@@ -99,8 +91,6 @@ homeassistant:
        report_when_not_changed: false
 
     light.bathroom_light_level:
-      google_assistant: true
-      google_assistant_name: Bathroom Lights
       friendly_name: Bathroom
       icon: mdi:water-pump
       custom_ui_state_card: state-card-custom-ui
@@ -114,8 +104,6 @@ homeassistant:
        report_when_not_changed: false
 
     light.hallway_light_level:
-      google_assistant: true
-      google_assistant_name: Hallway Lights
       friendly_name: Hallway
       icon: mdi:ceiling-light
       custom_ui_state_card: state-card-custom-ui
@@ -129,15 +117,10 @@ homeassistant:
        report_when_not_changed: false
 
     group.nightstands:
-      google_assistant: true
-      google_assistant_type: group
       friendly_name: Nightstands
       icon: mdi:lamp
-      aliases:
-        - Nightstand Lights
 
     light.nightstand1:
-      google_assistant: true
       friendly_name: USER1's Nightstand
       icon: mdi:lamp
       custom_ui_state_card: state-card-custom-ui
@@ -149,7 +132,6 @@ homeassistant:
        off_when_min: true
 
     light.nightstand2:
-      google_assistant: true
       friendly_name: USER2's Nightstand
       icon: mdi:lamp
       custom_ui_state_card: state-card-custom-ui
@@ -360,9 +342,10 @@ scene:
       light.nightstand2: off
       light.hallway_light_level: off
       media_player.viziotv: off
-      media_player.kermit: off
-      media_player.gir: off
-      media_player.two_amigos: off
+      media_player.bedside_speaker: off
+      media_player.kitchen_stereo: off
+      media_player.bedsidestereo_speakers: off
+      media_player.mopidy: off
       switch.nad_power: off
       switch.bedroom_outlet_switch_3: off
 
@@ -393,7 +376,8 @@ scene:
       light.livingroom_light_level: off
       light.diningroom_light_level: off
       switch.bedroom_outlet_switch_3: off
-      media_player.kermit: off
-      media_player.gir: off
-      media_player.two_amigos: off
+      media_player.bedside_speaker: off
+      media_player.kitchen_stereo: off
+      media_player.bedsidestereo_speakers: off
+      media_player.mopidy: off
       switch.nad_power: off

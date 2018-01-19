@@ -1,6 +1,6 @@
 # Home Assistant
 My personal implementation of [Home Assistant](https://home-assistant.io) (version: 0.60.1).
-Configuration updated 1/15/2018.
+Configuration updated 1/19/2018.
 
 ## Overview
 
@@ -45,7 +45,7 @@ Future Considerations:
 ### Controlled Devices
 * Vizio 4k TV
 * Nad Stereo (Controlled by Broadlink IR Blaster)
-* Roomba 650 (Started by Broadlink IR Blaster)
+* Roomba 890
 
 ### Media Devices
 * Google Home

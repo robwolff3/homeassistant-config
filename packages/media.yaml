@@ -8,13 +8,15 @@ media_player:
     host: REDACTED.234
     access_token: REDACTED
   - platform: cast
-    host: REDACTED.230 #Plankton
+    host: REDACTED.230 #living_room_tv
   - platform: cast
-    host: REDACTED.231 #Gir
+    host: REDACTED.231 #kitchen_stereo
   - platform: cast
-    host: REDACTED.232 #Jonny 2x4
+    host: REDACTED.232 #kitchen_home
   - platform: cast
-    host: REDACTED.233 #Kermit
+    host: REDACTED.233 #bedside_speaker
+  - platform: cast
+    host: REDACTED.228 #bedside_mini
   - platform: cast
     host: REDACTED.229 #Muffin Stuffin
 
@@ -24,63 +26,55 @@ media_player:
 homeassistant:
   customize:
 
-    switch.nad_power:
-      google_assistant: true
-      friendly_name: Amplifier
-      aliases:
-        - Stereo
-        - NAD
-
     media_player.viziotv:
-      google_assistant: true
-      friendly_name: TV
+      friendly_name: Vizio TV
 
-    media_player.plankton:
-      friendly_name: Plankton - Chromecast Ultra
+    media_player.living_room_tv:
+      friendly_name: Living Room TV - Chromecast Ultra
 
-    media_player.gir:
-      friendly_name: Gir - Chromecast Audio
+    media_player..kitchen_stereo:
+      friendly_name: Kitchen Stereo - Chromecast Audio
 
-    media_player.kermit:
-      friendly_name: Kermit - Vizio Speaker
+    media_player.bedside_speaker:
+      friendly_name: Bedside Speaker - Vizio Crave 360
 
-    media_player.johnny_2x4:
-      friendly_name: Johnny 2x4 - Google Home
+    media_player.kitchen_home:
+      friendly_name: Kitchen Home - Google Home
 
     media_player.bedside_mini:
       friendly_name: Bedside Mini - Google Home Mini
 
-    media_player.two_amigos:
-      friendly_name: Two Amigos - Cast Group
+    media_player.bedsidestereo_speakers:
+      friendly_name: Bedside/Stereo Speakers - Cast Group
 
 
 #################################################################
 ## Groups
 group:
 
-  plankton_main:
+  living_room_tv_main:
     entities:
-      - media_player.plankton
+      - media_player.living_room_tv
 
-  gir_main:
+  kitchen_stereo_main:
     entities:
-      - media_player.gir
+      - media_player.kitchen_stereo
 
-  kermit_main:
+  bedside_speaker_main:
     entities:
-      - media_player.kermit
+      - media_player.bedside_speaker
 
-  johnny_2x4_main:
+  kitchen_home_main:
     entities:
-      - media_player.johnny_2x4
+      - media_player.kitchen_home
 
   bedside_mini_main:
     entities:
       - media_player.bedside_mini
 
-  two_amigos_main:
+  bedsidestereo_speakers_main:
     entities:
-      - media_player.two_amigos
+      - media_player.bedsidestereo_speakers
 
 
 #################################################################
@@ -163,15 +157,15 @@ switch:
 automation:
 
   ##### Media Power Managment ######
-  # Turn on Nad and change input when Gir is active
-  - alias: nad on with gir
+  # Turn on Nad and change input when kitchen_stereo is active
+  - alias: nad on with kitchen_stereo
 
     trigger:
       - platform: state
-        entity_id: media_player.gir
+        entity_id: media_player.kitchen_stereo
         from: 'off'
       - platform: state
-        entity_id: media_player.two_amigos
+        entity_id: media_player.bedsidestereo_speakers
         from: 'off'
 
     action:
@@ -180,8 +174,8 @@ automation:
       - service: homeassistant.turn_on
         entity_id: switch.nad_ccinput
 
-  # Turn off Gir when NAD powered off
-  - alias: gir off with nad
+  # Turn off kitchen_stereo when NAD powered off
+  - alias: kitchen_stereo off with nad
 
     trigger:
       - platform: state
@@ -192,27 +186,27 @@ automation:
       - condition: or
         conditions:
           - condition: template
-            value_template: "{{ not is_state('media_player.gir', 'off') }}"
+            value_template: "{{ not is_state('media_player.kitchen_stereo', 'off') }}"
           - condition: template
-            value_template: "{{ not is_state('media_player.two_amigos', 'off') }}"
+            value_template: "{{ not is_state('media_player.bedsidestereo_speakers', 'off') }}"
 
     action:
       - service: homeassistant.turn_off
-        entity_id: media_player.gir
+        entity_id: media_player.kitchen_stereo
       - service: homeassistant.turn_off
-        entity_id: media_player.two_amigos
+        entity_id: media_player.bedsidestereo_speakers
 
-  # Turn off Nad when Gir off
-  - alias: nad off with gir
+  # Turn off Nad when kitchen_stereo off
+  - alias: nad off with kitchen_stereo
 
     trigger:
       - platform: state
-        entity_id: media_player.gir
+        entity_id: media_player.kitchen_stereo
         to: 'off'
         for:
           minutes: 1
       - platform: state
-        entity_id: media_player.two_amigos
+        entity_id: media_player.bedsidestereo_speakers
         to: 'off'
         for:
           minutes: 1
@@ -221,8 +215,8 @@ automation:
       - service: homeassistant.turn_off
         entity_id: switch.nad_power
 
-  # Turn off Plankton when Vizio powered off
-  - alias: plankton off with vizio
+  # Turn off living_room_tv when Vizio powered off
+  - alias: living_room_tv off with vizio
 
     trigger:
       - platform: state
@@ -231,24 +225,24 @@ automation:
 
     condition:
       - condition: template
-        value_template: "{{ not is_state('media_player.plankton', 'off') }}"
+        value_template: "{{ not is_state('media_player.living_room_tv', 'off') }}"
 
     action:
       - service: homeassistant.turn_off
-        entity_id: media_player.plankton
+        entity_id: media_player.living_room_tv
 
   ##### Volume setting ######
-  # Set kermit volume when turned on
-  - alias: kermit volume reset
+  # Set bedside_speaker volume when turned on
+  - alias: bedside_speaker volume reset
 
     trigger:
       - platform: state
-        entity_id: media_player.kermit
+        entity_id: media_player.bedside_speaker
         from: 'off'
 
     condition:
       - condition: state
-        entity_id: media_player.kermit
+        entity_id: media_player.bedside_speaker
         state: 'off'
         for:
           seconds: 10
@@ -256,20 +250,20 @@ automation:
     action:
       - service: media_player.volume_set
         data:
-          entity_id: media_player.kermit
+          entity_id: media_player.bedside_speaker
           volume_level: 0.18
 
-  # Set kermit volume when turned on two_amigos
-  - alias: kermit volume reset two_amigos
+  # Set bedside_speaker volume when turned on bedsidestereo_speakers
+  - alias: bedside_speaker volume reset bedsidestereo_speakers
 
     trigger:
       - platform: state
-        entity_id: media_player.two_amigos
+        entity_id: media_player.bedsidestereo_speakers
         from: 'off'
 
     condition:
       - condition: state
-        entity_id: media_player.two_amigos
+        entity_id: media_player.bedsidestereo_speakers
         state: 'off'
         for:
           seconds: 10
@@ -277,20 +271,20 @@ automation:
     action:
       - service: media_player.volume_set
         data:
-          entity_id: media_player.kermit
+          entity_id: media_player.bedside_speaker
           volume_level: 0.18
 
-  # Set gir volume when turned on
-  - alias: gir volume reset
+  # Set kitchen_stereo volume when turned on
+  - alias: kitchen_stereo volume reset
 
     trigger:
       - platform: state
-        entity_id: media_player.gir
+        entity_id: media_player.kitchen_stereo
         from: 'off'
 
     condition:
       - condition: state
-        entity_id: media_player.gir
+        entity_id: media_player.kitchen_stereo
         state: 'off'
         for:
           seconds: 10
@@ -298,20 +292,20 @@ automation:
     action:
       - service: media_player.volume_set
         data:
-          entity_id: media_player.gir
+          entity_id: media_player.kitchen_stereo
           volume_level: 1.0
 
-  # Set gir volume when turned on two_amigos
-  - alias: gir volume reset two_amigos
+  # Set kitchen_stereo volume when turned on bedsidestereo_speakers
+  - alias: kitchen_stereo volume reset bedsidestereo_speakers
 
     trigger:
       - platform: state
-        entity_id: media_player.two_amigos
+        entity_id: media_player.bedsidestereo_speakers
         from: 'off'
 
     condition:
       - condition: state
-        entity_id: media_player.two_amigos
+        entity_id: media_player.bedsidestereo_speakers
         state: 'off'
         for:
           seconds: 10
@@ -319,21 +313,21 @@ automation:
     action:
       - service: media_player.volume_set
         data:
-          entity_id: media_player.gir
+          entity_id: media_player.kitchen_stereo
           volume_level: 1.0
 
 
-  # Set plankton volume when turned on
-  - alias: plankton volume reset
+  # Set living_room_tv volume when turned on
+  - alias: living_room_tv volume reset
 
     trigger:
       - platform: state
-        entity_id: media_player.plankton
+        entity_id: media_player.living_room_tv
         from: 'off'
 
     condition:
       - condition: state
-        entity_id: media_player.plankton
+        entity_id: media_player.living_room_tv
         state: 'off'
         for:
           seconds: 10
@@ -341,7 +335,7 @@ automation:
     action:
       - service: media_player.volume_set
         data:
-          entity_id: media_player.plankton
+          entity_id: media_player.living_room_tv
           volume_level: 1.0
 
   # Reset Johnny2x4 volume everyday
@@ -354,7 +348,7 @@ automation:
     action:
       - service: media_player.volume_set
         data:
-          entity_id: media_player.johnny_2x4
+          entity_id: media_player.kitchen_home
           volume_level: 0.5
 
   # Reset bedside_mini volume everyday
@@ -371,115 +365,115 @@ automation:
           volume_level: 0.4
 
   ##### Media Player Visibilty ######
-  # Plankton Visable
-  - alias: plankton visable true
+  # living_room_tv Visable
+  - alias: living_room_tv visable true
 
     trigger:
       platform: template
-      value_template: "{{ not is_state('media_player.plankton', 'off') }}"
+      value_template: "{{ not is_state('media_player.living_room_tv', 'off') }}"
 
     action:
       service: group.set_visibility
-      entity_id: group.plankton_main
+      entity_id: group.living_room_tv_main
       data:
         visible: True
 
-  - alias: plankton visable false
+  - alias: living_room_tv visable false
 
     trigger:
       - platform: homeassistant
         event: start
       - platform: state
-        entity_id: media_player.plankton
+        entity_id: media_player.living_room_tv
         to: 'off'
 
     action:
       service: group.set_visibility
-      entity_id: group.plankton_main
+      entity_id: group.living_room_tv_main
       data:
         visible: False
 
-  # Gir Visable
-  - alias: gir visable true
+  # kitchen_stereo Visable
+  - alias: kitchen_stereo visable true
 
     trigger:
       platform: template
-      value_template: "{{ not is_state('media_player.gir', 'off') }}"
+      value_template: "{{ not is_state('media_player.kitchen_stereo', 'off') }}"
 
     action:
       service: group.set_visibility
-      entity_id: group.gir_main
+      entity_id: group.kitchen_stereo_main
       data:
         visible: True
 
-  - alias: gir visable false
+  - alias: kitchen_stereo visable false
 
     trigger:
       - platform: homeassistant
         event: start
       - platform: state
-        entity_id: media_player.gir
+        entity_id: media_player.kitchen_stereo
         to: 'off'
 
     action:
       service: group.set_visibility
-      entity_id: group.gir_main
+      entity_id: group.kitchen_stereo_main
       data:
         visible: False
 
-  # Kermit Visable
-  - alias: kermit visable true
+  # bedside_speaker Visable
+  - alias: bedside_speaker visable true
 
     trigger:
       platform: template
-      value_template: "{{ not is_state('media_player.kermit', 'off') }}"
+      value_template: "{{ not is_state('media_player.bedside_speaker', 'off') }}"
 
     action:
       service: group.set_visibility
-      entity_id: group.kermit_main
+      entity_id: group.bedside_speaker_main
       data:
         visible: True
 
-  - alias: kermit visable false
+  - alias: bedside_speaker visable false
 
     trigger:
       - platform: homeassistant
         event: start
       - platform: state
-        entity_id: media_player.kermit
+        entity_id: media_player.bedside_speaker
         to: 'off'
 
     action:
       service: group.set_visibility
-      entity_id: group.kermit_main
+      entity_id: group.bedside_speaker_main
       data:
         visible: False
 
-  # Johnny_2x4 Visable
-  - alias: johnny_2x4 visable true
+  # kitchen_home Visable
+  - alias: kitchen_home visable true
 
     trigger:
       platform: template
-      value_template: "{{ not is_state('media_player.johnny_2x4', 'off') }}"
+      value_template: "{{ not is_state('media_player.kitchen_home', 'off') }}"
 
     action:
       service: group.set_visibility
-      entity_id: group.johnny_2x4_main
+      entity_id: group.kitchen_home_main
       data:
         visible: True
 
-  - alias: johnny_2x4 visable false
+  - alias: kitchen_home visable false
 
     trigger:
       - platform: homeassistant
         event: start
       - platform: state
-        entity_id: media_player.johnny_2x4
+        entity_id: media_player.kitchen_home
         to: 'off'
 
     action:
       service: group.set_visibility
-      entity_id: group.johnny_2x4_main
+      entity_id: group.kitchen_home_main
       data:
         visible: False
 
@@ -511,30 +505,30 @@ automation:
       data:
         visible: False
 
-  # Two Amigos Visable
-  - alias: two_amigos visable true
+  # bedsidestereo_speakers Visable
+  - alias: bedsidestereo_speakers visable true
 
     trigger:
       platform: template
-      value_template: "{{ not is_state('media_player.two_amigos', 'off') }}"
+      value_template: "{{ not is_state('media_player.bedsidestereo_speakers', 'off') }}"
 
     action:
       service: group.set_visibility
-      entity_id: group.two_amigos_main
+      entity_id: group.bedsidestereo_speakers_main
       data:
         visible: True
 
-  - alias: two_amigos visable false
+  - alias: bedsidestereo_speakers visable false
 
     trigger:
       - platform: homeassistant
         event: start
       - platform: state
-        entity_id: media_player.two_amigos
+        entity_id: media_player.bedsidestereo_speakers
         to: 'off'
 
     action:
       service: group.set_visibility
-      entity_id: group.two_amigos_main
+      entity_id: group.bedsidestereo_speakers_main
       data:
         visible: False

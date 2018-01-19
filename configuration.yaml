@@ -57,6 +57,7 @@ recorder:
       - light
       - media_player
       - switch
+      - vacuum
     entities:
       - sensor.backdoor_contact
       - sensor.delivered_today
@@ -116,6 +117,9 @@ notify:
     platform: twilio_call
     from_number: REDACTED
 
+ifttt:
+  key: REDACTED
+
 google_assistant:
   expose_by_default: false
   project_id: REDACTED
@@ -123,6 +127,64 @@ google_assistant:
   access_token: REDACTED
   api_key: REDACTED
   agent_user_id: REDACTED
+  entity_config:
 
-ifttt:
-  key: REDACTED
+    light.livingroom_light_level:
+      expose: true
+      name: Living Room Lights
+
+    light.kitchen_light_level:
+      expose: true
+      name: Kitchen Lights
+
+    light.diningroom_light_level:
+      expose: true
+      name: Dining Room Lights
+
+    light.bedroom_light_level:
+      expose: true
+      name: Bedroom Lights
+
+    light.bathroom_light_level:
+      expose: true
+      name: Bathroom Lights
+
+    light.hallway_light_level:
+      expose: true
+      name: Hallway Lights
+
+    group.nightstands:
+      expose: true
+      type: group
+      name: Nightstand Lights
+
+    light.nightstand1:
+      expose: true
+      name: USER1's Nightstand
+
+    light.nightstand2:
+      expose: true
+      name: USER2's Nightstand
+
+    switch.bedroom_outlet_switch_3:
+      expose: true
+      name: Bedroom Fan
+      aliases:
+        - Fan
+
+    switch.kitchen_outlet_switch:
+      expose: true
+      name: Espresso Machine
+      aliases:
+        - Coffee Machine
+
+    switch.nad_power:
+      expose: true
+      name: Stereo
+      aliases:
+        - Amplifier
+        - NAD
+
+    media_player.viziotv:
+      expose: true
+      name: TV

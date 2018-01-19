@@ -9,16 +9,16 @@
     entities:
       - group.lights
 #      - group.climetecontrol
-      - group.devices_remote
+      - group.devices
       - group.vizio_remote
       - group.nad_remote
       - group.playlist_control
       - group.mopidy_main
-      - group.two_amigos_main
-      - group.plankton_main
-      - group.gir_main
-      - group.kermit_main
-      - group.johnny_2x4_main
+      - group.bedsidestereo_speakers_main
+      - group.living_room_tv_main
+      - group.kitchen_stereo_main
+      - group.bedside_speaker_main
+      - group.kitchen_home_main
       - group.bedside_mini_main
       - group.weather
       - camera.midwest_radar
@@ -43,14 +43,13 @@
       - group.overridechild
       - group.alarmclock
       - media_player.viziotv
-      - media_player.two_amigos
-      - media_player.plankton
-      - media_player.gir
-      - media_player.kermit
-      - media_player.johnny_2x4
+      - media_player.bedsidestereo_speakers
+      - media_player.living_room_tv
+      - media_player.kitchen_stereo
+      - media_player.bedside_speaker
+      - media_player.kitchen_home
       - media_player.bedside_mini
       - media_player.muffin_stuffin
-      - media_player.spotify
       - media_player.mopidy
 
   overridechild:
@@ -60,6 +59,7 @@
       - automation.motion_bathroom_lights_on_20min
       - automation.motion_hallway_lights_on_15min
       - automation.dark_arrive_home_lights
+      - automation.roomba_on_weekdays
       - switch.bedroom_outlet_switch_2
       - switch.meter_switch_switch
       - sensor.meter_switch_current

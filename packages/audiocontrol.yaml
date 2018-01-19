@@ -16,7 +16,7 @@ group:
       - media_player.mopidy
 
   playlist_control:
-    name: Playlist 
+    name: Playlist Control
     control: hidden
     entities:
     - input_select.playlist_content
@@ -31,19 +31,20 @@ input_select:
     name: 'Content:'
     options:
       - Michigan Radio
+      - Dinner
       - Jazz
       - Chicago Blues
-      - USER1's Saved Songs
+      - USER1's Favorites
     icon: mdi:playlist-play
 
   playlist_source:
     name: 'Source:'
     options:
-      - Gir
-      - Kermit
-      - Plankton
-      - Two Amigos
-    initial: Gir
+      - Kitchen Stereo
+      - Bedside Speaker
+      - Living Room TV
+      - Bedside/Stereo Speakers
+    initial: Kitchen Stereo
     icon: mdi:speaker-wireless
 
 #################################################################
@@ -59,9 +60,10 @@ script:
           media_content_type: 'audio/mp4'
           media_content_id: >
             {% if is_state("input_select.playlist_content", "Michigan Radio") %} tunein:station:s23407
+            {% elif is_state("input_select.playlist_content", "Dinner") %} REDACTED
             {% elif is_state("input_select.playlist_content", "Jazz") %} REDACTED
             {% elif is_state("input_select.playlist_content", "Chicago Blues") %} REDACTED
-            {% elif is_state("input_select.playlist_content", "USER1's Saved Songs") %} REDACTED 
+            {% elif is_state("input_select.playlist_content", "USER1's Favorites") %} REDACTED
             {% endif %}
       - delay: "00:00:01"
       - service: media_player.play_media
@@ -69,10 +71,10 @@ script:
           media_content_id: 'http://REDACTED.253:8000/mopidy.mp3'
           media_content_type: 'audio/mp4'
           entity_id: >
-            {% if is_state("input_select.playlist_source", "Gir") %} media_player.gir
-            {% elif is_state("input_select.playlist_source", "Kermit") %} media_player.kermit
-            {% elif is_state("input_select.playlist_source", "Plankton") %} media_player.plankton
-            {% elif is_state("input_select.playlist_source", "Two Amigos") %} media_player.two_amigos
+            {% if is_state("input_select.playlist_source", "Kitchen Stereo") %} media_player.kitchen_stereo
+            {% elif is_state("input_select.playlist_source", "Bedside Speaker") %} media_player.bedside_speaker
+            {% elif is_state("input_select.playlist_source", "Living Room TV") %} media_player.living_room_tv
+            {% elif is_state("input_select.playlist_source", "Bedside/Stereo Speakers") %} media_player.bedsidestereo_speakers
             {% endif %}
 
   playlist_volup:
@@ -80,10 +82,10 @@ script:
       service: media_player.volume_up
       data_template:
         entity_id: >
-          {% if is_state("input_select.playlist_source", "Gir") %} media_player.gir
-          {% elif is_state("input_select.playlist_source", "Kermit") %} media_player.kermit
-          {% elif is_state("input_select.playlist_source", "Plankton") %} media_player.plankton
-          {% elif is_state("input_select.playlist_source", "Two Amigos") %} media_player.two_amigos
+          {% if is_state("input_select.playlist_source", "Kitchen Stereo") %} media_player.kitchen_stereo
+          {% elif is_state("input_select.playlist_source", "Bedside Speaker") %} media_player.bedside_speaker
+          {% elif is_state("input_select.playlist_source", "Living Room TV") %} media_player.living_room_tv
+          {% elif is_state("input_select.playlist_source", "Bedside/Stereo Speakers") %} media_player.bedsidestereo_speakers
           {% endif %}
 
   playlist_voldown:
@@ -91,10 +93,10 @@ script:
       service: media_player.volume_down
       data_template:
         entity_id: >
-          {% if is_state("input_select.playlist_source", "Gir") %} media_player.gir
-          {% elif is_state("input_select.playlist_source", "Kermit") %} media_player.kermit
-          {% elif is_state("input_select.playlist_source", "Plankton") %} media_player.plankton
-          {% elif is_state("input_select.playlist_source", "Two Amigos") %} media_player.two_amigos
+          {% if is_state("input_select.playlist_source", "Kitchen Stereo") %} media_player.kitchen_stereo
+          {% elif is_state("input_select.playlist_source", "Bedside Speaker") %} media_player.bedside_speaker
+          {% elif is_state("input_select.playlist_source", "Living Room TV") %} media_player.living_room_tv
+          {% elif is_state("input_select.playlist_source", "Bedside/Stereo Speakers") %} media_player.bedsidestereo_speakers
           {% endif %}
 
   playlist_stop:
@@ -104,10 +106,10 @@ script:
       - service: homeassistant.turn_off
         data_template:
           entity_id: >
-            {% if is_state("input_select.playlist_source", "Gir") %} media_player.gir
-            {% elif is_state("input_select.playlist_source", "Kermit") %} media_player.kermit
-            {% elif is_state("input_select.playlist_source", "Plankton") %} media_player.plankton
-            {% elif is_state("input_select.playlist_source", "Two Amigos") %} media_player.two_amigos
+            {% if is_state("input_select.playlist_source", "Kitchen Stereo") %} media_player.kitchen_stereo
+            {% elif is_state("input_select.playlist_source", "Bedside Speaker") %} media_player.bedside_speaker
+            {% elif is_state("input_select.playlist_source", "Living Room TV") %} media_player.living_room_tv
+            {% elif is_state("input_select.playlist_source", "Bedside/Stereo Speakers") %} media_player.bedsidestereo_speakers
             {% endif %}
 
 #################################################################
@@ -119,32 +121,32 @@ automation:
 
     trigger:
       - platform: state
-        entity_id: media_player.gir
+        entity_id: media_player.kitchen_stereo
         to: 'off'
       - platform: state
-        entity_id: media_player.kermit
+        entity_id: media_player.bedside_speaker
         to: 'off'
       - platform: state
-        entity_id: media_player.plankton
+        entity_id: media_player.living_room_tv
         to: 'off'
       - platform: state
-        entity_id: media_player.two_amigos
+        entity_id: media_player.bedsidestereo_speakers
         to: 'off'
 
     condition:
       condition: and
       conditions:
         - condition: state
-          entity_id: media_player.gir
+          entity_id: media_player.kitchen_stereo
           state: 'off'
         - condition: state
-          entity_id: media_player.kermit
+          entity_id: media_player.bedside_speaker
           state: 'off'
         - condition: state
-          entity_id: media_player.plankton
+          entity_id: media_player.living_room_tv
           state: 'off'
         - condition: state
-          entity_id: media_player.two_amigos
+          entity_id: media_player.bedsidestereo_speakers
           state: 'off'
 
     action:

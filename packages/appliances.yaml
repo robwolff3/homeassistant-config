@@ -6,15 +6,24 @@
 #  client_id: REDACTED
 #  client_secret: REDACTED
 
+vacuum:
+  - platform: roomba
+    host: REDACTED.247
+    username: REDACTED
+    password: 'REDACTED'
 
 #################################################################
 ## Groups
 group:
 
- # climetecontrol:
- #   name: Climate Control
- #   entities:
- #     - climate.dining_room
+  devices:
+    name: Things
+    control: hidden
+    entities:
+      - vacuum.roomba
+      - sensor.dishwasher_status
+      - switch.kitchen_outlet_switch
+      - switch.bedroom_outlet_switch_3
 
 
 #################################################################
@@ -23,21 +32,25 @@ homeassistant:
   customize:
 
     sensor.dishwasher_status:
+      friendly_name: Dishwasher
       icon: mdi:washing-machine
-      friendly_name: 'Dishwasher Status:'
+
+    switch.meter_switch_switch:
+      friendly_name: Dishwasher Switch
+
+    sensor.meter_switch_current:
+      friendly_name: Dishwasher Current
+
+    sensor.meter_switch_power:
+      friendly_name: Dishwasher Power
 
     switch.bedroom_outlet_switch_3:
-      google_assistant: true
-      google_assistant_type: fan
-      friendly_name: Fan
-      aliases:
-        - Bedroom Fan
+      friendly_name: Bedroom Fan
+      icon: mdi:fan
 
     switch.kitchen_outlet_switch:
-      google_assistant: true
       friendly_name: Espresso Machine
-      aliases:
-        - Coffee Machine
+      icon: mdi:coffee
 
     switch.bedroom_outlet_switch_2:
       friendly_name: Bedroom Outlet Left
@@ -64,11 +77,10 @@ input_select:
   dishwasher_status:
     name: Dishwasher Status
     options:
-      - Dirty
       - Running
       - Drying
-      - Clean
-    initial: Dirty
+      - 'Off'
+    initial: 'Off'
 
 
 #################################################################
@@ -90,149 +102,145 @@ automation:
       data:
         message: 'Espresso machine is warmed up!'
 
-#  # Sceduled Roobma!!
-#  - alias: Roomba On Weekdays
+  # Sceduled Roobma!!
+  - alias: Roomba On Weekdays
+
+    trigger:
+      - platform: time
+        at: '10:00:00'
+
+    condition:
+      condition: and
+      conditions:
+        - condition: time
+          weekday:
+            - mon
+            - tue
+            - wed
+            - thu
+            - fri
+        - condition: template
+          value_template: '{{states.vacuum.roomba.attributes.battery_level > 80}}'
+
+    action:
+      - service: homeassistant.turn_on
+        entity_id: vacuum.roomba
+
+  # Notify when Roomba is finished
+  - alias: Roomba notify finished
+
+    trigger:
+      - platform: state
+        entity_id: vacuum.roomba
+        from: 'on'
+        to: 'off'
+
+    condition:
+      - condition: state
+        entity_id: vacuum.roomba
+        state: 'on'
+        for:
+          minutes: 50
+
+    action:
+      service: notify.pushbullet
+      data:
+        message: 'Schmidt is finished and bin is full.'
+        title: 'Roomba Finished'
+
+  # Notify when Roomba is error
+#  - alias: Roomba notify error
 #
 #    trigger:
-#      - platform: time
-#        at: '10:00:00'
+#      platform: state
+#      entity_id: vacuum.roomba
+#      from: 'on'
+#      to: 'off'
 #
 #    condition:
-#      - condition: time
-#        weekday:
-#          - mon
-#          - tue
-#          - wed
-#          - thu
-#          - fri
+#      - condition: template
+#        value_template: '{{states.vacuum.roomba.attributes.battery_level > 80}}'
 #
 #    action:
-#      - service: script.roomba_on
+#      service: notify.pushbullet
+#      data:
+#        message: 'Schmidt is stuck or something else is wrong.'
+#        title: 'Roomba Error'
 
 
-#Dishwasher state logic
-  # When we detect power being drawn from the dishwasher,
-  # mark the dishwasher as using power
-   
+#Dishwasher logic
+  # Dishwasher set running
   - alias: Set dishwasher active when power detected
+
     trigger:
       - platform: numeric_state
         entity_id: sensor.meter_switch_power
         above: 10
+
     condition:
-      condition: or
-      conditions:
-        - condition: state
-          entity_id: input_select.dishwasher_status
-          state: Dirty
-        - condition: state
-          entity_id: input_select.dishwasher_status
-          state: Clean
-        - condition: state
-          entity_id: input_select.dishwasher_status
-          state: Drying
+      - condition: state
+        entity_id: input_select.dishwasher_status
+        state: 'Off'
+
     action:
       - service: input_select.select_option
         data:
           entity_id: input_select.dishwasher_status
           option: Running
    
-  # When the power level drops below 10, and the Dishwasher is set to
-  # the 'Running' state, mark the Dishwasher as Finished
-   
+  # Dishwasher set drying
   - alias: Set dishwasher drying when power drops
+
     trigger:
       - platform: numeric_state
         entity_id: sensor.meter_switch_power
-        below: 10
+        below: 600
+        above: 380
+        for:
+          minutes: 2
+
     condition:
       - condition: state
         entity_id: input_select.dishwasher_status
         state: Running
+
     action:
       - service: input_select.select_option
         data:
           entity_id: input_select.dishwasher_status
           option: Drying
    
-  # Once the dishwasher status has been 'Drying' for 30 minutes, mark the
-  # dishwasher as clean
-   
-  - alias: Set dishwasher clean
+  # Dishwasher set off
+  - alias: Set dishwasher off
+
     trigger:
-      - platform: state
-        entity_id: input_select.dishwasher_status
-        to: Drying
+      - platform: numeric_state
+        entity_id: sensor.meter_switch_power
+        below: 5
         for:
-          minutes: 15
+          minutes: 6
+
     condition:
       - condition: state
         entity_id: input_select.dishwasher_status
         state: Drying
-    action:
-      - service: input_select.select_option
-        data:
-          entity_id: input_select.dishwasher_status
-          option: Clean
-   
-  # When the power drops and the dishwasher is Clean or Drying, someone has
-  # turned the Dishwasher off and emptied it. We should do this when the state
-  # of the Dishwasher is clean or Finishing, just incase someone opens the
-  # Dishwasher before the 30 minute timeout has been reached.
-   
-  - alias: Set Dishwasher dirty when power off
-    trigger:
-      - platform: numeric_state
-        entity_id: sensor.meter_switch_power
-        below: 1
-    condition:
-      condition: and
-      conditions:
-        - condition: numeric_state
-          entity_id: sensor.meter_switch_power
-          below: 1
-        - condition: or
-          conditions:
-            - condition: state
-              entity_id: input_select.dishwasher_status
-              state: Clean
-            - condition: state
-              entity_id: input_select.dishwasher_status
-              state: Drying
-    action:
-      - service: input_select.select_option
-        data:
-          entity_id: input_select.dishwasher_status
-          option: Dirty
 
-  # Dishwasher Alert when clean
-  - alias: Send alert when dishwasher is clean
+    action:
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.dishwasher_status
+          option: 'Off'
+
+  # Dishwasher Alert when done
+  - alias: Send alert when dishwasher is done
+
     trigger:
       - platform: state
         entity_id: input_select.dishwasher_status
-        to: Clean
-      - platform: time
-        at: '08:30:00'
-    condition:
-      condition: and
-      conditions:
-        - condition: time
-          before: '22:30:00'
-          after: '08:29:00'
-        - condition: state
-          entity_id: input_select.dishwasher_status
-          state: Clean
-        # Don't send this alert if it was last triggered less than 30 minutes ago (1,800 seconds)
-        - condition: template
-          value_template: >
-            {% if states.automation.send_alert_when_dishwasher_is_clean.last_triggered is not none %}
-              {% if as_timestamp(now()) | int   -  as_timestamp(states.automation.send_alert_when_dishwasher_is_clean.attributes.last_triggered) | int > 3600 %} true {% else %} false
-              {% endif %}
-            {% else %}
-            false
-            {% endif %}
+        to: 'Off'
+
     action:
       service: notify.pushbullet
       data:
-        message: 'The Dishwasher has finished and is ready to be emptied!'
-        title: 'Dishwasher Update'
+        message: 'The Dishwasher has finished and is ready to be emptied.'
+        title: 'Dishwasher Finished'

@@ -121,7 +121,7 @@ automation:
       - service: light.turn_off
         entity_id: light.diningroom_light_level
       - service: homeassistant.turn_off
-        entity_id: media_player.two_amigos
+        entity_id: media_player.bedsidestereo_speakers
       - service: homeassistant.turn_off
         entity_id: media_player.mopidy
       - service: input_boolean.turn_off
@@ -180,36 +180,36 @@ script:
       - service: input_select.select_option
         data:
           entity_id: input_select.playlist_source
-          option: Two Amigos
+          option: Bedside/Stereo Speakers
       - service: script.turn_on
         entity_id: script.playlist_action
       # Gradually increase radio volume
       - delay: "00:00:01"
       - service: media_player.volume_set
         data:
-          entity_id: media_player.kermit
+          entity_id: media_player.bedside_speaker
           volume_level: 0.1
       - service: media_player.volume_set
         data:
-          entity_id: media_player.gir
+          entity_id: media_player.kitchen_stereo
           volume_level: 0.3
       - delay: "00:01:00"
       - service: media_player.volume_set
         data:
-          entity_id: media_player.kermit
+          entity_id: media_player.bedside_speaker
           volume_level: 0.135
       - service: media_player.volume_set
         data:
-          entity_id: media_player.gir
+          entity_id: media_player.kitchen_stereo
           volume_level: 0.5
       - delay: "00:01:00"
       - service: media_player.volume_set
         data:
-          entity_id: media_player.kermit
+          entity_id: media_player.bedside_speaker
           volume_level: 0.17
       - service: media_player.volume_set
         data:
-          entity_id: media_player.gir
+          entity_id: media_player.kitchen_stereo
           volume_level: 0.7
       # Cancel after 2 hours and disable alarmclock
       - delay: "02:00:00"

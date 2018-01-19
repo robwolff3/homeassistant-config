@@ -5,26 +5,6 @@
 homeassistant:
   customize:
 
-    script.devices:
-      custom_ui_state_card: state-card-tiles
-      config:
-        columns: 2
-        row_height: 50px
-        column_width: 62px
-        gap: 15px
-        color: '#555B65'
-        color_on: '#D5D619'
-        color_off: '#BBBEC2'
-        entities:
-          - entity: switch.bedroom_outlet_switch_3
-            icon: mdi:fan
-            column: 1
-            row: 1
-          - entity: switch.kitchen_outlet_switch
-            icon: mdi:coffee
-            column: 2
-            row: 1
-
     script.vizio_remote:
       custom_ui_state_card: state-card-tiles
       config:
@@ -134,19 +114,13 @@ homeassistant:
 ## Groups
 group:
 
-  devices_remote:
-    name: Things
-    entities:
-      - sensor.dishwasher_status
-      - script.devices
-
   vizio_remote:
-    name: TV
+    name: Living Room TV
     entities:
       - script.vizio_remote
 
   nad_remote:
-    name: Stereo
+    name: Kitchen Stereo
     entities:
       - script.nad_remote
 
@@ -154,9 +128,6 @@ group:
 ##################################################
 ## Scripts
 script:
-
-  devices:
-    sequence:
 
   vizio_remote:
     sequence:
