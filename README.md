@@ -64,6 +64,6 @@ Future Considerations:
 ![UI](images/ha_home.png)
 ![UI](images/ha_security.png)
 ![UI](images/ha_override.png)
-<img src="images/ha_mhome.png" width="300">
-<img src="images/ha_msecurity.png" width="300">
+<img src="images/ha_mhome2.png" width="300">
+<img src="images/ha_msecurity2.png" width="300">
 ![UI](images/ha_ifttt.jpg)
