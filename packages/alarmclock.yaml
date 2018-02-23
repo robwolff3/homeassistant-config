@@ -6,6 +6,7 @@ group:
   alarmclock:
     name: Alarm Clock
     control: hidden
+    icon: mdi:timer
     entities:
       - sensor.alarmclock_time_template
       - input_boolean.alarmclock_enabled
@@ -172,6 +173,8 @@ script:
         entity_id: light.diningroom_light_level
         data:
           brightness: 100
+      - service: homeassistant.turn_off
+        entity_id: switch.bedroom_outlet_switch_3
       # Cast NPR to media group
       - service: input_select.select_option
         data:
@@ -184,7 +187,7 @@ script:
       - service: script.turn_on
         entity_id: script.playlist_action
       # Gradually increase radio volume
-      - delay: "00:00:01"
+      - delay: "00:00:03"
       - service: media_player.volume_set
         data:
           entity_id: media_player.bedside_speaker

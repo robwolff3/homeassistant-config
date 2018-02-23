@@ -13,23 +13,11 @@ camera:
     extra_arguments: -vf scale=640:360
 
 device_tracker:
-  - platform: asuswrt
+  - platform: netgear
     host: REDACTED.250
     username: REDACTED
     password: REDACTED
-    protocol: ssh
-    port: REDACTED
-    mode: ap
-    interval_seconds: 12
-    new_device_defaults:
-      track_new_devices: False
-  - platform: asuswrt
-    host: REDACTED.236
-    username: REDACTED
-    password: REDACTED
-    protocol: ssh
-    port: REDACTED
-    mode: ap
+    port: 80
     interval_seconds: 12
     new_device_defaults:
       track_new_devices: False
@@ -96,17 +84,13 @@ homeassistant:
 ## Groups
 group:
 
-  presence_detection:
-    name: Presence Detection
+  sensors:
+    name: Sensors
     entities:
       - device_tracker.USER2_iphone
       - device_tracker.USER1_pixel
       - device_tracker.USER3_pixel
       - device_tracker.USER4_galaxy
-
-  sensorsinfo:
-    name: Sensors
-    entities:
       - sensor.frontdoor_contact
       - sensor.sidedoor_contact
       - sensor.backdoor_contact
@@ -126,6 +110,7 @@ group:
       - input_boolean.enable_armed_away
       - input_boolean.manual_armed_home
       - input_boolean.manual_armed_away
+
 
 #################################################################
 ## Sensors
@@ -261,14 +246,9 @@ automation:
         - condition: state
           entity_id: input_boolean.enable_armed_home
           state: 'on'
-        - condition: or
-          conditions:
-            - condition: state
-              entity_id: alarm_control_panel.main
-              state: pending
-            - condition: state
-              entity_id: alarm_control_panel.main
-              state: armed_home
+        - condition: state
+          entity_id: alarm_control_panel.main
+          state: armed_home
 
     action:
       service: alarm_control_panel.alarm_trigger
@@ -430,14 +410,9 @@ automation:
         - condition: state
           entity_id: input_boolean.enable_armed_away
           state: 'on'
-        - condition: or
-          conditions:
-            - condition: state
-              entity_id: alarm_control_panel.main
-              state: pending
-            - condition: state
-              entity_id: alarm_control_panel.main
-              state: armed_away
+        - condition: state
+          entity_id: alarm_control_panel.main
+          state: armed_away
 
     action:
       service: alarm_control_panel.alarm_trigger
@@ -496,11 +471,6 @@ automation:
     trigger:
       - platform: state
         entity_id: alarm_control_panel.main
-        from: 'armed_home'
-        to: 'triggered'
-      - platform: state
-        entity_id: alarm_control_panel.main
-        from: 'armed_away'
         to: 'triggered'
 
     action:

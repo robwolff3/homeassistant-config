@@ -1,6 +1,6 @@
 # Home Assistant
-My personal implementation of [Home Assistant](https://home-assistant.io) (version: 0.60.1).
-Configuration updated 1/19/2018.
+My personal implementation of [Home Assistant](https://home-assistant.io) (version: 0.63.3).
+Configuration updated 2/23/2018.
 
 ## Overview
 
@@ -21,7 +21,6 @@ Here is my home automation project Ive been improving since mid 2017. At that ti
 * Google Assistant - I'm using the Google Assistant native integration to control lights and switches. For everything else and custom commands I setup the IFTTT integration with HA and Google Assistant, [guide here](https://community.home-assistant.io/t/how-to-integrate-google-assistant-and-home-assistant-api-using-only-ifttt/19269) thanks [fanuch](https://community.home-assistant.io/u/fanuch/summary)!
 * Brightness slider below light switch - This provides the functionality of the dimming slider on the main part of a switch. Thanks [andrey-git](https://github.com/andrey-git)! [state-card-custom-ui](https://github.com/andrey-git/home-assistant-custom-ui) 
 * Remote custom icon layout - This is how I front end my media and other devices with buttons instead of the horizontal switch layout. I wanted this functionality for a while as it was the last thing holding my UI back from looking right for media remotes. Big thanks to [eddi89](https://community.home-assistant.io/u/eddi89) and [mviezzer](https://community.home-assistant.io/u/mviezzer/summary)! [state-card-tiles](https://github.com/maattdiy/home-assistant-config)
-* Package Tracking - This is a cool idea I am still testing out. As of writing this the USPS component is broken. Took the example from [here](https://github.com/brianjking/homeassistant-config), [here](https://github.com/home-assistant/home-assistant/issues/7918) and adapted it to my own. Thanks [brianjking](https://github.com/brianjking)!
 * [geekofweek](https://github.com/geekofweek/homeassistant) Repository - When I was getting started I pulled a lot of ideas and config examples from [geekoftheweek](https://community.home-assistant.io/u/geekoftheweek). Many thanks to this guy!
 
 Future Considerations:
@@ -32,7 +31,7 @@ Future Considerations:
 * Raspberry Pi 3
 * Aeotec Z-Stick Gen5
 * DIY [pfSense](https://www.pfsense.org/) router
-* Asus Router (Set in AP mode) - 2
+* Netgear Orbi (Set in AP mode)
 
 ### Z-Wave Devices
 * GE Z-Wave Plus In-wall Smart Dimmer Toggle 14295 - 6
@@ -62,9 +61,9 @@ Future Considerations:
 * Hue Dimmer Switch
 
 ## Interface
-![UI](images/ha_home.jpg)
-![UI](images/ha_security.jpg)
-![UI](images/ha_override.jpg)
+![UI](images/ha_home.png)
+![UI](images/ha_security.png)
+![UI](images/ha_override.png)
 <img src="images/ha_mhome.png" width="300">
 <img src="images/ha_msecurity.png" width="300">
 ![UI](images/ha_ifttt.jpg)

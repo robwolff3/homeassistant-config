@@ -32,7 +32,7 @@ homeassistant:
     media_player.living_room_tv:
       friendly_name: Living Room TV - Chromecast Ultra
 
-    media_player..kitchen_stereo:
+    media_player.kitchen_stereo:
       friendly_name: Kitchen Stereo - Chromecast Audio
 
     media_player.bedside_speaker:
@@ -181,6 +181,8 @@ automation:
       - platform: state
         entity_id: switch.nad_power
         to: 'off'
+        for:
+          seconds: 1
 
     condition:
       - condition: or
@@ -195,25 +197,6 @@ automation:
         entity_id: media_player.kitchen_stereo
       - service: homeassistant.turn_off
         entity_id: media_player.bedsidestereo_speakers
-
-  # Turn off Nad when kitchen_stereo off
-  - alias: nad off with kitchen_stereo
-
-    trigger:
-      - platform: state
-        entity_id: media_player.kitchen_stereo
-        to: 'off'
-        for:
-          minutes: 1
-      - platform: state
-        entity_id: media_player.bedsidestereo_speakers
-        to: 'off'
-        for:
-          minutes: 1
-
-    action:
-      - service: homeassistant.turn_off
-        entity_id: switch.nad_power
 
   # Turn off living_room_tv when Vizio powered off
   - alias: living_room_tv off with vizio
@@ -240,13 +223,6 @@ automation:
         entity_id: media_player.bedside_speaker
         from: 'off'
 
-    condition:
-      - condition: state
-        entity_id: media_player.bedside_speaker
-        state: 'off'
-        for:
-          seconds: 10
-
     action:
       - service: media_player.volume_set
         data:
@@ -260,13 +236,6 @@ automation:
       - platform: state
         entity_id: media_player.bedsidestereo_speakers
         from: 'off'
-
-    condition:
-      - condition: state
-        entity_id: media_player.bedsidestereo_speakers
-        state: 'off'
-        for:
-          seconds: 10
 
     action:
       - service: media_player.volume_set
@@ -282,13 +251,6 @@ automation:
         entity_id: media_player.kitchen_stereo
         from: 'off'
 
-    condition:
-      - condition: state
-        entity_id: media_player.kitchen_stereo
-        state: 'off'
-        for:
-          seconds: 10
-
     action:
       - service: media_player.volume_set
         data:
@@ -302,13 +264,6 @@ automation:
       - platform: state
         entity_id: media_player.bedsidestereo_speakers
         from: 'off'
-
-    condition:
-      - condition: state
-        entity_id: media_player.bedsidestereo_speakers
-        state: 'off'
-        for:
-          seconds: 10
 
     action:
       - service: media_player.volume_set
@@ -324,13 +279,6 @@ automation:
       - platform: state
         entity_id: media_player.living_room_tv
         from: 'off'
-
-    condition:
-      - condition: state
-        entity_id: media_player.living_room_tv
-        state: 'off'
-        for:
-          seconds: 10
 
     action:
       - service: media_player.volume_set

@@ -60,10 +60,10 @@ script:
           media_content_type: 'audio/mp4'
           media_content_id: >
             {% if is_state("input_select.playlist_content", "Michigan Radio") %} tunein:station:s23407
-            {% elif is_state("input_select.playlist_content", "Dinner") %} REDACTED
-            {% elif is_state("input_select.playlist_content", "Jazz") %} REDACTED
+            {% elif is_state("input_select.playlist_content", "Dinner") %} spotify:user:REDACTED
+            {% elif is_state("input_select.playlist_content", "Jazz") %} spotify:user:REDACTED
             {% elif is_state("input_select.playlist_content", "Chicago Blues") %} REDACTED
-            {% elif is_state("input_select.playlist_content", "USER1's Favorites") %} REDACTED
+            {% elif is_state("input_select.playlist_content", "USER1's Favorites") %} spotify:user:REDACTED
             {% endif %}
       - delay: "00:00:01"
       - service: media_player.play_media

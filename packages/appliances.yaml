@@ -24,6 +24,8 @@ group:
       - sensor.dishwasher_status
       - switch.kitchen_outlet_switch
       - switch.bedroom_outlet_switch_3
+      - script.vizio_remote
+      - script.nad_remote
 
 
 #################################################################
@@ -35,14 +37,8 @@ homeassistant:
       friendly_name: Dishwasher
       icon: mdi:washing-machine
 
-    switch.meter_switch_switch:
+    switch.meter_outlet_switch:
       friendly_name: Dishwasher Switch
-
-    sensor.meter_switch_current:
-      friendly_name: Dishwasher Current
-
-    sensor.meter_switch_power:
-      friendly_name: Dishwasher Power
 
     switch.bedroom_outlet_switch_3:
       friendly_name: Bedroom Fan
@@ -100,8 +96,11 @@ automation:
     action:
       service: notify.pushbullet
       data:
-        message: 'Espresso machine is warmed up!'
+        message: 'Espresso machine is warmed up.'
+        title: 'Espresso Ready'
 
+
+#Roomba logic
   # Sceduled Roobma!!
   - alias: Roomba On Weekdays
 
@@ -120,52 +119,86 @@ automation:
             - thu
             - fri
         - condition: template
-          value_template: '{{states.vacuum.roomba.attributes.battery_level > 80}}'
+          value_template: '{{states.vacuum.roomba.attributes.battery_level > 79}}'
 
     action:
       - service: homeassistant.turn_on
         entity_id: vacuum.roomba
+
+  # Notify when Roomba is stuck or stopped
+  - alias: Roomba notify stuck or stopped
+
+    trigger:
+      - platform: state
+        entity_id: vacuum.roomba
+        to: 'off'
+        for:
+          minutes: 1
+
+    condition:
+      condition: or
+      conditions:
+        - condition: template
+          value_template: '{{states.vacuum.roomba.attributes.status == "Stuck"}}'
+        - condition: template
+          value_template: '{{states.vacuum.roomba.attributes.status == "Stopped"}}'
+
+    action:
+      service: notify.pushbullet
+      data:
+        message: 'Schmidt is stuck or something else stopped him.'
+        title: 'Roomba Error'
+
+  # Notify when Roomba cant find dock
+  - alias: Roomba notify cant find dock
+
+    trigger:
+      - platform: state
+        entity_id: sensor.roomba_status
+        from: 'User Docking'
+        to: 'Stopped'
+
+#    condition:
+#      - condition: template
+#        value_template: '{{states.vacuum.roomba.attributes.battery_level > 21}}'
+
+    action:
+      service: notify.pushbullet
+      data:
+        message: 'Schmidt is lost and cant find his dock.'
+        title: 'Roomba Error'
 
   # Notify when Roomba is finished
   - alias: Roomba notify finished
 
     trigger:
       - platform: state
-        entity_id: vacuum.roomba
-        from: 'on'
-        to: 'off'
-
-    condition:
-      - condition: state
-        entity_id: vacuum.roomba
-        state: 'on'
-        for:
-          minutes: 50
+        entity_id: sensor.roomba_status
+        from: 'User Docking'
+        to: 'Charging'
+      - platform: state
+        entity_id: sensor.roomba_status
+        from: 'Docking - End Mission'
+        to: 'Charging'
 
     action:
       service: notify.pushbullet
       data:
-        message: 'Schmidt is finished and bin is full.'
+        message: 'Schmidt is finished and bin needs emptying.'
         title: 'Roomba Finished'
 
-  # Notify when Roomba is error
-#  - alias: Roomba notify error
-#
-#    trigger:
-#      platform: state
-#      entity_id: vacuum.roomba
-#      from: 'on'
-#      to: 'off'
-#
-#    condition:
-#      - condition: template
-#        value_template: '{{states.vacuum.roomba.attributes.battery_level > 80}}'
-#
-#    action:
-#      service: notify.pushbullet
-#      data:
-#        message: 'Schmidt is stuck or something else is wrong.'
-#        title: 'Roomba Error'
+  # Notify when Roomba battery very low
+  - alias: Roomba notify battery very low
+
+    trigger:
+      - platform: template
+        value_template: '{{states.vacuum.roomba.attributes.battery_level < 11}}'
+
+    action:
+      service: notify.pushbullet
+      data:
+        message: 'Schmidt battery is 10%.'
+        title: 'Roomba Error'
 
 
 #Dishwasher logic
@@ -174,7 +207,7 @@ automation:
 
     trigger:
       - platform: numeric_state
-        entity_id: sensor.meter_switch_power
+        entity_id: sensor.meter_outlet_power
         above: 10
 
     condition:
@@ -193,7 +226,7 @@ automation:
 
     trigger:
       - platform: numeric_state
-        entity_id: sensor.meter_switch_power
+        entity_id: sensor.meter_outlet_power
         below: 600
         above: 380
         for:
@@ -215,7 +248,7 @@ automation:
 
     trigger:
       - platform: numeric_state
-        entity_id: sensor.meter_switch_power
+        entity_id: sensor.meter_outlet_power
         below: 5
         for:
           minutes: 6

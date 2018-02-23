@@ -20,7 +20,7 @@ frontend:
     - /local/custom_ui/state-card-tiles.html
   extra_html_url_es5:
     - /local/custom_ui/state-card-custom-ui-es5.html
-    - /local/custom_ui/state-card-tiles.html
+    - /local/custom_ui/state-card-tiles_es5.html
   themes:
     dark:
       primary-color: '#36454f'
@@ -60,16 +60,11 @@ recorder:
       - vacuum
     entities:
       - sensor.backdoor_contact
-      - sensor.delivered_today
       - sensor.dishwasher_status
-      - sensor.fedex
       - sensor.frontdoor_contact
-      - sensor.meter_switch_current
-      - sensor.meter_switch_power
-      - sensor.out_for_delivery
-      - sensor.packages_in_transit
+      - sensor.meter_outlet_current
+      - sensor.meter_outlet_power
       - sensor.sidedoor_contact
-      - sensor.ups
 
   exclude:
     entities:
@@ -92,16 +87,18 @@ history:
 
 logbook:
 
-customizer:
-  hide_attributes:
-    - node_id
-    - value_index
-    - value_instance
-    - value_id
-    - old_entity_id
-    - new_entity_id
-    - google_assistant
-    - google_assistant_name
+#customizer:
+#  hide_attributes:
+#    - node_id
+#    - value_index
+#    - value_instance
+#    - value_id
+#    - old_entity_id
+#    - new_entity_id
+#    - google_assistant
+#    - google_assistant_name
+
+sun:
 
 ios:
 
@@ -166,7 +163,7 @@ google_assistant:
       expose: true
       name: USER2's Nightstand
 
-    switch.bedroom_outlet_switch_3:
+    switch.bedroom_outlet_switch_2:
       expose: true
       name: Bedroom Fan
       aliases:

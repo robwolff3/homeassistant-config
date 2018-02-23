@@ -5,13 +5,11 @@
 ## Default View
   default_view:
     view: yes
-    name: Home
+    name: 'Home'
     entities:
       - group.lights
 #      - group.climetecontrol
       - group.devices
-      - group.vizio_remote
-      - group.nad_remote
       - group.playlist_control
       - group.mopidy_main
       - group.bedsidestereo_speakers_main
@@ -20,8 +18,6 @@
       - group.bedside_speaker_main
       - group.kitchen_home_main
       - group.bedside_mini_main
-      - group.weather
-      - camera.midwest_radar
 
 ## Security
   security:
@@ -29,9 +25,7 @@
     view: yes
     entities:
       - group.alarmcontrol
-      - group.sensorsinfo
-      - group.presence_detection
-      - group.deliveries
+      - group.sensors
       - camera.frontdoor
       - camera.backdoor
 
@@ -41,7 +35,6 @@
     view: yes
     entities:
       - group.overridechild
-      - group.alarmclock
       - media_player.viziotv
       - media_player.bedsidestereo_speakers
       - media_player.living_room_tv
@@ -61,6 +54,4 @@
       - automation.dark_arrive_home_lights
       - automation.roomba_on_weekdays
       - switch.bedroom_outlet_switch_2
-      - switch.meter_switch_switch
-      - sensor.meter_switch_current
-      - sensor.meter_switch_power
+      - switch.meter_outlet_switch

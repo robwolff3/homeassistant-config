@@ -158,6 +158,7 @@ group:
       - light.bathroom_light_level
       - light.hallway_light_level
       - group.nightstands
+      - group.alarmclock
       - script.light_remote
 
   nightstands:
@@ -285,7 +286,12 @@ automation:
         - condition: state
           entity_id: light.diningroom_light_level
           state: 'off'
-        ## Add condition for after sunset and before sunrise
+        - condition: state
+          entity_id: sun.sun
+          state: 'below_horizon'
+        - condition: time
+          after: '17:00:00'
+          before: '02:00:00'
 
     action:
       - service: homeassistant.turn_on
