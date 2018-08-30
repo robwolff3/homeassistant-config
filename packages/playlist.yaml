@@ -1,19 +1,42 @@
 
-#################################################################
-## Media Players
+#################################################
+## Customize
 
-media_player:
-  - platform: mpd
-    name: 'Mopidy'
-    host: REDACTED.253
+homeassistant:
+  customize:
+    script.playlist_remote:
+      custom_ui_state_card: state-card-tiles
+      config:
+        columns: 4
+        row_height: 40px
+        column_width: 60px
+        gap: 10px
+        entities:
+          - entity: script.playlist_action
+            icon: mdi:play
+            color: '#9a9fa8'
+            column: 1
+            row: 1
+          - entity: script.playlist_stop
+            icon: mdi:stop
+            color: '#9a9fa8'
+            column: 2
+            row: 1
+          - entity: script.playlist_voldown
+            icon: mdi:volume-medium
+            color: '#9a9fa8'
+            column: 3
+            row: 1
+          - entity: script.playlist_volup
+            icon: mdi:volume-high
+            color: '#9a9fa8'
+            column: 4
+            row: 1
+
 
 #################################################################
 ## Groups
 group:
-
-  mopidy_main:
-    entities:
-      - media_player.mopidy
 
   playlist_control:
     name: Playlist Control
@@ -31,25 +54,30 @@ input_select:
     name: 'Content:'
     options:
       - Michigan Radio
+      - "WRCJ 90.9 FM"
       - Dinner
       - Jazz
       - Chicago Blues
       - USER1's Favorites
+      - Ocean Sounds
     icon: mdi:playlist-play
 
   playlist_source:
     name: 'Source:'
     options:
       - Kitchen Stereo
-      - Bedside Speaker
+      - Bedroom Speaker
       - Living Room TV
-      - Bedside/Stereo Speakers
+      - Kitchen/Bedroom
     initial: Kitchen Stereo
     icon: mdi:speaker-wireless
 
 #################################################################
 ## Scripts
 script:
+
+  playlist_remote:
+    sequence:
 
   playlist_action:
     sequence:
@@ -60,10 +88,12 @@ script:
           media_content_type: 'audio/mp4'
           media_content_id: >
             {% if is_state("input_select.playlist_content", "Michigan Radio") %} tunein:station:s23407
-            {% elif is_state("input_select.playlist_content", "Dinner") %} spotify:user:REDACTED
-            {% elif is_state("input_select.playlist_content", "Jazz") %} spotify:user:REDACTED
+            {% elif is_state("input_select.playlist_content", "WRCJ 90.9 FM") %} tunein:station:s28356
+            {% elif is_state("input_select.playlist_content", "Dinner") %} REDACTED
+            {% elif is_state("input_select.playlist_content", "Jazz") %} REDACTED
             {% elif is_state("input_select.playlist_content", "Chicago Blues") %} REDACTED
-            {% elif is_state("input_select.playlist_content", "USER1's Favorites") %} spotify:user:REDACTED
+            {% elif is_state("input_select.playlist_content", "USER1's Favorites") %} REDACTED
+            {% elif is_state("input_select.playlist_content", "Ocean Sounds") %} local:track:waves.mp3
             {% endif %}
       - delay: "00:00:01"
       - service: media_player.play_media
@@ -72,9 +102,9 @@ script:
           media_content_type: 'audio/mp4'
           entity_id: >
             {% if is_state("input_select.playlist_source", "Kitchen Stereo") %} media_player.kitchen_stereo
-            {% elif is_state("input_select.playlist_source", "Bedside Speaker") %} media_player.bedside_speaker
+            {% elif is_state("input_select.playlist_source", "Bedroom Speaker") %} media_player.bedroom_speaker
             {% elif is_state("input_select.playlist_source", "Living Room TV") %} media_player.living_room_tv
-            {% elif is_state("input_select.playlist_source", "Bedside/Stereo Speakers") %} media_player.bedsidestereo_speakers
+            {% elif is_state("input_select.playlist_source", "Kitchen/Bedroom") %} media_player.kitchenbedroom
             {% endif %}
 
   playlist_volup:
@@ -82,10 +112,10 @@ script:
       service: media_player.volume_up
       data_template:
         entity_id: >
-          {% if is_state("input_select.playlist_source", "Kitchen Stereo") %} media_player.kitchen_stereo
-          {% elif is_state("input_select.playlist_source", "Bedside Speaker") %} media_player.bedside_speaker
+          {% if is_state("input_select.playlist_source", "Kitchen Stereo") %} media_player.nadc338
+          {% elif is_state("input_select.playlist_source", "Bedroom Speaker") %} media_player.bedroom_speaker
           {% elif is_state("input_select.playlist_source", "Living Room TV") %} media_player.living_room_tv
-          {% elif is_state("input_select.playlist_source", "Bedside/Stereo Speakers") %} media_player.bedsidestereo_speakers
+          {% elif is_state("input_select.playlist_source", "Kitchen/Bedroom") %} media_player.kitchenbedroom
           {% endif %}
 
   playlist_voldown:
@@ -93,10 +123,10 @@ script:
       service: media_player.volume_down
       data_template:
         entity_id: >
-          {% if is_state("input_select.playlist_source", "Kitchen Stereo") %} media_player.kitchen_stereo
-          {% elif is_state("input_select.playlist_source", "Bedside Speaker") %} media_player.bedside_speaker
+          {% if is_state("input_select.playlist_source", "Kitchen Stereo") %} media_player.nadc338
+          {% elif is_state("input_select.playlist_source", "Bedroom Speaker") %} media_player.bedroom_speaker
           {% elif is_state("input_select.playlist_source", "Living Room TV") %} media_player.living_room_tv
-          {% elif is_state("input_select.playlist_source", "Bedside/Stereo Speakers") %} media_player.bedsidestereo_speakers
+          {% elif is_state("input_select.playlist_source", "Kitchen/Bedroom") %} media_player.kitchenbedroom
           {% endif %}
 
   playlist_stop:
@@ -107,9 +137,9 @@ script:
         data_template:
           entity_id: >
             {% if is_state("input_select.playlist_source", "Kitchen Stereo") %} media_player.kitchen_stereo
-            {% elif is_state("input_select.playlist_source", "Bedside Speaker") %} media_player.bedside_speaker
+            {% elif is_state("input_select.playlist_source", "Bedroom Speaker") %} media_player.bedroom_speaker
             {% elif is_state("input_select.playlist_source", "Living Room TV") %} media_player.living_room_tv
-            {% elif is_state("input_select.playlist_source", "Bedside/Stereo Speakers") %} media_player.bedsidestereo_speakers
+            {% elif is_state("input_select.playlist_source", "Kitchen/Bedroom") %} media_player.kitchenbedroom
             {% endif %}
 
 #################################################################
@@ -124,13 +154,13 @@ automation:
         entity_id: media_player.kitchen_stereo
         to: 'off'
       - platform: state
-        entity_id: media_player.bedside_speaker
+        entity_id: media_player.bedroom_speaker
         to: 'off'
       - platform: state
         entity_id: media_player.living_room_tv
         to: 'off'
       - platform: state
-        entity_id: media_player.bedsidestereo_speakers
+        entity_id: media_player.kitchenbedroom
         to: 'off'
 
     condition:
@@ -140,13 +170,13 @@ automation:
           entity_id: media_player.kitchen_stereo
           state: 'off'
         - condition: state
-          entity_id: media_player.bedside_speaker
+          entity_id: media_player.bedroom_speaker
           state: 'off'
         - condition: state
           entity_id: media_player.living_room_tv
           state: 'off'
         - condition: state
-          entity_id: media_player.bedsidestereo_speakers
+          entity_id: media_player.kitchenbedroom
           state: 'off'
 
     action:

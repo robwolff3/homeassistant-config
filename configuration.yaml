@@ -3,21 +3,24 @@
 ## Home Assistant
 
 homeassistant:
-  name: Home
+  name: Home Assistant
   latitude: REDACTED
   longitude: REDACTED
   elevation: 250
   unit_system: imperial
   time_zone: America/Detroit
   packages: !include_dir_named packages/
+#  auth_providers:
+#   - type: homeassistant
 
 group: !include groups.yaml
 
 frontend:
-  javascript_version: es5
   extra_html_url:
     - /local/custom_ui/state-card-custom-ui.html
     - /local/custom_ui/state-card-tiles.html
+    - /local/custom_ui/state-card-custom_stereo.html
+    - /local/custom_ui/state-card-custom_tv.html
   extra_html_url_es5:
     - /local/custom_ui/state-card-custom-ui-es5.html
     - /local/custom_ui/state-card-tiles_es5.html
@@ -31,9 +34,8 @@ http:
   server_port: REDACTED
   api_password: REDACTED
   base_url: REDACTED
-  trusted_networks:
-    - REDACTED
-    - REDACTED
+  use_x_forwarded_for: true
+  trusted_proxies: REDACTED
   ip_ban_enabled: true
   login_attempts_threshold: 5
 
@@ -46,7 +48,7 @@ discovery:
 
 recorder:
   purge_interval: 1
-  purge_keep_days: 5
+  purge_keep_days: 3
   include:
     domains:
       - alarm_control_panel
@@ -58,6 +60,7 @@ recorder:
       - media_player
       - switch
       - vacuum
+      - lock
     entities:
       - sensor.backdoor_contact
       - sensor.dishwasher_status
@@ -65,6 +68,8 @@ recorder:
       - sensor.meter_outlet_current
       - sensor.meter_outlet_power
       - sensor.sidedoor_contact
+      - sensor.kwikset_touchpad_electronic_deadbolt_alarm_level_2
+      - sensor.kwikset_touchpad_electronic_deadbolt_alarm_type_2
 
   exclude:
     entities:
@@ -82,106 +87,229 @@ recorder:
       - switch.nad_ccinput
       - switch.nad_power
       - switch.nad_volume
+      - input_boolean.alarmclock_cancel
+      - media_player.muffin_stuffin
+      - input_boolean.manual_armed_away
+      - input_boolean.manual_armed_home
+      - input_select.playlist_content
+      - input_select.playlist_source
+      - switch.livingroom_outlet_switch_3
+      - switch.livingroom_outlet_switch_2
+      - switch.livingroom_outlet_switch
 
 history:
 
 logbook:
 
-#customizer:
-#  hide_attributes:
-#    - node_id
-#    - value_index
-#    - value_instance
-#    - value_id
-#    - old_entity_id
-#    - new_entity_id
-#    - google_assistant
-#    - google_assistant_name
-
 sun:
 
 ios:
+
+#################################################################
+## Media Players
+
+media_player:
+  - platform: vizio
+    name: viziotv
+    host: REDACTED.234
+    access_token: REDACTED
+  - platform: nadtcp2
+    name: nadc338
+    max_volume: -20
+    min_volume: -70
+    volume_step: 2
+    host: REDACTED.231
+  - platform: mpd
+    name: 'Mopidy'
+    host: REDACTED.253
+
+
+#################################################################
+## Lights
+
+zwave:
+  usb_path: "/dev/ttyACM0"
+  network_key: "0xFE, 0xB5, 0x53, 0xC5, 0x3D, 0x6F, 0x13, 0x41, 0x25, 0xCC, 0x51, 0x77, 0x89, 0xBF, 0x14, 0xE7"
+  polling_interval: 30000
+  device_config:
+    light.livingroom_light_level:
+      polling_intensity: 1
+      refresh_value: true
+    light.kitchen_light_level:
+      polling_intensity: 1
+      refresh_value: true
+    light.diningroom_light_level:
+      polling_intensity: 1
+      refresh_value: true
+    light.bedroom_light_level:
+      polling_intensity: 1
+      refresh_value: true
+    light.bathroom_light_level:
+      polling_intensity: 1
+      refresh_value: true
+    light.hallway_light_level:
+      polling_intensity: 1
+      refresh_value: true
+
+light:
+  - platform: hue
+    host: REDACTED.240
+    allow_unreachable: true
+    allow_hue_groups: true
+
+
+#################################################################
+## Things
+
+nest:
+  client_id: REDACTED
+  client_secret: REDACTED
+
+vacuum:
+  - platform: roomba
+    host: REDACTED.247
+    username: REDACTED
+    password: 'REDACTED'
+
+
+#################################################################
+## Security
+
+alarm_control_panel:
+  platform: manual
+  name: Main
+  pending_time: 30
+  trigger_time: 99999999
+
+zoneminder:
+  host: 'REDACTED'
+  path: /
+  path_zms: /cgi-bin/nph-zms
+  ssl: true
+  username: REDACTED
+  password: REDACTED
+camera:
+  - platform: zoneminder
+sensor:
+  - platform: zoneminder
+
+device_tracker:
+  - platform: netgear
+    host: REDACTED.250
+    username: REDACTED
+    password: REDACTED
+    port: 80
+    interval_seconds: 12
+    new_device_defaults:
+      track_new_devices: False
+
+zone:
+  name: Home
+  latitude: REDACTED
+  longitude: REDACTED
+  radius: 200
+
+
+#################################################################
+## Notifications and Google Assistant
 
 twilio:
   account_sid: REDACTED
   auth_token: REDACTED
 
 notify:
-  - name: pushbullet
-    platform: pushbullet
-    api_key: REDACTED
-  - name: twilio_call
+  - name: twilio_calling
     platform: twilio_call
     from_number: REDACTED
+  - name: html5
+    platform: html5
+    gcm_api_key: 'REDACTED'
+    gcm_sender_id: 'REDACTED'
 
-ifttt:
-  key: REDACTED
-
-google_assistant:
-  expose_by_default: false
-  project_id: REDACTED
-  client_id: REDACTED
-  access_token: REDACTED
-  api_key: REDACTED
-  agent_user_id: REDACTED
-  entity_config:
-
-    light.livingroom_light_level:
-      expose: true
-      name: Living Room Lights
-
-    light.kitchen_light_level:
-      expose: true
-      name: Kitchen Lights
-
-    light.diningroom_light_level:
-      expose: true
-      name: Dining Room Lights
-
-    light.bedroom_light_level:
-      expose: true
-      name: Bedroom Lights
-
-    light.bathroom_light_level:
-      expose: true
-      name: Bathroom Lights
-
-    light.hallway_light_level:
-      expose: true
-      name: Hallway Lights
-
-    group.nightstands:
-      expose: true
-      type: group
-      name: Nightstand Lights
-
-    light.nightstand1:
-      expose: true
-      name: USER1's Nightstand
-
-    light.nightstand2:
-      expose: true
-      name: USER2's Nightstand
-
-    switch.bedroom_outlet_switch_2:
-      expose: true
-      name: Bedroom Fan
-      aliases:
-        - Fan
-
-    switch.kitchen_outlet_switch:
-      expose: true
-      name: Espresso Machine
-      aliases:
-        - Coffee Machine
-
-    switch.nad_power:
-      expose: true
-      name: Stereo
-      aliases:
-        - Amplifier
-        - NAD
-
-    media_player.viziotv:
-      expose: true
-      name: TV
+cloud:
+  google_actions:
+    filter:
+      include_entities:
+        - light.livingroom_light_level
+        - light.kitchen_light_level
+        - light.diningroom_light_level
+        - light.bedroom_light_level
+        - light.bathroom_light_level
+        - light.hallway_light_level
+        - light.nightstand
+        - switch.bedroom_outlet_switch_3
+        - switch.kitchen_outlet_switch
+        - switch.nad_stereo
+        - switch.vizio_tv
+        - scene.dinner
+        - scene.watching_tv
+        - scene.goodmorning
+        - scene.bedtime
+        - scene.all_things_off
+        - script.roomba_on
+        - script.cancel_alarm
+        - script.vizio_tv_volup
+        - script.vizio_tv_voldown
+        - script.nad_volup
+        - script.nad_voldown
+        - script.playlist_stop
+    entity_config:
+      light.livingroom_light_level:
+        name: Living Room Lights
+      light.kitchen_light_level:
+        name: Kitchen Lights
+      light.diningroom_light_level:
+        name: Dining Room Lights
+      light.bedroom_light_level:
+        name: Bedroom Lights
+      light.bathroom_light_level:
+        name: Bathroom Lights
+      light.hallway_light_level:
+        name: Hallway Lights
+      light.nightstand:
+        name: Nightstand Lights
+      switch.bedroom_outlet_switch_3:
+        name: Bedroom Fan Switch
+        aliases:
+          - Bedroom Fan
+          - Fan
+      switch.kitchen_outlet_switch:
+        name: Espresso Machine Switch
+        aliases:
+          - Espresso Machine
+          - Coffee Machine
+          - Kitchen Outlet
+      switch.nad_stereo:
+        name: Stereo Switch
+        aliases:
+          - Stereo
+          - Nad
+      switch.vizio_tv:
+        name: TV Switch
+        aliases:
+          - TV
+          - Vizio
+      scene.dinner:
+        name: Dinner Scene
+      scene.watching_tv:
+        name: Watching TV Scene
+      scene.goodmorning:
+        name: GoodMorning Scene
+      scene.bedtime:
+        name: Bedtime Scene
+      scene.all_things_off:
+        name: All Things Off Scene
+      script.roomba_on:
+        name: Roomba
+      script.cancel_alarm:
+        name: Cancel Alarm
+      script.vizio_tv_volup:
+        name: Vizio volup
+      script.vizio_tv_voldown:
+        name: Vizio voldown
+      script.nad_volup:
+        name: Nad volup
+      script.nad_voldown:
+        name: Nad voldown
+      script.playlist_stop:
+        name: Playlist Stop

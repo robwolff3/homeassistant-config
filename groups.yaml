@@ -8,22 +8,17 @@
     name: 'Home'
     entities:
       - group.lights
-#      - group.climetecontrol
-      - group.devices
+      - group.things
       - group.playlist_control
-      - group.mopidy_main
-      - group.bedsidestereo_speakers_main
-      - group.living_room_tv_main
-      - group.kitchen_stereo_main
-      - group.bedside_speaker_main
-      - group.kitchen_home_main
-      - group.bedside_mini_main
+      - group.media_players_active
 
 ## Security
   security:
     name: Security
     view: yes
     entities:
+      - group.locks
+      - group.zmevents
       - group.alarmcontrol
       - group.sensors
       - camera.frontdoor
@@ -36,13 +31,12 @@
     entities:
       - group.overridechild
       - media_player.viziotv
-      - media_player.bedsidestereo_speakers
+      - media_player.kitchenbedroom
       - media_player.living_room_tv
       - media_player.kitchen_stereo
-      - media_player.bedside_speaker
+      - media_player.nadc338
+      - media_player.bedroom_speaker
       - media_player.kitchen_home
-      - media_player.bedside_mini
-      - media_player.muffin_stuffin
       - media_player.mopidy
 
   overridechild:
@@ -55,3 +49,6 @@
       - automation.roomba_on_weekdays
       - switch.bedroom_outlet_switch_2
       - switch.meter_outlet_switch
+      - script.updateha
+      - script.restartha
+      - script.rebootpi

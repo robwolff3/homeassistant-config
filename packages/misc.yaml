@@ -1,4 +1,45 @@
 
+##################################################
+## Commands
+shell_command:
+  updateha: /home/homeassistant/.homeassistant/updateha.sh
+  restartha: sudo systemctl restart home-assistant.service
+  rebootpi: sudo reboot
+
+##################################################
+## Scripts
+script:
+
+  # Update HA
+  updateha:
+    alias: Update Home Assistant
+    sequence:
+      - service: shell_command.updateha
+
+  # Restart Home Assistant
+  restartha:
+    alias: Restart Home Assistant
+    sequence:
+      - service: shell_command.restartha
+
+  # Reboot Raspberry Pi
+  rebootpi:
+    alias: Reboot Raspberry Pi
+    sequence:
+      - service: shell_command.rebootpi
+
+  # Notify package delivered
+  package_notify:
+    sequence:
+      - service: notify.html5
+        data:
+          title: 'Package Delivered'
+          message: 'A package has been delivered.'
+          data:
+            requireInteraction: true
+            renotify: true
+            tag: 'package_notify'
+
 #################################################################
 ## Automations
 automation:
@@ -11,9 +52,12 @@ automation:
       entity_id: updater.updater
 
     action:
-      service: notify.pushbullet
-      data:
-        message: "Update for Home Assistant is available."
+      - service: notify.html5
+        data:
+          title: 'New Home Assistant Release'
+          message: 'Home Assistant  {{ states.updater.updater.state }}  is now available.'
+          data:
+            requireInteraction: true
 
   # Set HA theme on startup
   - alias: 'Set theme at startup'

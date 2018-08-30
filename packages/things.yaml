@@ -1,31 +1,21 @@
 
 #################################################################
-## Components
-
-#nest:
-#  client_id: REDACTED
-#  client_secret: REDACTED
-
-vacuum:
-  - platform: roomba
-    host: REDACTED.247
-    username: REDACTED
-    password: 'REDACTED'
-
-#################################################################
 ## Groups
 group:
 
-  devices:
+  things:
     name: Things
     control: hidden
     entities:
-      - vacuum.roomba
-      - sensor.dishwasher_status
-      - switch.kitchen_outlet_switch
+      - switch.vizio_tv
+      - switch.nad_stereo
       - switch.bedroom_outlet_switch_3
-      - script.vizio_remote
-      - script.nad_remote
+      - switch.kitchen_outlet_switch
+      - sensor.dishwasher_status
+      - climate.dining_room
+      - vacuum.roomba
+      - lock.front_door_handle_locked
+      - group.alarmclock
 
 
 #################################################################
@@ -51,8 +41,19 @@ homeassistant:
     switch.bedroom_outlet_switch_2:
       friendly_name: Bedroom Outlet Left
 
-#    climate.dining_room:
-#      friendly_name: Nest
+    climate.dining_room:
+      friendly_name: Thermostat
+
+
+#################################################################
+## Scripts
+
+script:
+
+  roomba_on:
+    sequence:
+      - service: homeassistant.turn_on
+        entity_id: vacuum.roomba
 
 
 #################################################################
@@ -64,6 +65,12 @@ sensor:
       dishwasher_status:
         value_template: '{{ states.input_select.dishwasher_status.state}}'
         friendly_name: 'Dishwasher Status'
+
+  - platform: template
+    sensors:
+      roomba_status:
+        value_template: '{{ states.vacuum.roomba.attributes.status}}'
+        friendly_name: 'Roomba Status'
 
 
 ##################################################
@@ -94,10 +101,12 @@ automation:
         minutes: 30
 
     action:
-      service: notify.pushbullet
-      data:
-        message: 'Espresso machine is warmed up.'
-        title: 'Espresso Ready'
+      - service: notify.html5
+        data:
+          title: 'Espresso Ready'
+          message: 'Espresso machine is warmed up.'
+          data:
+            requireInteraction: true
 
 
 #Roomba logic
@@ -144,10 +153,14 @@ automation:
           value_template: '{{states.vacuum.roomba.attributes.status == "Stopped"}}'
 
     action:
-      service: notify.pushbullet
-      data:
-        message: 'Schmidt is stuck or something else stopped him.'
-        title: 'Roomba Error'
+      - service: notify.html5
+        data:
+          title: 'Roomba Error'
+          message: 'Schmidt is stuck or something else stopped him.'
+          data:
+            requireInteraction: true
+            renotify: true
+            tag: 'roomba_notify'
 
   # Notify when Roomba cant find dock
   - alias: Roomba notify cant find dock
@@ -163,10 +176,14 @@ automation:
 #        value_template: '{{states.vacuum.roomba.attributes.battery_level > 21}}'
 
     action:
-      service: notify.pushbullet
-      data:
-        message: 'Schmidt is lost and cant find his dock.'
-        title: 'Roomba Error'
+      - service: notify.html5
+        data:
+          title: 'Roomba Error'
+          message: 'Schmidt is lost and cant find his dock.'
+          data:
+            requireInteraction: true
+            renotify: true
+            tag: 'roomba_notify'
 
   # Notify when Roomba is finished
   - alias: Roomba notify finished
@@ -182,10 +199,14 @@ automation:
         to: 'Charging'
 
     action:
-      service: notify.pushbullet
-      data:
-        message: 'Schmidt is finished and bin needs emptying.'
-        title: 'Roomba Finished'
+      - service: notify.html5
+        data:
+          title: 'Roomba Finished'
+          message: 'Schmidt is finished and bin needs emptying.'
+          data:
+            requireInteraction: true
+            renotify: true
+            tag: 'roomba_notify'
 
   # Notify when Roomba battery very low
   - alias: Roomba notify battery very low
@@ -195,10 +216,14 @@ automation:
         value_template: '{{states.vacuum.roomba.attributes.battery_level < 11}}'
 
     action:
-      service: notify.pushbullet
-      data:
-        message: 'Schmidt battery is 10%.'
-        title: 'Roomba Error'
+      - service: notify.html5
+        data:
+          title: 'Roomba Error'
+          message: 'Schmidt battery is 10%.'
+          data:
+            requireInteraction: true
+            renotify: true
+            tag: 'roomba_notify'
 
 
 #Dishwasher logic
@@ -273,7 +298,9 @@ automation:
         to: 'Off'
 
     action:
-      service: notify.pushbullet
-      data:
-        message: 'The Dishwasher has finished and is ready to be emptied.'
-        title: 'Dishwasher Finished'
+      - service: notify.html5
+        data:
+          title: 'Dishwasher Finished'
+          message: 'The Dishwasher has finished and is ready to be emptied.'
+          data:
+            requireInteraction: true

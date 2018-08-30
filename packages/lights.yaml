@@ -1,38 +1,5 @@
 
 #################################################################
-## Components
-
-zwave:
-  usb_path: "/dev/ttyACM0"
-  polling_interval: 30000
-  device_config:
-    light.livingroom_light_level:
-      polling_intensity: 1
-      refresh_value: 1
-    light.kitchen_light_level:
-      polling_intensity: 1
-      refresh_value: 1
-    light.diningroom_light_level:
-      polling_intensity: 1
-      refresh_value: 1
-    light.bedroom_light_level:
-      polling_intensity: 1
-      refresh_value: 1
-    light.bathroom_light_level:
-      polling_intensity: 1
-      refresh_value: 1
-    light.hallway_light_level:
-      polling_intensity: 1
-      refresh_value: 1
-
-light:
-  - platform: hue
-    host: REDACTED.240
-    allow_unreachable: true
-    allow_hue_groups: true
-
-
-#################################################################
 ## Customize
 homeassistant:
   customize:
@@ -119,6 +86,13 @@ homeassistant:
     group.nightstands:
       friendly_name: Nightstands
       icon: mdi:lamp
+      custom_ui_state_card: state-card-custom-ui
+      state_card_mode: break-slider
+      stretch_slider: true
+      slider_theme:
+       min: 0
+       max: 255
+       off_when_min: true
 
     light.nightstand1:
       friendly_name: USER1's Nightstand
@@ -158,8 +132,7 @@ group:
       - light.bathroom_light_level
       - light.hallway_light_level
       - group.nightstands
-      - group.alarmclock
-      - script.light_remote
+      - input_select.scene_selector
 
   nightstands:
     name: Nightstands
@@ -263,6 +236,39 @@ automation:
       entity_id: light.hallway_light_level
 
 
+  # Turn on Kitchen lights at entry
+  - alias: Turn on Kitchen lights at entry
+
+    trigger:
+      - platform: template
+        value_template: '{{states.lock.front_door_handle_locked.attributes.lock_status == "Unlocked by RF"}}'
+      - platform: template
+        value_template: '{{states.lock.front_door_handle_locked.attributes.lock_status == "Unlocked with Keypad by user 1"}}'
+
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.livingroom_light_level
+          state: 'off'
+        - condition: state
+          entity_id: light.kitchen_light_level
+          state: 'off'
+        - condition: state
+          entity_id: light.diningroom_light_level
+          state: 'off'
+
+    action:
+      - service: homeassistant.turn_on
+        entity_id: light.kitchen_light_level
+        data:
+          brightness: 150
+      - service: homeassistant.turn_on
+        entity_id: light.diningroom_light_level
+        data:
+          brightness: 80
+
+
   # Dark arrive home lights
   - alias: Dark Arrive Home Lights
 
@@ -312,78 +318,180 @@ automation:
           brightness: 120
 
 
-#################################################################
-## Scripts
-#################################################################
-script:
+  # Scene Selector
+  - alias: Scene Selector
 
-  scene_everything_off:
-    sequence:
-      - service: homeassistant.turn_on
-        entity_id: scene.everything_off
+    trigger:
+      platform: state
+      entity_id: input_select.scene_selector
 
-  scene_nighttime:
-    sequence:
-      - service: homeassistant.turn_on
-        entity_id: scene.nighttime
-
-  scene_doglights:
-    sequence:
-      - service: homeassistant.turn_on
-        entity_id: scene.doglights
+    action:
+      - service: scene.turn_on
+        data_template:
+          entity_id: scene.{{trigger.to_state.state}}
+      - delay: '00:00:30'
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.scene_selector
+          option: None
 
 
 #################################################################
 ## Scenes
-#################################################################
+
 scene:
 
-  - name: everything_off
-    entities:
-      light.livingroom_light_level: off
-      light.kitchen_light_level: off
-      light.diningroom_light_level: off
-      light.bedroom_light_level: off
-      light.nightstand1: off
-      light.nightstand2: off
-      light.hallway_light_level: off
-      media_player.viziotv: off
-      media_player.bedside_speaker: off
-      media_player.kitchen_stereo: off
-      media_player.bedsidestereo_speakers: off
-      media_player.mopidy: off
-      switch.nad_power: off
-      switch.bedroom_outlet_switch_3: off
-
-  - name: nighttime
-    entities:
-      switch.bedroom_outlet_switch_3: on
-      light.nightstand1:
-        state: on
-        brightness: 130
-      light.nightstand2:
-        state: on
-        brightness: 130
-      light.livingroom_light_level: off
-      light.kitchen_light_level: off
-      light.diningroom_light_level: off
-      light.bedroom_light_level: off
-      media_player.viziotv: off
-      switch.nad_power: off
-
-  - name: doglights
+  - name: Dinner 
     entities:
       light.kitchen_light_level:
         state: on
+        brightness: 255
+      light.diningroom_light_level:
+        state: on
+        brightness: 128
+      script.dinner_automusic: on
+
+  - name: Watching_TV
+    entities:
+      light.kitchen_light_level:
+        state: on
+        brightness: 70
+      light.livingroom_light_level:
+        state: on
+        brightness: 70
+      light.diningroom_light_level: off
+      media_player.viziotv: on
+
+  - name: GoodMorning
+    entities:
+      light.bedroom_light_level:
+        state: on
         brightness: 150
-      light.nightstand1: off
+      light.kitchen_light_level:
+        state: on
+        brightness: 150
+      switch.bedroom_outlet_switch_3: off
+
+  - name: Bedtime
+    entities:
+      light.nightstand1:
+        state: on
+        brightness: 45
+      light.nightstand2:
+        state: on
+        brightness: 45
+      switch.bedroom_outlet_switch_3: on
+      media_player.viziotv: off
+      media_player.nadc338: off
+      script.bedtime_autooff: on
+
+  - name: USER2_Bedtime
+    entities:
+      light.nightstand1:
+        state: on
+        brightness: 30
       light.nightstand2: off
       light.bedroom_light_level: off
+      light.kitchen_light_level:
+        state: on
+        brightness: 70
+      switch.bedroom_outlet_switch_3: on
+      script.USER2_bedtime: on
+
+  - name: All_Things_Off
+    entities:
       light.livingroom_light_level: off
+      light.kitchen_light_level: off
       light.diningroom_light_level: off
+      light.bedroom_light_level: off
+      light.nightstand1: off
+      light.nightstand2: off
       switch.bedroom_outlet_switch_3: off
-      media_player.bedside_speaker: off
-      media_player.kitchen_stereo: off
-      media_player.bedsidestereo_speakers: off
+      media_player.viziotv: off
+      media_player.bedroom_speaker: off
+      media_player.nadc338: off
+      media_player.kitchenbedroom: off
       media_player.mopidy: off
-      switch.nad_power: off
+
+
+#################################################################
+## Scripts
+
+script:
+
+  bedtime_autooff:
+    sequence:
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.playlist_content
+          option: "Ocean Sounds"
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.playlist_source
+          option: "Bedroom Speaker"
+      - service: script.turn_on
+        entity_id: script.playlist_action
+      - delay: '00:03:00'
+      - service: light.turn_on
+        entity_id: light.kitchen_light_level
+        data:
+          brightness: 50
+      - service: homeassistant.turn_off
+        entity_id: light.livingroom_light_level
+      - service: homeassistant.turn_off
+        entity_id: light.diningroom_light_level
+      - service: homeassistant.turn_off
+        entity_id: light.bedroom_light_level
+      - delay: '00:05:00'
+      - service: homeassistant.turn_off
+        entity_id: light.kitchen_light_level
+      - delay: '00:05:00'
+      - service: homeassistant.turn_off
+        entity_id: light.nightstand1
+      - service: homeassistant.turn_off
+        entity_id: light.nightstand2
+
+  USER2_bedtime:
+    sequence:
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.playlist_content
+          option: "Ocean Sounds"
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.playlist_source
+          option: "Bedroom Speaker"
+      - service: script.turn_on
+        entity_id: script.playlist_action
+
+  dinner_automusic:
+    sequence:
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.playlist_content
+          option: "Jazz"
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.playlist_source
+          option: "Kitchen Stereo"
+      - service: script.turn_on
+        entity_id: script.playlist_action
+
+
+#################################################################
+## Input Select
+
+input_select:
+  scene_selector:
+    name: Lighting Scenes
+    icon: mdi:ceiling-light
+    initial: None
+    options:
+      - Dinner
+      - Watching_TV
+      - GoodMorning
+      - Bedtime
+      - USER2_Bedtime
+      - All_Things_Off
+      - None
+

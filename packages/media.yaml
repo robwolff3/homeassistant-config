@@ -1,27 +1,5 @@
 
 #################################################################
-## Media Players
-
-media_player:
-  - platform: vizio
-    name: viziotv
-    host: REDACTED.234
-    access_token: REDACTED
-  - platform: cast
-    host: REDACTED.230 #living_room_tv
-  - platform: cast
-    host: REDACTED.231 #kitchen_stereo
-  - platform: cast
-    host: REDACTED.232 #kitchen_home
-  - platform: cast
-    host: REDACTED.233 #bedside_speaker
-  - platform: cast
-    host: REDACTED.228 #bedside_mini
-  - platform: cast
-    host: REDACTED.229 #Muffin Stuffin
-
-
-#################################################################
 ## Customize
 homeassistant:
   customize:
@@ -29,52 +7,33 @@ homeassistant:
     media_player.viziotv:
       friendly_name: Vizio TV
 
+    media_player.nadc338:
+      friendly_name: NAD C 338 Receiver
+
     media_player.living_room_tv:
       friendly_name: Living Room TV - Chromecast Ultra
 
     media_player.kitchen_stereo:
-      friendly_name: Kitchen Stereo - Chromecast Audio
+      friendly_name: Kitchen Stereo - NAD C 338
 
-    media_player.bedside_speaker:
-      friendly_name: Bedside Speaker - Vizio Crave 360
+    media_player.bedroom_speaker:
+      friendly_name: Bedroom Speaker - JBL Link 20
 
     media_player.kitchen_home:
       friendly_name: Kitchen Home - Google Home
 
-    media_player.bedside_mini:
-      friendly_name: Bedside Mini - Google Home Mini
+    media_player.kitchenbedroom:
+      friendly_name: Kitchen/Bedroom - Cast Group
 
-    media_player.bedsidestereo_speakers:
-      friendly_name: Bedside/Stereo Speakers - Cast Group
+    switch.vizio_tv:
+      friendly_name: TV
+      icon: mdi:monitor
+      custom_ui_state_card: state-card-custom_tv
 
-
-#################################################################
-## Groups
-group:
-
-  living_room_tv_main:
-    entities:
-      - media_player.living_room_tv
-
-  kitchen_stereo_main:
-    entities:
-      - media_player.kitchen_stereo
-
-  bedside_speaker_main:
-    entities:
-      - media_player.bedside_speaker
-
-  kitchen_home_main:
-    entities:
-      - media_player.kitchen_home
-
-  bedside_mini_main:
-    entities:
-      - media_player.bedside_mini
-
-  bedsidestereo_speakers_main:
-    entities:
-      - media_player.bedsidestereo_speakers
+    switch.nad_stereo:
+      friendly_name: Stereo
+      icon: mdi:speaker
+      custom_ui_state_card: state-card-custom_stereo
 
 
 #################################################################
@@ -105,99 +64,99 @@ script:
       data:
         source: HDMI-4
 
-  nad_poweron:
-    sequence:
-      service: homeassistant.turn_on
-      entity_id: switch.nad_power
-
-  nad_poweroff:
-    sequence:
-      service: homeassistant.turn_off
-      entity_id: switch.nad_power
-
   nad_volup:
     sequence:
-      service: homeassistant.turn_on
-      entity_id: switch.nad_volume
+      service: media_player.volume_up
+      entity_id: media_player.nadc338
 
   nad_voldown:
     sequence:
-      service: homeassistant.turn_off
-      entity_id: switch.nad_volume
-
-  nad_ccinput:
-    sequence:
-      service: homeassistant.turn_on
-      entity_id: switch.nad_ccinput
+      service: media_player.volume_down
+      entity_id: media_player.nadc338
 
 
 #################################################################
-## Switches
+## Sensors
+sensor:
+
+  - platform: template
+    sensors:
+      nadc338_input_status:
+        value_template: '{{ states.media_player.nadc338.attributes.source}}'
+
+  - platform: template
+    sensors:
+      media_players_active:
+        friendly_name: 'Active Media Players'
+        value_template: >
+          {{ states.media_player
+            | rejectattr('state', 'equalto', 'off')
+            | rejectattr('entity_id', 'equalto', 'media_player.nadc338')
+            | rejectattr('entity_id', 'equalto', 'media_player.viziotv')
+            | rejectattr('entity_id', 'equalto', 'media_player.muffin_stuffin')
+            | rejectattr('entity_id', 'equalto', 'media_player.upstairs_kitchen')
+            | rejectattr('entity_id', 'equalto', 'media_player.the_universe')
+            | map(attribute ='entity_id')
+            | join(', ')
+          }}
+
+
+#################################################################
+## Switch
 switch:
 
-  # Broadlink IR Blaster
-  - platform: broadlink
-    host: REDACTED.239
-    mac: 'REDACTED'
-    type: rm_mini
-    timeout: 15
+  - platform: template
     switches:
-      nad_power:
-        command_on: 'JgBgAAABI5YQORI3FDYSFA4XDxYQFBM1FRMSEw45EDgSOxA5EjcTExI3EhMOOhEWDxYQORITERQOFw86ERUSNhA5ERYQOBM2FAAE9QABJ0kUAAxKAAEmSxMADEoAASVMEQANBQAAAAAAAAAA'
-        command_off: 'JgBYAAABJJcQORI4EzUUExEUDhcQFBM2FBITEhI4EjYUNRU1EzYTEw8WDxcQFRE4EhMSExM3EjcOOhA6EDkSFBI3EjgOFw8WEQAE9wABK0gSAAxLAAEoRRQADQU='
-      nad_volume:
-        command_on: 'JgBYAAABJZUVMxQ2EzYSFBQRFRATERI4ExISFBQ1FTQSOBUzEzgRFBAUExQSEhkvFxATEhEUEDgWNBQ2ETcRFRA6FDQWMxQTFAAE9QABIk0VAAxGAAEpShIADQU='
-        command_off: 'JgBYAAABKJETNhU1FDIXEg4XDxYQFRA4ERUUERUzFTUTNxM2ETkRFBURFBEUNBQ1FRERFBEVEDkQORM2FhAUERI2EToQORAVEAAE9AABKkoSAAxMAAEoSRQADQU='
-      nad_ccinput:
-        command_on: 'JgBYAAABKJASOBYzEDoVEBQREhQRFBQ0FREUERI3EjgOOxE5FDYSEhIUEBURFRQRFRATERI4EjcUNRI4EDkRORE4FDYVDxIUEwAE8wABK0cUAAxKAAEnSRMADQU='
+      vizio_tv:
+        value_template: "{{ is_state('media_player.viziotv', 'on') }}"
+        turn_on:
+          service: media_player.turn_on
+          data:
+            entity_id: media_player.viziotv
+        turn_off:
+          service: media_player.turn_off
+          data:
+            entity_id: media_player.viziotv
+
+  - platform: template
+    switches:
+      nad_stereo:
+        value_template: "{{ is_state('media_player.nadc338', 'on') }}"
+        turn_on:
+          service: media_player.turn_on
+          data:
+            entity_id: media_player.nadc338
+        turn_off:
+          service: media_player.turn_off
+          data:
+            entity_id: media_player.nadc338
 
 
 #################################################################
 ## Automation
 automation:
 
-  ##### Media Power Managment ######
-  # Turn on Nad and change input when kitchen_stereo is active
-  - alias: nad on with kitchen_stereo
+  ##### Media Player Visibility ######
+  - alias: Media Update Active Group
 
     trigger:
-      - platform: state
-        entity_id: media_player.kitchen_stereo
-        from: 'off'
-      - platform: state
-        entity_id: media_player.bedsidestereo_speakers
-        from: 'off'
+    - entity_id: sensor.media_players_active
+      platform: state
 
     action:
-      - service: homeassistant.turn_on
-        entity_id: switch.nad_power
-      - service: homeassistant.turn_on
-        entity_id: switch.nad_ccinput
+    - service: group.set
+      data_template:
+        object_id: media_players_active
+        visible: >
+          {{ trigger.to_state.state != '' }}
+        entities: >
+          {% if trigger.to_state.state != '' %}
+            {{ trigger.to_state.state }}
+          {% else %}
+            {{ states.group.media_players_active.entity_id }}
+          {% endif %}
 
-  # Turn off kitchen_stereo when NAD powered off
-  - alias: kitchen_stereo off with nad
-
-    trigger:
-      - platform: state
-        entity_id: switch.nad_power
-        to: 'off'
-        for:
-          seconds: 1
-
-    condition:
-      - condition: or
-        conditions:
-          - condition: template
-            value_template: "{{ not is_state('media_player.kitchen_stereo', 'off') }}"
-          - condition: template
-            value_template: "{{ not is_state('media_player.bedsidestereo_speakers', 'off') }}"
-
-    action:
-      - service: homeassistant.turn_off
-        entity_id: media_player.kitchen_stereo
-      - service: homeassistant.turn_off
-        entity_id: media_player.bedsidestereo_speakers
-
+  ##### Media Power Management ######
   # Turn off living_room_tv when Vizio powered off
   - alias: living_room_tv off with vizio
 
@@ -215,70 +174,93 @@ automation:
         entity_id: media_player.living_room_tv
 
   ##### Volume setting ######
-  # Set bedside_speaker volume when turned on
-  - alias: bedside_speaker volume reset
+  # Set bedroom_speaker volume when turned on
+  - alias: bedroom_speaker volume reset
 
     trigger:
       - platform: state
-        entity_id: media_player.bedside_speaker
+        entity_id: media_player.bedroom_speaker
         from: 'off'
+
+    condition:
+      - condition: state
+        entity_id: script.alarmclock_activate
+        state: 'off'
 
     action:
       - service: media_player.volume_set
         data:
-          entity_id: media_player.bedside_speaker
-          volume_level: 0.18
+          entity_id: media_player.bedroom_speaker
+          volume_level: 0.5
 
-  # Set bedside_speaker volume when turned on bedsidestereo_speakers
-  - alias: bedside_speaker volume reset bedsidestereo_speakers
+  # Set bedroom_speaker volume when turned on kitchenbedroom
+  - alias: bedroom_speaker volume reset kitchenbedroom
 
     trigger:
       - platform: state
-        entity_id: media_player.bedsidestereo_speakers
+        entity_id: media_player.kitchenbedroom
         from: 'off'
+
+    condition:
+      - condition: state
+        entity_id: script.alarmclock_activate
+        state: 'off'
 
     action:
       - service: media_player.volume_set
         data:
-          entity_id: media_player.bedside_speaker
-          volume_level: 0.18
+          entity_id: media_player.bedroom_speaker
+          volume_level: 0.5
 
-  # Set kitchen_stereo volume when turned on
-  - alias: kitchen_stereo volume reset
+  # Set nadc338 volume when turned on
+  - alias: nadc338 volume reset
 
     trigger:
       - platform: state
-        entity_id: media_player.kitchen_stereo
+        entity_id: media_player.nadc338
         from: 'off'
+
+    condition:
+      - condition: state
+        entity_id: script.alarmclock_activate
+        state: 'off'
 
     action:
       - service: media_player.volume_set
         data:
-          entity_id: media_player.kitchen_stereo
-          volume_level: 1.0
+          entity_id: media_player.nadc338
+          volume_level: 0.65
+      
 
-  # Set kitchen_stereo volume when turned on bedsidestereo_speakers
-  - alias: kitchen_stereo volume reset bedsidestereo_speakers
+  # Set nadc338 volume when input changed
+  - alias: nadc338 volume reset input changed
 
     trigger:
       - platform: state
-        entity_id: media_player.bedsidestereo_speakers
-        from: 'off'
+        entity_id: sensor.nadc338_input_status
+        to: 'Wireless'
+      - platform: state
+        entity_id: sensor.nadc338_input_status
+        to: 'Stream'
+
+    condition:
+      - condition: state
+        entity_id: script.alarmclock_activate
+        state: 'off'
 
     action:
       - service: media_player.volume_set
         data:
-          entity_id: media_player.kitchen_stereo
-          volume_level: 1.0
+          entity_id: media_player.nadc338
+          volume_level: 0.65
 
 
-  # Set living_room_tv volume when turned on
+  # Reset living_room_tv volume everyday
   - alias: living_room_tv volume reset
 
     trigger:
-      - platform: state
-        entity_id: media_player.living_room_tv
-        from: 'off'
+      - platform: time
+        at: '05:00:00'
 
     action:
       - service: media_player.volume_set
@@ -298,185 +280,3 @@ automation:
         data:
           entity_id: media_player.kitchen_home
           volume_level: 0.5
-
-  # Reset bedside_mini volume everyday
-  - alias: bedside_mini volume reset
-
-    trigger:
-      - platform: time
-        at: '12:00:00'
-
-    action:
-      - service: media_player.volume_set
-        data:
-          entity_id: media_player.bedside_mini
-          volume_level: 0.4
-
-  ##### Media Player Visibilty ######
-  # living_room_tv Visable
-  - alias: living_room_tv visable true
-
-    trigger:
-      platform: template
-      value_template: "{{ not is_state('media_player.living_room_tv', 'off') }}"
-
-    action:
-      service: group.set_visibility
-      entity_id: group.living_room_tv_main
-      data:
-        visible: True
-
-  - alias: living_room_tv visable false
-
-    trigger:
-      - platform: homeassistant
-        event: start
-      - platform: state
-        entity_id: media_player.living_room_tv
-        to: 'off'
-
-    action:
-      service: group.set_visibility
-      entity_id: group.living_room_tv_main
-      data:
-        visible: False
-
-  # kitchen_stereo Visable
-  - alias: kitchen_stereo visable true
-
-    trigger:
-      platform: template
-      value_template: "{{ not is_state('media_player.kitchen_stereo', 'off') }}"
-
-    action:
-      service: group.set_visibility
-      entity_id: group.kitchen_stereo_main
-      data:
-        visible: True
-
-  - alias: kitchen_stereo visable false
-
-    trigger:
-      - platform: homeassistant
-        event: start
-      - platform: state
-        entity_id: media_player.kitchen_stereo
-        to: 'off'
-
-    action:
-      service: group.set_visibility
-      entity_id: group.kitchen_stereo_main
-      data:
-        visible: False
-
-  # bedside_speaker Visable
-  - alias: bedside_speaker visable true
-
-    trigger:
-      platform: template
-      value_template: "{{ not is_state('media_player.bedside_speaker', 'off') }}"
-
-    action:
-      service: group.set_visibility
-      entity_id: group.bedside_speaker_main
-      data:
-        visible: True
-
-  - alias: bedside_speaker visable false
-
-    trigger:
-      - platform: homeassistant
-        event: start
-      - platform: state
-        entity_id: media_player.bedside_speaker
-        to: 'off'
-
-    action:
-      service: group.set_visibility
-      entity_id: group.bedside_speaker_main
-      data:
-        visible: False
-
-  # kitchen_home Visable
-  - alias: kitchen_home visable true
-
-    trigger:
-      platform: template
-      value_template: "{{ not is_state('media_player.kitchen_home', 'off') }}"
-
-    action:
-      service: group.set_visibility
-      entity_id: group.kitchen_home_main
-      data:
-        visible: True
-
-  - alias: kitchen_home visable false
-
-    trigger:
-      - platform: homeassistant
-        event: start
-      - platform: state
-        entity_id: media_player.kitchen_home
-        to: 'off'
-
-    action:
-      service: group.set_visibility
-      entity_id: group.kitchen_home_main
-      data:
-        visible: False
-
-  # Bedside Mini Visable
-  - alias: bedside_mini visable true
-
-    trigger:
-      platform: template
-      value_template: "{{ not is_state('media_player.bedside_mini', 'off') }}"
-
-    action:
-      service: group.set_visibility
-      entity_id: group.bedside_mini_main
-      data:
-        visible: True
-
-  - alias: bedside_mini visable false
-
-    trigger:
-      - platform: homeassistant
-        event: start
-      - platform: state
-        entity_id: media_player.bedside_mini
-        to: 'off'
-
-    action:
-      service: group.set_visibility
-      entity_id: group.bedside_mini_main
-      data:
-        visible: False
-
-  # bedsidestereo_speakers Visable
-  - alias: bedsidestereo_speakers visable true
-
-    trigger:
-      platform: template
-      value_template: "{{ not is_state('media_player.bedsidestereo_speakers', 'off') }}"
-
-    action:
-      service: group.set_visibility
-      entity_id: group.bedsidestereo_speakers_main
-      data:
-        visible: True
-
-  - alias: bedsidestereo_speakers visable false
-
-    trigger:
-      - platform: homeassistant
-        event: start
-      - platform: state
-        entity_id: media_player.bedsidestereo_speakers
-        to: 'off'
-
-    action:
-      service: group.set_visibility
-      entity_id: group.bedsidestereo_speakers_main
-      data:
-        visible: False

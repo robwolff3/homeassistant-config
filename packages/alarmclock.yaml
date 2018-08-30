@@ -122,7 +122,7 @@ automation:
       - service: light.turn_off
         entity_id: light.diningroom_light_level
       - service: homeassistant.turn_off
-        entity_id: media_player.bedsidestereo_speakers
+        entity_id: media_player.kitchenbedroom
       - service: homeassistant.turn_off
         entity_id: media_player.mopidy
       - service: input_boolean.turn_off
@@ -132,6 +132,11 @@ automation:
 ##################################################
 ## Scripts
 script:
+
+  cancel_alarm:
+    sequence:
+      - service: automation.trigger
+        entity_id: automation.alarmclock_cancel
 
 # Bedroom lights on over 30 minutes
   alarmclock_activate:
@@ -175,45 +180,45 @@ script:
           brightness: 100
       - service: homeassistant.turn_off
         entity_id: switch.bedroom_outlet_switch_3
-      # Cast NPR to media group
+      # Cast media to cast group
       - service: input_select.select_option
         data:
           entity_id: input_select.playlist_content
-          option: Michigan Radio
+          option: "WRCJ 90.9 FM"
       - service: input_select.select_option
         data:
           entity_id: input_select.playlist_source
-          option: Bedside/Stereo Speakers
+          option: "Kitchen/Bedroom"
       - service: script.turn_on
         entity_id: script.playlist_action
       # Gradually increase radio volume
-      - delay: "00:00:03"
+      - delay: "00:00:04"
       - service: media_player.volume_set
         data:
-          entity_id: media_player.bedside_speaker
-          volume_level: 0.1
+          entity_id: media_player.bedroom_speaker
+          volume_level: 0.3
       - service: media_player.volume_set
         data:
-          entity_id: media_player.kitchen_stereo
+          entity_id: media_player.nadc338
           volume_level: 0.3
       - delay: "00:01:00"
       - service: media_player.volume_set
         data:
-          entity_id: media_player.bedside_speaker
-          volume_level: 0.135
+          entity_id: media_player.bedroom_speaker
+          volume_level: 0.4
       - service: media_player.volume_set
         data:
-          entity_id: media_player.kitchen_stereo
-          volume_level: 0.5
+          entity_id: media_player.nadc338
+          volume_level: 0.4
       - delay: "00:01:00"
       - service: media_player.volume_set
         data:
-          entity_id: media_player.bedside_speaker
-          volume_level: 0.17
+          entity_id: media_player.bedroom_speaker
+          volume_level: 0.5
       - service: media_player.volume_set
         data:
-          entity_id: media_player.kitchen_stereo
-          volume_level: 0.7
+          entity_id: media_player.nadc338
+          volume_level: 0.5
       # Cancel after 2 hours and disable alarmclock
       - delay: "02:00:00"
       - condition: and

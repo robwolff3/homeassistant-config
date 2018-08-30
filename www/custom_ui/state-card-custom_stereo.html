@@ -1,0 +1,50 @@
+<dom-module id="state-card-custom_stereo">
+  <template>
+    <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
+    <style>
+      :host {
+        line-height: 1.5;
+      }
+      paper-button {
+        min-width: 60px;
+        background-color:#9a9fa8
+      }
+    </style>
+
+<div class='horizontal justified layout'>
+  <state-info state-obj="[[stateObj]]"></state-info>
+  <paper-button-group>
+      <paper-button on-tap="btntap2"><svg style="width:24px;height:24px" viewBox="0 0 24 24"><path fill="#ffffff" d="M3,9H7L12,4V20L7,15H3V9M14,11H22V13H14V11Z" /></svg></paper-button>
+      <paper-button on-tap="btntap1"><svg style="width:24px;height:24px" viewBox="0 0 24 24"><path fill="#ffffff" d="M3,9H7L12,4V20L7,15H3V9M14,11H17V8H19V11H22V13H19V16H17V13H14V11Z" /></svg></paper-button>
+  </paper-button-group>
+  <ha-entity-toggle state-obj="[[stateObj]]" hass="[[hass]]"></ha-entity-toggle>
+</div>
+</template>
+</dom-module>
+<script>
+        Polymer({
+          is: 'state-card-custom_stereo',
+          properties: {
+            hass: {
+              type: Object,
+            },
+            stateObj: {
+              type: Object,
+            },
+          },
+
+          btntap1: function (ev) {
+            this.setVol('nad_volup', ev);
+          },
+          btntap2: function (ev) {
+            this.setVol('nad_voldown', ev);
+          },
+
+          setVol(vol,ev) {
+            var serviceData = {entity_id:('script.'+vol)};
+            this.hass.callService('script', 'turn_on', serviceData);
+            ev.stopPropagation();
+  },
+
+});
+</script>

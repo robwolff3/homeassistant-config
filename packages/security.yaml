@@ -1,34 +1,5 @@
 
 #################################################################
-## Components
-
-camera:
-  - platform: ffmpeg
-    name: Frontdoor
-    input: rtsp://REDACTED@REDACTED.252:554/Streaming/Channels/2
-    extra_arguments: -vf scale=640:360
-  - platform: ffmpeg
-    name: Backdoor
-    input: rtsp://REDACTED@REDACTED.251:554/Streaming/Channels/2
-    extra_arguments: -vf scale=640:360
-
-device_tracker:
-  - platform: netgear
-    host: REDACTED.250
-    username: REDACTED
-    password: REDACTED
-    port: 80
-    interval_seconds: 12
-    new_device_defaults:
-      track_new_devices: False
-
-zone:
-  name: Home
-  latitude: REDACTED
-  longitude: REDACTED
-  radius: 200
-
-#################################################################
 ## Customize
 homeassistant:
   customize:
@@ -50,19 +21,19 @@ homeassistant:
       friendly_name: USER4
 
     binary_sensor.bathroom_motion_sensor:
-      friendly_name: Bathroom Motion
+      friendly_name: Bathroom
       icon: mdi:run
     binary_sensor.hallway_motion1_sensor:
-      friendly_name: Hallway 1 Motion
+      friendly_name: Hallway 1
       icon: mdi:run
     binary_sensor.hallway_motion2_sensor:
-      friendly_name: Hallway 2 Motion
+      friendly_name: Hallway 2
       icon: mdi:run
     binary_sensor.uplivingroom_motion_sensor:
-      friendly_name: Up Livingroom Motion
+      friendly_name: Up Living
       icon: mdi:run
     binary_sensor.upoffice_motion_sensor:
-      friendly_name: Up Office Motion
+      friendly_name: Up Office
       icon: mdi:run
     sensor.frontdoor_contact:
       device_class: opening
@@ -74,6 +45,10 @@ homeassistant:
       device_class: opening
       icon: mdi:door
 
+    lock.front_door_handle_locked:
+      friendly_name: Front Door Lock
+      icon: mdi:lock-smart
+
     camera.frontdoor:
       friendly_name: Frontdoor Camera
   
@@ -83,6 +58,17 @@ homeassistant:
 #################################################################
 ## Groups
 group:
+
+  locks:
+    name: Locks
+    entities:
+      - lock.front_door_handle_locked
+
+  zmevents:
+    name: Camera Events
+    entities:
+      - sensor.backdoor_events
+      - sensor.frontdoor_events
 
   sensors:
     name: Sensors
@@ -108,8 +94,6 @@ group:
       - input_boolean.enable_alarm_system
       - input_boolean.enable_armed_home
       - input_boolean.enable_armed_away
-      - input_boolean.manual_armed_home
-      - input_boolean.manual_armed_away
 
 
 #################################################################
@@ -120,7 +104,7 @@ sensor:
   - platform: template
     sensors:
       frontdoor_contact:
-        friendly_name: Frontdoor Contact
+        friendly_name: Frontdoor
         value_template: >-
           {% if is_state("sensor.frontdoor_contact_access_control", "22") %}
           open
@@ -131,7 +115,7 @@ sensor:
   - platform: template
     sensors:
       sidedoor_contact:
-        friendly_name: Sidedoor Contact
+        friendly_name: Sidedoor
         value_template: >-
           {% if is_state("sensor.sidedoor_contact_access_control", "22") %}
           open
@@ -142,7 +126,7 @@ sensor:
   - platform: template
     sensors:
       backdoor_contact:
-        friendly_name: Backdoor Contact
+        friendly_name: Backdoor
         value_template: >-
           {% if is_state("sensor.backdoor_contact_access_control", "22") %}
           open
@@ -150,15 +134,6 @@ sensor:
           closed
           {% endif %}
 
-#################################################################
-## Alarm Control Panel
-#################################################################
-
-alarm_control_panel:
-  platform: manual
-  name: Main
-  pending_time: 10
-  trigger_time: 99999999
 
 #################################################################
 ## Automations
@@ -202,32 +177,6 @@ automation:
       service: alarm_control_panel.alarm_arm_home
       entity_id: alarm_control_panel.main
 
-# Manual set status for Armed Home
-  - alias: Manual Status - Armed Home
-
-    trigger:
-      - platform: state
-        entity_id: input_boolean.manual_armed_home
-        from: 'off'
-        to: 'on'
-
-    condition:
-      condition: and
-      conditions:
-        - condition: state
-          entity_id: input_boolean.enable_alarm_system
-          state: 'on'
-        - condition: state
-          entity_id: input_boolean.enable_armed_home
-          state: 'on'
-
-    action:
-      - service: alarm_control_panel.alarm_arm_home
-        entity_id: alarm_control_panel.main
-      - service: input_boolean.turn_off
-        data:
-          entity_id: input_boolean.manual_armed_home
-
 # Trigger for Alarm Home
   - alias: Alarm - Armed Home
 
@@ -267,6 +216,9 @@ automation:
     condition:
       condition: and
       conditions:
+        - condition: time
+          after: '00:00:01'
+          before: '06:00:00'
         - condition: or
           conditions:
             - condition: state
@@ -362,32 +314,6 @@ automation:
       service: alarm_control_panel.alarm_arm_away
       entity_id: alarm_control_panel.main
 
-# Manual set status for Armed Away
-  - alias: Manual Status - Armed Away
-
-    trigger:
-      - platform: state
-        entity_id: input_boolean.manual_armed_away
-        from: 'off'
-        to: 'on'
-
-    condition:
-      condition: and
-      conditions:
-        - condition: state
-          entity_id: input_boolean.enable_alarm_system
-          state: 'on'
-        - condition: state
-          entity_id: input_boolean.enable_armed_away
-          state: 'on'
-
-    action:
-      - service: alarm_control_panel.alarm_arm_away
-        entity_id: alarm_control_panel.main
-      - service: input_boolean.turn_off
-        data:
-          entity_id: input_boolean.manual_armed_away
-
 # Trigger for Alarm Away
   - alias: Alarm - Armed Away
 
@@ -451,7 +377,7 @@ automation:
         entity_id: alarm_control_panel.main
 
 
-# Disable and reset alarm
+# Disable alarm
   - alias: Disable Alarm System
 
     trigger:
@@ -465,22 +391,103 @@ automation:
         entity_id: alarm_control_panel.main
 
 
-# Notification
+# Notifcation disarm
+  - alias: Notifcation Disarm
+
+    trigger:
+      - platform: event
+        event_type: html5_notification.clicked
+        event_data:
+          action: disarm_ha
+
+    action:
+      - service: alarm_control_panel.alarm_disarm
+        entity_id: alarm_control_panel.main
+
+
+# Notification when alarm pending
+  - alias: Notify when alarm is pending
+
+    trigger:
+      - platform: state
+        entity_id: alarm_control_panel.main
+        from: 'armed_away'
+        to: 'pending'
+      - platform: state
+        entity_id: alarm_control_panel.main
+        from: 'armed_home'
+        to: 'pending'
+
+    action:
+      - service: notify.html5
+        data:
+          title: 'Alarm Pending'
+          message: "Your home alarm is pending for an alarm."
+          data:
+            image: "https://REDACTED/api/camera_proxy/camera.frontdoor?api_password=REDACTED"
+            requireInteraction: true
+            renotify: true
+            tag: 'ha_alarm'
+            url: '/states/group.security'
+            actions:
+              - action: 'disarm_ha'
+                title: 'Disarm'
+
+# Notification when alarm triggerd
   - alias: Notify when alarm is triggered
 
     trigger:
       - platform: state
         entity_id: alarm_control_panel.main
+        from: 'pending'
         to: 'triggered'
 
     action:
-      - service: notify.pushbullet
+      - service: notify.html5
         data:
-          message: "ALARM! Your HomeAssistant security alarm has been triggered."
-      - service: notify.twilio_call
+          title: 'ALARM!'
+          message: "ALARM! Your home alarm has been triggered."
+          data:
+            image: "https://REDACTED/api/camera_proxy/camera.frontdoor?api_password=REDACTED"
+            requireInteraction: true
+            renotify: true
+            tag: 'ha_alarm'
+            url: '/states/group.security'
+            actions:
+              - action: 'disarm_ha'
+                title: 'Disarm'
+      - service: notify.twilio_calling
         data:
-          message: "Your home assistant security alarm has been triggered."
-          target: REDACTED
+          message: 'Your home assistant security alarm has been triggered.'
+          target:
+            - REDACTED
+
+# Notification when alarm disarmed
+  - alias: Notify when alarm is disarmed
+
+    trigger:
+      - platform: state
+        entity_id: alarm_control_panel.main
+        from: 'pending'
+        to: 'disarmed'
+      - platform: state
+        entity_id: alarm_control_panel.main
+        from: 'triggered'
+        to: 'disarmed'
+
+    action:
+      - service: notify.html5
+        data:
+          title: 'Disarmed'
+          message: "Your home alarm has been disarmed."
+          data:
+            requireInteraction: false
+            renotify: false
+            silent: true
+            noscreen: true
+            tag: 'ha_alarm'
+            url: '/states/group.security'
+
 
 ##################################################
 ## Inputs
@@ -500,13 +507,3 @@ input_boolean:
     name: Away Armed Active
     initial: on
     icon: mdi:bell-ring
-
-  manual_armed_home:
-    name: Manual Armed Home
-    initial: off
-    icon: mdi:play
-
-  manual_armed_away:
-    name: Manual Armed Away
-    initial: off
-    icon: mdi:play
