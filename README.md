@@ -1,5 +1,5 @@
 # Home Assistant
-My personal implementation of [Home Assistant](https://home-assistant.io) (version: 0.70.1).
+My personal implementation of [Home Assistant](https://home-assistant.io) (version: 0.77.1).
 Configuration updated 8/30/2018.
 
 ## Overview
