@@ -95,13 +95,16 @@ automation:
               - wed
               - thu
               - fri
+          - condition: state
+            entity_id: input_boolean.vacation_mode
+            state: 'off'
 
     action:
       - service: script.alarmclock_activate
 
   # Alarmclock Cancel
   - alias: Alarmclock Cancel
-   
+
     trigger:
       platform: state
       entity_id: input_boolean.alarmclock_cancel

@@ -1,6 +1,6 @@
 # Home Assistant
-My personal implementation of [Home Assistant](https://home-assistant.io) (version: 0.77.1).
-Configuration updated 8/30/2018.
+My personal implementation of [Home Assistant](https://home-assistant.io) (version: 0.78.3).
+Configuration updated 9/22/2018.
 
 ## Overview
 
@@ -9,8 +9,7 @@ Here is my home automation project Ive been improving since mid 2017. At that ti
 ### In-front of Home Assistant
 * HA is running in a Virtual Environment on Raspberry Pi 3 running Debian Stretch (I highly recommend running HA on a RasPi with a Z-stick). I tried Hassbian and other deployment methods, but wasn't satisfied with the level of control of the things I list below until I put HA on top of my own deployed OS. 
 * To connect to HA externally, I use my own domain through Google Domains with a Dynamic DNS record setup on a sub domain. To solve the internal/external connection problem, I have a Host Override setup on my pfSense router that forwards my HA sub domain to the local IP address of HA when I'm on my local network.
-* For connection security on HA, I have an Nginx reverse proxy setup on the RaspberryPi that forwards requests to HA. My Nginx config is pretty strict and I have a certificate setup through [Let's Encrypt](https://letsencrypt.org/)
- that auto-renews to secure my traffic internally and externally.
+* For connection security on HA, I have an Nginx reverse proxy setup on the RaspberryPi that forwards requests to HA. My Nginx config is pretty strict and I have a certificate setup through [Let's Encrypt](https://letsencrypt.org/) that auto-renews to secure my traffic internally and externally.
 
 ### Big Components and Ideas
 * Playlist - For a while there has been a limitation of automation Spotify to cast to a device. I figured out a way around that using the guide [Part 7: Get the party started with multi-room audio](https://www.vittoriomonaco.de/home-automation-part-7.html) for the backend and using [Spotify Playlist Player](https://community.home-assistant.io/t/spotify-playlist-player/22491) as the automaton/frontend. It takes a while to setup with Mopidy, Icecast2, a fallback .mp3 and not using Spotify owned playlists, but the end result is definitely worth it. Now I can play playlists on any media devices with ease and I don't have to use Spotify's app that only works sometimes. Big thanks to [vittoriom](https://github.com/vittoriom) and [GigabitGuy](https://community.home-assistant.io/u/GigabitGuy) for making this possible. You can find my adaptation here [playlist.yaml](packages/playlist.yaml).

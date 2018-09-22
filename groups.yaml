@@ -30,6 +30,8 @@
     view: yes
     entities:
       - group.overridechild
+      - group.systemmgmt
+      - group.vacation
       - media_player.viziotv
       - media_player.kitchenbedroom
       - media_player.living_room_tv
@@ -39,16 +41,4 @@
       - media_player.kitchen_home
       - media_player.mopidy
 
-  overridechild:
-    name: Override
-    control: hidden
-    entities:
-      - automation.motion_bathroom_lights_on_20min
-      - automation.motion_hallway_lights_on_15min
-      - automation.dark_arrive_home_lights
-      - automation.roomba_on_weekdays
-      - switch.bedroom_outlet_switch_2
-      - switch.meter_outlet_switch
-      - script.updateha
-      - script.restartha
-      - script.rebootpi
+

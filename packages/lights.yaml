@@ -12,11 +12,11 @@ homeassistant:
       stretch_slider: true
       hide_control: true
       slider_theme:
-       min: 0
-       max: 255
-       pin: false
-       off_when_min: true
-       report_when_not_changed: false
+        min: 0
+        max: 255
+        pin: false
+        off_when_min: true
+        report_when_not_changed: false
 
     light.kitchen_light_level:
       friendly_name: Kitchen
@@ -26,10 +26,11 @@ homeassistant:
       stretch_slider: true
       hide_control: true
       slider_theme:
-       min: 0
-       max: 255
-       off_when_min: true
-       report_when_not_changed: false
+        min: 0
+        max: 255
+        pin: false
+        off_when_min: true
+        report_when_not_changed: false
 
     light.diningroom_light_level:
       friendly_name: Dining Room
@@ -39,10 +40,11 @@ homeassistant:
       stretch_slider: true
       hide_control: true
       slider_theme:
-       min: 0
-       max: 255
-       off_when_min: true
-       report_when_not_changed: false
+        min: 0
+        max: 255
+        pin: false
+        off_when_min: true
+        report_when_not_changed: false
 
     light.bedroom_light_level:
       friendly_name: Bedroom
@@ -52,10 +54,11 @@ homeassistant:
       stretch_slider: true
       hide_control: true
       slider_theme:
-       min: 0
-       max: 255
-       off_when_min: true
-       report_when_not_changed: false
+        min: 0
+        max: 255
+        pin: false
+        off_when_min: true
+        report_when_not_changed: false
 
     light.bathroom_light_level:
       friendly_name: Bathroom
@@ -65,10 +68,11 @@ homeassistant:
       stretch_slider: true
       hide_control: true
       slider_theme:
-       min: 0
-       max: 255
-       off_when_min: true
-       report_when_not_changed: false
+        min: 0
+        max: 255
+        pin: false
+        off_when_min: true
+        report_when_not_changed: false
 
     light.hallway_light_level:
       friendly_name: Hallway
@@ -78,10 +82,11 @@ homeassistant:
       stretch_slider: true
       hide_control: true
       slider_theme:
-       min: 0
-       max: 255
-       off_when_min: true
-       report_when_not_changed: false
+        min: 0
+        max: 255
+        pin: false
+        off_when_min: true
+        report_when_not_changed: false
 
     group.nightstands:
       friendly_name: Nightstands
@@ -90,31 +95,31 @@ homeassistant:
       state_card_mode: break-slider
       stretch_slider: true
       slider_theme:
-       min: 0
-       max: 255
-       off_when_min: true
+        min: 0
+        max: 255
+        off_when_min: true
 
     light.nightstand1:
-      friendly_name: USER1's Nightstand
+      friendly_name: !secret user2ns
       icon: mdi:lamp
       custom_ui_state_card: state-card-custom-ui
       state_card_mode: break-slider
       stretch_slider: true
       slider_theme:
-       min: 0
-       max: 255
-       off_when_min: true
+        min: 0
+        max: 255
+        off_when_min: true
 
     light.nightstand2:
-      friendly_name: USER2's Nightstand
+      friendly_name: !secret user1ns
       icon: mdi:lamp
       custom_ui_state_card: state-card-custom-ui
       state_card_mode: break-slider
       stretch_slider: true
       slider_theme:
-       min: 0
-       max: 255
-       off_when_min: true
+        min: 0
+        max: 255
+        off_when_min: true
 
 
 #################################################################
@@ -197,17 +202,18 @@ automation:
         to: 'open'
 
     condition:
-      condition: state
-      entity_id: light.hallway_light_level
-      state: 'off'
-      for:
-        minutes: 1
+      - condition: state
+        entity_id: light.hallway_light_level
+        state: 'off'
+        for:
+          minutes: 1
+
 
     action:
       service: homeassistant.turn_on
       entity_id: light.hallway_light_level
       data:
-        brightness: 150
+        brightness: 100
 
   - alias: Hallway Lights Off After 15min
 
@@ -240,8 +246,6 @@ automation:
   - alias: Turn on Kitchen lights at entry
 
     trigger:
-      - platform: template
-        value_template: '{{states.lock.front_door_handle_locked.attributes.lock_status == "Unlocked by RF"}}'
       - platform: template
         value_template: '{{states.lock.front_door_handle_locked.attributes.lock_status == "Unlocked with Keypad by user 1"}}'
 
@@ -385,7 +389,7 @@ scene:
       media_player.nadc338: off
       script.bedtime_autooff: on
 
-  - name: USER2_Bedtime
+  - name: !secret user1bt
     entities:
       light.nightstand1:
         state: on
@@ -396,7 +400,7 @@ scene:
         state: on
         brightness: 70
       switch.bedroom_outlet_switch_3: on
-      script.USER2_bedtime: on
+      script.a_bedtime: on
 
   - name: All_Things_Off
     entities:
@@ -450,8 +454,11 @@ script:
         entity_id: light.nightstand1
       - service: homeassistant.turn_off
         entity_id: light.nightstand2
+      - delay: '01:00:00'
+      - service: script.turn_on
+        entity_id: script.playlist_stop
 
-  USER2_bedtime:
+  a_bedtime:
     sequence:
       - service: input_select.select_option
         data:
@@ -463,6 +470,9 @@ script:
           option: "Bedroom Speaker"
       - service: script.turn_on
         entity_id: script.playlist_action
+      - delay: '01:00:00'
+      - service: script.turn_on
+        entity_id: script.playlist_stop
 
   dinner_automusic:
     sequence:
@@ -491,7 +501,7 @@ input_select:
       - Watching_TV
       - GoodMorning
       - Bedtime
-      - USER2_Bedtime
+      - !secret user1bt
       - All_Things_Off
       - None
 

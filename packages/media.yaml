@@ -173,6 +173,30 @@ automation:
       - service: homeassistant.turn_off
         entity_id: media_player.living_room_tv
 
+  # Turn off vizio off if chrome cast idle 10 minutes
+  - alias: vizio off with chromecast idle
+
+    trigger:
+      - platform: state
+        entity_id: media_player.living_room_tv
+        to: 'off'
+        for:
+          minutes: 10
+
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: media_player.viziotv
+          state: 'on'
+        - condition: template
+          value_template: '{{states.media_player.viziotv.attributes.source == "HDMI-2"}}'
+
+    action:
+      - service: homeassistant.turn_off
+        entity_id: media_player.viziotv
+
+
   ##### Volume setting ######
   # Set bedroom_speaker volume when turned on
   - alias: bedroom_speaker volume reset

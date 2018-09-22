@@ -1,10 +1,48 @@
 
+#################################################################
+## Groups
+group:
+
+  overridechild:
+    name: Override
+    control: hidden
+    entities:
+      - automation.motion_bathroom_lights_on_20min
+      - automation.motion_hallway_lights_on_15min
+      - automation.dark_arrive_home_lights
+      - automation.turn_on_kitchen_lights_at_entry
+      - automation.roomba_on_weekdays
+      - group.alarmclock
+      - switch.bedroom_outlet_switch_2
+      - switch.meter_outlet_switch
+
+  systemmgmt:
+    name: System Management
+    control: hidden
+    entities:
+      - input_boolean.vacation_mode
+      - script.updateha
+      - script.restartha
+      - script.rebootpi
+
+
+##################################################
+## Inputs
+input_boolean:
+
+  vacation_mode:
+    name: Vacation Mode
+    initial: off
+    icon: mdi:airplane-takeoff
+
+
 ##################################################
 ## Commands
 shell_command:
   updateha: /home/homeassistant/.homeassistant/updateha.sh
   restartha: sudo systemctl restart home-assistant.service
   rebootpi: sudo reboot
+
 
 ##################################################
 ## Scripts
@@ -40,6 +78,7 @@ script:
             renotify: true
             tag: 'package_notify'
 
+
 #################################################################
 ## Automations
 automation:
@@ -63,8 +102,8 @@ automation:
   - alias: 'Set theme at startup'
     initial_state: 'on'
     trigger:
-     - platform: homeassistant
-       event: start
+      - platform: homeassistant
+        event: start
     action:
       service: frontend.set_theme
       data:

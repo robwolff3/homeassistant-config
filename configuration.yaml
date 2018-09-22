@@ -4,26 +4,24 @@
 
 homeassistant:
   name: Home Assistant
-  latitude: REDACTED
-  longitude: REDACTED
+  latitude: !secret halatitude
+  longitude: !secret halongitude
   elevation: 250
   unit_system: imperial
   time_zone: America/Detroit
   packages: !include_dir_named packages/
-#  auth_providers:
-#   - type: homeassistant
 
 group: !include groups.yaml
 
 frontend:
   extra_html_url:
-    - /local/custom_ui/state-card-custom-ui.html
     - /local/custom_ui/state-card-tiles.html
     - /local/custom_ui/state-card-custom_stereo.html
     - /local/custom_ui/state-card-custom_tv.html
+    - /local/custom_ui/state-card-custom-ui.html
   extra_html_url_es5:
-    - /local/custom_ui/state-card-custom-ui-es5.html
     - /local/custom_ui/state-card-tiles_es5.html
+    - /local/custom_ui/state-card-custom-ui-es5.html
   themes:
     dark:
       primary-color: '#36454f'
@@ -31,11 +29,11 @@ frontend:
 config:
 
 http:
-  server_port: REDACTED
-  api_password: REDACTED
-  base_url: REDACTED
+  server_port: !secret server_port
+  api_password: !secret api_password
+  base_url: !secret base_url
   use_x_forwarded_for: true
-  trusted_proxies: REDACTED
+  trusted_proxies: 127.0.0.1
   ip_ban_enabled: true
   login_attempts_threshold: 5
 
@@ -111,17 +109,17 @@ ios:
 media_player:
   - platform: vizio
     name: viziotv
-    host: REDACTED.234
-    access_token: REDACTED
+    host: !secret viziohost
+    access_token: !secret vizioaccess_token
   - platform: nadtcp2
     name: nadc338
     max_volume: -20
     min_volume: -70
     volume_step: 2
-    host: REDACTED.231
+    host: !secret nadtcp2host
   - platform: mpd
     name: 'Mopidy'
-    host: REDACTED.253
+    host: !secret mpdhost
 
 
 #################################################################
@@ -129,7 +127,7 @@ media_player:
 
 zwave:
   usb_path: "/dev/ttyACM0"
-  network_key: "REDACTED"
+  network_key: !secret network_key
   polling_interval: 30000
   device_config:
     light.livingroom_light_level:
@@ -153,7 +151,7 @@ zwave:
 
 light:
   - platform: hue
-    host: REDACTED.240
+    host: !secret huehost
     allow_unreachable: true
     allow_hue_groups: true
 
@@ -162,14 +160,14 @@ light:
 ## Things
 
 nest:
-  client_id: REDACTED
-  client_secret: REDACTED
+  client_id: !secret nestclient_id
+  client_secret: !secret nestclient_secret
 
 vacuum:
   - platform: roomba
-    host: REDACTED.247
-    username: REDACTED
-    password: 'REDACTED'
+    host: !secret roombahost
+    username: !secret roombausername
+    password: !secret roombapassword
 
 
 #################################################################
@@ -182,12 +180,12 @@ alarm_control_panel:
   trigger_time: 99999999
 
 zoneminder:
-  host: 'REDACTED'
+  host: !secret zmhost
   path: /
   path_zms: /cgi-bin/nph-zms
   ssl: true
-  username: REDACTED
-  password: REDACTED
+  username: !secret zmusername
+  password: !secret zmpassword
 camera:
   - platform: zoneminder
 sensor:
@@ -195,9 +193,9 @@ sensor:
 
 device_tracker:
   - platform: netgear
-    host: REDACTED.250
-    username: REDACTED
-    password: REDACTED
+    host: !secret netgearhost
+    username: !secret netgearusername
+    password: !secret netgearpassword
     port: 80
     interval_seconds: 12
     new_device_defaults:
@@ -205,8 +203,8 @@ device_tracker:
 
 zone:
   name: Home
-  latitude: REDACTED
-  longitude: REDACTED
+  latitude: !secret zonelatitude
+  longitude: !secret zonelongitude
   radius: 200
 
 
@@ -214,17 +212,17 @@ zone:
 ## Notifications and Google Assistant
 
 twilio:
-  account_sid: REDACTED
-  auth_token: REDACTED
+  account_sid: !secret twilioaccountsid
+  auth_token: !secret twilioauthtoken
 
 notify:
   - name: twilio_calling
     platform: twilio_call
-    from_number: REDACTED
+    from_number: !secret twiliofromnumber
   - name: html5
     platform: html5
-    gcm_api_key: 'REDACTED'
-    gcm_sender_id: 'REDACTED'
+    gcm_api_key: !secret gcpapikey
+    gcm_sender_id: !secret gcpsenderid
 
 cloud:
   google_actions:

@@ -12,10 +12,8 @@ group:
       - switch.bedroom_outlet_switch_3
       - switch.kitchen_outlet_switch
       - sensor.dishwasher_status
-      - climate.dining_room
       - vacuum.roomba
-      - lock.front_door_handle_locked
-      - group.alarmclock
+      - climate.dining_room
 
 
 #################################################################
@@ -129,6 +127,9 @@ automation:
             - fri
         - condition: template
           value_template: '{{states.vacuum.roomba.attributes.battery_level > 79}}'
+        - condition: state
+          entity_id: input_boolean.vacation_mode
+          state: 'off'
 
     action:
       - service: homeassistant.turn_on
@@ -245,7 +246,7 @@ automation:
         data:
           entity_id: input_select.dishwasher_status
           option: Running
-   
+
   # Dishwasher set drying
   - alias: Set dishwasher drying when power drops
 
@@ -267,7 +268,7 @@ automation:
         data:
           entity_id: input_select.dishwasher_status
           option: Drying
-   
+
   # Dishwasher set off
   - alias: Set dishwasher off
 

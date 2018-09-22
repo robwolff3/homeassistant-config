@@ -8,17 +8,17 @@ homeassistant:
       friendly_name: Status
       icon: mdi:shield
 
-    device_tracker.USER2_iphone:
-      friendly_name: USER2
+    device_tracker.user1:
+      friendly_name: !secret user1
 
-    device_tracker.USER1_pixel:
-      friendly_name: USER1
+    device_tracker.user2:
+      friendly_name: !secret user2
 
-    device_tracker.USER3_pixel:
-      friendly_name: USER3
+    device_tracker.user3:
+      friendly_name: !secret user3
 
-    device_tracker.USER4_galaxy:
-      friendly_name: USER4
+    device_tracker.user4:
+      friendly_name: !secret user4
 
     binary_sensor.bathroom_motion_sensor:
       friendly_name: Bathroom
@@ -73,10 +73,10 @@ group:
   sensors:
     name: Sensors
     entities:
-      - device_tracker.USER2_iphone
-      - device_tracker.USER1_pixel
-      - device_tracker.USER3_pixel
-      - device_tracker.USER4_galaxy
+      - device_tracker.user1
+      - device_tracker.user2
+      - device_tracker.user3
+      - device_tracker.user4
       - sensor.frontdoor_contact
       - sensor.sidedoor_contact
       - sensor.backdoor_contact
@@ -152,16 +152,16 @@ automation:
         - condition: or
           conditions:
             - condition: state
-              entity_id: device_tracker.USER2_iphone
+              entity_id: device_tracker.user1
               state: 'home'
             - condition: state
-              entity_id: device_tracker.USER1_pixel
+              entity_id: device_tracker.user2
               state: 'home'
             - condition: state
-              entity_id: device_tracker.USER3_pixel
+              entity_id: device_tracker.user3
               state: 'home'
             - condition: state
-              entity_id: device_tracker.USER4_galaxy
+              entity_id: device_tracker.user4
               state: 'home'
         - condition: state
           entity_id: alarm_control_panel.main
@@ -209,7 +209,7 @@ automation:
 
     trigger:
       - platform: state
-        entity_id: device_tracker.USER2_iphone, device_tracker.USER1_pixel, device_tracker.USER3_pixel, device_tracker.USER4_galaxy
+        entity_id: device_tracker.user1, device_tracker.user2, device_tracker.user3, device_tracker.user4
         from: 'not_home'
         to: 'home'
 
@@ -218,7 +218,7 @@ automation:
       conditions:
         - condition: time
           after: '00:00:01'
-          before: '06:00:00'
+          before: '04:55:00'
         - condition: or
           conditions:
             - condition: state
@@ -246,19 +246,14 @@ automation:
 
     trigger:
       - platform: time
-        at: '06:00:00'
+        at: '05:00:00'
 
     condition:
       condition: and
       conditions:
-        - condition: or
-          conditions:
-            - condition: state
-              entity_id: alarm_control_panel.main
-              state: pending
-            - condition: state
-              entity_id: alarm_control_panel.main
-              state: armed_home
+        - condition: state
+          entity_id: alarm_control_panel.main
+          state: armed_home
         - condition: state
           entity_id: input_boolean.enable_alarm_system
           state: 'on'
@@ -276,7 +271,7 @@ automation:
 
     trigger:
       - platform: state
-        entity_id: device_tracker.USER2_iphone, device_tracker.USER1_pixel, device_tracker.USER3_pixel, device_tracker.USER4_galaxy
+        entity_id: device_tracker.user1, device_tracker.user2, device_tracker.user3, device_tracker.user4
         from: 'home'
         to: 'not_home'
 
@@ -292,16 +287,16 @@ automation:
               entity_id: alarm_control_panel.main
               state: armed_home
         - condition: state
-          entity_id: device_tracker.USER2_iphone
+          entity_id: device_tracker.user1
           state: 'not_home'
         - condition: state
-          entity_id: device_tracker.USER1_pixel
+          entity_id: device_tracker.user2
           state: 'not_home'
         - condition: state
-          entity_id: device_tracker.USER3_pixel
+          entity_id: device_tracker.user3
           state: 'not_home'
         - condition: state
-          entity_id: device_tracker.USER4_galaxy
+          entity_id: device_tracker.user4
           state: 'not_home'
         - condition: state
           entity_id: input_boolean.enable_alarm_system
@@ -343,14 +338,14 @@ automation:
     action:
       service: alarm_control_panel.alarm_trigger
       entity_id: alarm_control_panel.main
- 
+
 
 # Auto disarm for Armed Away
   - alias: Auto Status - Disarmed Away
 
     trigger:
       - platform: state
-        entity_id: device_tracker.USER2_iphone, device_tracker.USER1_pixel, device_tracker.USER3_pixel, device_tracker.USER4_galaxy
+        entity_id: device_tracker.user1, device_tracker.user2, device_tracker.user3, device_tracker.user4
         from: 'not_home'
         to: 'home'
 
@@ -391,7 +386,7 @@ automation:
         entity_id: alarm_control_panel.main
 
 
-# Notifcation disarm
+# Disarm when notifcation clicked
   - alias: Notifcation Disarm
 
     trigger:
@@ -406,32 +401,32 @@ automation:
 
 
 # Notification when alarm pending
-  - alias: Notify when alarm is pending
+#  - alias: Notify when alarm is pending
+#
+#    trigger:
+#      - platform: state
+#        entity_id: alarm_control_panel.main
+#        from: 'armed_away'
+#        to: 'pending'
+#      - platform: state
+#        entity_id: alarm_control_panel.main
+#        from: 'armed_home'
+#        to: 'pending'
 
-    trigger:
-      - platform: state
-        entity_id: alarm_control_panel.main
-        from: 'armed_away'
-        to: 'pending'
-      - platform: state
-        entity_id: alarm_control_panel.main
-        from: 'armed_home'
-        to: 'pending'
-
-    action:
-      - service: notify.html5
-        data:
-          title: 'Alarm Pending'
-          message: "Your home alarm is pending for an alarm."
-          data:
-            image: "https://REDACTED/api/camera_proxy/camera.frontdoor?api_password=REDACTED"
-            requireInteraction: true
-            renotify: true
-            tag: 'ha_alarm'
-            url: '/states/group.security'
-            actions:
-              - action: 'disarm_ha'
-                title: 'Disarm'
+#    action:
+#      - service: notify.html5
+#        data:
+#          title: 'Alarm Pending'
+#          message: "Your home alarm is pending for an alarm."
+#          data:
+#            image: !secret frontdoorimage
+#            requireInteraction: true
+#            renotify: true
+#            tag: 'ha_alarm'
+#            url: '/states/group.security'
+#            actions:
+#              - action: 'disarm_ha'
+#                title: 'Disarm'
 
 # Notification when alarm triggerd
   - alias: Notify when alarm is triggered
@@ -448,7 +443,7 @@ automation:
           title: 'ALARM!'
           message: "ALARM! Your home alarm has been triggered."
           data:
-            image: "https://REDACTED/api/camera_proxy/camera.frontdoor?api_password=REDACTED"
+            image: !secret frontdoorimage
             requireInteraction: true
             renotify: true
             tag: 'ha_alarm'
@@ -460,7 +455,7 @@ automation:
         data:
           message: 'Your home assistant security alarm has been triggered.'
           target:
-            - REDACTED
+            - !secret notificationtarget
 
 # Notification when alarm disarmed
   - alias: Notify when alarm is disarmed
@@ -468,12 +463,13 @@ automation:
     trigger:
       - platform: state
         entity_id: alarm_control_panel.main
-        from: 'pending'
-        to: 'disarmed'
-      - platform: state
-        entity_id: alarm_control_panel.main
         from: 'triggered'
         to: 'disarmed'
+
+    condition:
+      - condition: state
+        entity_id: input_boolean.enable_alarm_system
+        state: 'on'
 
     action:
       - service: notify.html5
