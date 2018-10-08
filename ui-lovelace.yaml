@@ -1,0 +1,402 @@
+
+#################################################################
+## Home Assistant
+
+resources:
+  - url: /local/lovelace-slider-entity-row/slider-entity-row.js
+    type: module
+  - url: /local/custom-lovelace/alarm_control_panel-card/alarm_control_panel-card.js
+    type: module
+  - url: /local/mini-media-player/mini-media-player.js?v=0.8.3
+    type: module
+  - url: /local/button-card.js
+    type: module
+  - url: /local/custom_ui/weather-card.js
+    type: js
+
+
+title: Home Assistant
+views:
+
+
+#################################################################
+## Home
+
+  - title: Home
+    id: home
+    cards:
+
+      - type: entities
+        title: Lights
+        show_header_toggle: false
+        entities:
+          - entity: light.livingroom_light_level
+            name: Living Room
+            icon: mdi:sofa
+            type: custom:slider-entity-row
+            hide_toggle: true
+          - entity: light.kitchen_light_level
+            name: Kitchen
+            icon: mdi:fridge
+            type: custom:slider-entity-row
+            hide_toggle: true
+          - entity: light.diningroom_light_level
+            name: Dining Room
+            icon: mdi:silverware-variant
+            type: custom:slider-entity-row
+            hide_toggle: true
+          - entity: light.bedroom_light_level
+            name: Bedroom
+            icon: mdi:hotel
+            type: custom:slider-entity-row
+            hide_toggle: true
+          - entity: light.bathroom_light_level
+            name: Bathroom
+            icon: mdi:water-pump
+            type: custom:slider-entity-row
+            hide_toggle: true
+          - entity: light.hallway_light_level
+            name: Hallway
+            icon: mdi:ceiling-light
+            type: custom:slider-entity-row
+            hide_toggle: true
+          - entity: light.nightstand1
+            name: !secret user2ns
+            icon: mdi:lamp
+            type: custom:slider-entity-row
+            hide_toggle: true
+          - entity: light.nightstand2
+            name: !secret user1ns
+            icon: mdi:lamp
+            type: custom:slider-entity-row
+            hide_toggle: true
+
+      - type: entities
+        title: Things
+        show_header_toggle: false
+        entities:
+          - entity: input_select.scene_selector
+            name: Scenes
+            icon: mdi:creation
+          - entity: switch.bedroom_outlet_switch_3
+            name: Bedroom Fan
+            icon: mdi:fan
+          - entity: switch.kitchen_outlet_switch
+            name: Espresso Machine
+            icon: mdi:coffee
+          - entity: sensor.dishwasher_status
+            name: Dishwasher
+            icon: mdi:washing-machine
+          - entity: vacuum.roomba
+            name: Roomba
+            icon: mdi:robot-vacuum-variant
+          - entity: climate.dining_room
+            name: Nest
+          - entity: media_player.viziotv
+            type: "custom:mini-media-player"
+            name: Vizio TV
+            icon: mdi:monitor
+            show_source: small
+            hide_controls: true
+            hide_mute: true
+            volume_stateless: true
+            power_color: true
+            group: true
+          - entity: media_player.nadc338
+            type: "custom:mini-media-player"
+            name: NAD Stereo
+            icon: mdi:speaker
+            show_source: small
+            hide_controls: true
+            hide_mute: true
+            volume_stateless: true
+            power_color: true
+            group: true
+
+      - type: vertical-stack
+        cards:
+          - type: entities
+            title: Playlist Control
+            entities:
+              - entity: input_select.playlist_content
+                name: 'Content:'
+                icon: mdi:playlist-play
+              - entity: input_select.playlist_source
+                name: 'Source:'
+                icon: mdi:speaker-wireless
+          - type: horizontal-stack
+            cards:
+              - type: "custom:button-card"
+                color_type: blank-card
+              - type: "custom:button-card"
+                color_type: card
+                color: '#9a9fa8'
+                size: 19px
+                icon: mdi:play
+                action: service
+                service:
+                  domain: script
+                  action: turn_on
+                  data:
+                    entity_id: script.playlist_action
+              - type: "custom:button-card"
+                color_type: card
+                color: '#9a9fa8'
+                size: 19px
+                icon: mdi:stop
+                action: service
+                service:
+                  domain: script
+                  action: turn_on
+                  data:
+                    entity_id: script.playlist_stop
+              - type: "custom:button-card"
+                color_type: card
+                color: '#9a9fa8'
+                size: 19px
+                icon: mdi:volume-medium
+                action: service
+                service:
+                  domain: script
+                  action: turn_on
+                  data:
+                    entity_id: script.playlist_voldown
+              - type: "custom:button-card"
+                color_type: card
+                color: '#9a9fa8'
+                size: 19px
+                icon: mdi:volume-high
+                action: service
+                service:
+                  domain: script
+                  action: turn_on
+                  data:
+                    entity_id: script.playlist_volup
+              - type: "custom:button-card"
+                color_type: blank-card
+
+      - type: conditional
+        conditions:
+          - entity: media_player.living_room
+            state_not: "off"
+        card:
+          type: custom:mini-media-player
+          entity: media_player.living_room
+          name: Living Room
+          artwork: cover
+          short_info: true
+          power_color: true
+          show_progress: true
+          hide_mute: true
+          volume_stateless: true
+
+      - type: conditional
+        conditions:
+          - entity: media_player.kitchen_stereo
+            state_not: "off"
+        card:
+          type: custom:mini-media-player
+          entity: media_player.kitchen_stereo
+          name: Kitchen Stereo
+          artwork: cover
+          short_info: true
+          power_color: true
+          show_progress: true
+          hide_mute: true
+          volume_stateless: true
+
+      - type: conditional
+        conditions:
+          - entity: media_player.bedroom_speaker
+            state_not: "off"
+        card:
+          type: custom:mini-media-player
+          entity: media_player.bedroom_speaker
+          name: Bedroom Speaker
+          artwork: cover
+          short_info: true
+          power_color: true
+          show_progress: true
+          hide_mute: true
+          volume_stateless: true
+
+      - type: conditional
+        conditions:
+          - entity: media_player.basement_group
+            state_not: "off"
+          - entity: media_player.basement_group
+            state_not: "unavailable"
+        card:
+          type: custom:mini-media-player
+          entity: media_player.basement_group
+          name: Basement Audio Group
+          artwork: cover
+          short_info: true
+          power_color: true
+          show_progress: true
+          hide_mute: true
+          volume_stateless: true
+
+      - type: custom:weather-card
+        entity_weather: weather.yweather
+        entity_sun: sun.sun
+
+      - type: picture-entity
+        name: Midwest Radar
+        entity: camera.midwest_radar
+        show_state: false
+
+
+#################################################################
+## Security
+
+  - title: Security
+    id: security
+    cards:
+
+      - type: custom:alarm_control_panel-card
+        entity: alarm_control_panel.main
+        show_keypad: true
+        title: Alarm Control
+        hide_keypad: true
+        style: '--alarm-color-disarmed: var(--label-badge-blue);'
+        states:
+          - arm_home
+          - arm_away
+
+      - type: entities
+        title: Locks
+        entities:
+          - entity: lock.front_door_handle_locked
+            name: Frontdoor Lock
+            icon: mdi:lock-smart
+
+      - type: glance
+        title: Occupancy Sensors
+        entities:
+          - entity: binary_sensor.user1_occupancy
+            name: !secret user1
+            icon: mdi:account
+          - entity: binary_sensor.user2_occupancy
+            name: !secret user2
+            icon: mdi:account
+          - entity: binary_sensor.user3_occupancy
+            name: !secret user3
+            icon: mdi:account
+          - entity: binary_sensor.user4_occupancy
+            name: !secret user4
+            icon: mdi:account
+
+      - type: glance
+        title: Door Sensors
+        entities:
+          - entity: binary_sensor.frontdoor_contact
+            name: Frontdoor
+            icon: mdi:door
+          - entity: binary_sensor.sidedoor_contact
+            name: Sidedoor
+            icon: mdi:door
+          - entity: binary_sensor.backdoor_contact
+            name: Backdoor
+            icon: mdi:door
+
+      - type: glance
+        title: Motion Sensors
+        entities:
+          - entity: binary_sensor.uplivingroom_motion_sensor
+            name: Up Living
+            icon: mdi:run
+          - entity: binary_sensor.upoffice_motion_sensor
+            name: Up Office
+            icon: mdi:run
+          - entity: binary_sensor.hallway_motion1_sensor
+            name: Hallway 1
+            icon: mdi:run
+          - entity: binary_sensor.hallway_motion2_sensor
+            name: Hallway 2
+            icon: mdi:run
+          - entity: binary_sensor.bathroom_motion_sensor
+            name: Bathroom
+            icon: mdi:run
+
+      - type: picture-entity
+        name: Frontdoor Camera
+        entity: camera.frontdoor
+        show_state: false
+      - type: picture-entity
+        name: Backdoor Camera
+        entity: camera.backdoor
+        show_state: false
+
+
+#################################################################
+## Override
+
+  - title: Override
+    id: override
+    cards:
+
+      - type: entities
+        title: Override
+        show_header_toggle: false
+        entities:
+          - automation.motion_bathroom_lights_on_20min
+          - automation.motion_hallway_lights_on_15min
+          - automation.dark_arrive_home_lights
+          - automation.turn_on_kitchen_lights_at_entry
+          - automation.roomba_on_weekdays
+          - automation.haalert
+          - entity: input_boolean.enable_alarm_system
+            name: Alarm System Enabled
+            icon: mdi:toggle-switch
+          - entity: switch.bedroom_outlet_switch_2
+            name: Bedroom Outlet Left
+            icon: mdi:power-socket-us
+          - entity: switch.meter_outlet_switch
+            name: Dishwasher Switch
+            icon: mdi:washing-machine
+
+      - type: entities
+        title: System Management
+        show_header_toggle: false
+        entities:
+          - entity: input_boolean.vacation_mode
+            name: Vacation Mode
+            icon: mdi:airplane-takeoff
+          - script.updateha
+          - script.restartha
+          - script.rebootpi
+          - script.restartmonitor
+          - script.updatemonitor
+
+
+      - type: entities
+        title: Alarm Clock
+        show_header_toggle: false
+        entities:
+          - entity: sensor.alarmclock_time_template
+            name: 'Time'
+            icon: mdi:alarm
+          - entity: input_boolean.alarmclock_enabled
+            name: Enabled
+            icon: mdi:toggle-switch
+          - entity: input_number.alarmclock_hour
+            name: Hour
+            icon: mdi:timer
+          - entity: input_number.alarmclock_minute
+            name: Minute
+            icon: mdi:timer
+          - entity: input_boolean.alarmclock_cancel
+            name: Cancel Alarmclock
+            icon: mdi:cancel
+
+      - type: entities
+        title: Media
+        entities:
+          - media_player.viziotv
+          - media_player.basement_group
+          - media_player.living_room
+          - media_player.kitchen_stereo
+          - media_player.nadc338
+          - media_player.bedroom_speaker
+          - media_player.kitchen_home

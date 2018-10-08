@@ -1,47 +1,20 @@
 
-#################################################################
-## Groups
-group:
-
-  overridechild:
-    name: Override
-    control: hidden
-    entities:
-      - automation.motion_bathroom_lights_on_20min
-      - automation.motion_hallway_lights_on_15min
-      - automation.dark_arrive_home_lights
-      - automation.turn_on_kitchen_lights_at_entry
-      - automation.roomba_on_weekdays
-      - group.alarmclock
-      - switch.bedroom_outlet_switch_2
-      - switch.meter_outlet_switch
-
-  systemmgmt:
-    name: System Management
-    control: hidden
-    entities:
-      - input_boolean.vacation_mode
-      - script.updateha
-      - script.restartha
-      - script.rebootpi
-
-
 ##################################################
 ## Inputs
 input_boolean:
 
   vacation_mode:
-    name: Vacation Mode
     initial: off
-    icon: mdi:airplane-takeoff
 
 
 ##################################################
 ## Commands
 shell_command:
-  updateha: /home/homeassistant/.homeassistant/updateha.sh
+  updateha: /home/homeassistant/.homeassistant/scripts/update_ha.sh
   restartha: sudo systemctl restart home-assistant.service
   rebootpi: sudo reboot
+  restartmonitor: /home/homeassistant/.homeassistant/scripts/restart_monitor.sh
+  updatemonitor: /home/homeassistant/.homeassistant/scripts/update_monitor.sh
 
 
 ##################################################
@@ -66,35 +39,60 @@ script:
     sequence:
       - service: shell_command.rebootpi
 
-  # Notify package delivered
-  package_notify:
+  # Restart Monitor
+  restartmonitor:
+    alias: Restart Monitor
     sequence:
-      - service: notify.html5
-        data:
-          title: 'Package Delivered'
-          message: 'A package has been delivered.'
-          data:
-            requireInteraction: true
-            renotify: true
-            tag: 'package_notify'
+      - service: shell_command.restartmonitor
+
+  # Update Monitor
+  updatemonitor:
+    alias: Update Monitor
+    sequence:
+      - service: shell_command.updatemonitor
+
+
+##################################################
+## Sensors
+
+sensor:
+  - platform: rest
+    name: Home Assistant Release
+    resource: https://api.github.com/repos/home-assistant/home-assistant/releases/latest
+    username: !secret github_username
+    password: !secret github_access_token
+    authentication: basic
+    value_template: '{{ value_json.tag_name }}'
+    headers:
+      Accept: application/vnd.github.v3+json
+      Content-Type: application/json
+      User-Agent: Home Assistant REST sensor
+
+  - platform: version
 
 
 #################################################################
 ## Automations
 automation:
 
-  # Notify when HA update is availavle
-  - alias: 'Update Available Notifications'
+  # Notify when HA update is available
+  - alias: Home Assistant Release Check
 
     trigger:
-      platform: state
-      entity_id: updater.updater
+    - platform: state
+      entity_id: sensor.home_assistant_release
+    - platform: homeassistant
+      event: start
+
+    condition:
+      condition: template
+      value_template:  "{{ states('sensor.home_assistant_release') != states('sensor.current_version') }}"
 
     action:
       - service: notify.html5
         data:
-          title: 'New Home Assistant Release'
-          message: 'Home Assistant  {{ states.updater.updater.state }}  is now available.'
+          title: 'New Home Assistant Release - {{ states("sensor.home_assistant_release") }}'
+          message: 'Home Assistant update is now available. - {{now().strftime("%l:%M %P")}}'
           data:
             requireInteraction: true
 
@@ -104,7 +102,19 @@ automation:
     trigger:
       - platform: homeassistant
         event: start
+
     action:
       service: frontend.set_theme
       data:
         name: dark
+
+  # Restart Monitor and nodes on boot to reacquire state of users
+  - alias: 'Restart Monitor and nodes on boot'
+    initial_state: 'on'
+    trigger:
+      - platform: homeassistant
+        event: start
+
+    action:
+      - delay: '00:00:10'
+      - service: script.restartmonitor

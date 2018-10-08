@@ -1,57 +1,26 @@
 
 #################################################################
-## Groups
-group:
-
-  things:
-    name: Things
-    control: hidden
-    entities:
-      - switch.vizio_tv
-      - switch.nad_stereo
-      - switch.bedroom_outlet_switch_3
-      - switch.kitchen_outlet_switch
-      - sensor.dishwasher_status
-      - vacuum.roomba
-      - climate.dining_room
-
-
-#################################################################
-## Customize
-homeassistant:
-  customize:
-
-    sensor.dishwasher_status:
-      friendly_name: Dishwasher
-      icon: mdi:washing-machine
-
-    switch.meter_outlet_switch:
-      friendly_name: Dishwasher Switch
-
-    switch.bedroom_outlet_switch_3:
-      friendly_name: Bedroom Fan
-      icon: mdi:fan
-
-    switch.kitchen_outlet_switch:
-      friendly_name: Espresso Machine
-      icon: mdi:coffee
-
-    switch.bedroom_outlet_switch_2:
-      friendly_name: Bedroom Outlet Left
-
-    climate.dining_room:
-      friendly_name: Thermostat
-
-
-#################################################################
 ## Scripts
-
 script:
 
   roomba_on:
     sequence:
       - service: homeassistant.turn_on
         entity_id: vacuum.roomba
+
+  # Notify package delivered
+  package_notify:
+    sequence:
+      - service: notify.html5
+        data:
+          title: 'Package Delivered - {{now().strftime("%l:%M %P")}}'
+          message: 'A package has been delivered.'
+          data:
+            requireInteraction: true
+            renotify: true
+            tag: 'package_notify'
+      - service: automation.trigger
+        entity_id: automation.say_package_is_delivered
 
 
 #################################################################
@@ -76,36 +45,16 @@ sensor:
 input_select:
 
   dishwasher_status:
-    name: Dishwasher Status
+    initial: 'Off'
     options:
       - Running
       - Drying
       - 'Off'
-    initial: 'Off'
 
 
 #################################################################
 ## Automations
 automation:
-
-  # Espresso Notify
-  - alias: Espresso Notify
-
-    trigger:
-      platform: state
-      entity_id: switch.kitchen_outlet_switch
-      to: 'on'
-      for:
-        minutes: 30
-
-    action:
-      - service: notify.html5
-        data:
-          title: 'Espresso Ready'
-          message: 'Espresso machine is warmed up.'
-          data:
-            requireInteraction: true
-
 
 #Roomba logic
   # Sceduled Roobma!!
@@ -116,20 +65,18 @@ automation:
         at: '10:00:00'
 
     condition:
-      condition: and
-      conditions:
-        - condition: time
-          weekday:
-            - mon
-            - tue
-            - wed
-            - thu
-            - fri
-        - condition: template
-          value_template: '{{states.vacuum.roomba.attributes.battery_level > 79}}'
-        - condition: state
-          entity_id: input_boolean.vacation_mode
-          state: 'off'
+      - condition: time
+        weekday:
+          - mon
+          - tue
+          - wed
+          - thu
+          - fri
+      - condition: template
+        value_template: '{{states.vacuum.roomba.attributes.battery_level > 79}}'
+      - condition: state
+        entity_id: input_boolean.vacation_mode
+        state: 'off'
 
     action:
       - service: homeassistant.turn_on
@@ -156,31 +103,8 @@ automation:
     action:
       - service: notify.html5
         data:
-          title: 'Roomba Error'
+          title: 'Roomba Error - {{now().strftime("%l:%M %P")}}'
           message: 'Schmidt is stuck or something else stopped him.'
-          data:
-            requireInteraction: true
-            renotify: true
-            tag: 'roomba_notify'
-
-  # Notify when Roomba cant find dock
-  - alias: Roomba notify cant find dock
-
-    trigger:
-      - platform: state
-        entity_id: sensor.roomba_status
-        from: 'User Docking'
-        to: 'Stopped'
-
-#    condition:
-#      - condition: template
-#        value_template: '{{states.vacuum.roomba.attributes.battery_level > 21}}'
-
-    action:
-      - service: notify.html5
-        data:
-          title: 'Roomba Error'
-          message: 'Schmidt is lost and cant find his dock.'
           data:
             requireInteraction: true
             renotify: true
@@ -202,7 +126,7 @@ automation:
     action:
       - service: notify.html5
         data:
-          title: 'Roomba Finished'
+          title: 'Roomba Finished - {{now().strftime("%l:%M %P")}}'
           message: 'Schmidt is finished and bin needs emptying.'
           data:
             requireInteraction: true
@@ -219,13 +143,12 @@ automation:
     action:
       - service: notify.html5
         data:
-          title: 'Roomba Error'
+          title: 'Roomba Error - {{now().strftime("%l:%M %P")}}'
           message: 'Schmidt battery is 10%.'
           data:
             requireInteraction: true
             renotify: true
             tag: 'roomba_notify'
-
 
 #Dishwasher logic
   # Dishwasher set running
@@ -290,8 +213,8 @@ automation:
           entity_id: input_select.dishwasher_status
           option: 'Off'
 
-  # Dishwasher Alert when done
-  - alias: Send alert when dishwasher is done
+  # Text and add to todo Dishwasher Alert when done
+  - alias: Send text alert when dishwasher is done
 
     trigger:
       - platform: state
@@ -301,7 +224,218 @@ automation:
     action:
       - service: notify.html5
         data:
-          title: 'Dishwasher Finished'
+          title: 'Dishwasher Finished - {{now().strftime("%l:%M %P")}}'
           message: 'The Dishwasher has finished and is ready to be emptied.'
+          data:
+            requireInteraction: true
+      - service: google_keep.add_to_list
+        data_template:
+          title: 'Rob To Do'
+          items: 'Empty Dishwasher  - {{now().strftime("%l:%M %P")}}'
+
+  # Check for things left on
+  - alias: Check for things left on
+
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.user1_occupancy, binary_sensor.user2_occupancy
+        from: 'on'
+        to: 'off'
+
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: binary_sensor.user1_occupancy
+          state: 'off'
+        - condition: state
+          entity_id: binary_sensor.user2_occupancy
+          state: 'off'
+        - condition: or
+          conditions:
+            - condition: template
+              value_template: '{{states.light.livingroom_light_level.attributes.brightness > 128}}'
+            - condition: template
+              value_template: '{{states.light.kitchen_light_level.attributes.brightness > 128}}'
+            - condition: state
+              entity_id: light.diningroom_light_level
+              state: 'on'
+            - condition: state
+              entity_id: light.bedroom_light_level
+              state: 'on'
+            - condition: state
+              entity_id: light.bathroom_light_level
+              state: 'on'
+            - condition: state
+              entity_id: light.nightstand1
+              state: 'on'
+            - condition: state
+              entity_id: light.nightstand2
+              state: 'on'
+            - condition: state
+              entity_id: switch.bedroom_outlet_switch_3
+              state: 'on'
+            - condition: state
+              entity_id: switch.kitchen_outlet_switch
+              state: 'on'
+            - condition: state
+              entity_id: media_player.viziotv
+              state: 'on'
+            - condition: state
+              entity_id: media_player.nadc338
+              state: 'on'
+
+    action:
+      - service: notify.html5
+        data:
+          title: 'Something left on - {{now().strftime("%l:%M %P")}}'
+          message: 'A light or outlet was left on.'
+          data:
+            requireInteraction: true
+            renotify: true
+            url: '/states'
+            actions:
+              - action: 'turn_off'
+                title: 'Turn off'
+
+# Turn off when notifcation clicked
+  - alias: Turn off notifcation
+
+    trigger:
+      - platform: event
+        event_type: html5_notification.clicked
+        event_data:
+          action: turn_off
+
+    action:
+      - service: scene.turn_on
+        entity_id: scene.all_things_off
+
+  # Say Dishwasher Alert when done
+  - alias: Say alert when dishwasher is done
+
+    trigger:
+      - platform: state
+        entity_id: input_select.dishwashers_status
+        to: 'Off'
+
+    condition:
+      condition: and
+      conditions:
+        - condition: time
+          after: '08:00:00'
+          before: '20:00:00'
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: binary_sensor.user1_occupancy
+              state: 'on'
+            - condition: state
+              entity_id: binary_sensor.user2_occupancy
+              state: 'on'
+
+    action:
+      - service: notify.ga_broadcast
+        data_template:
+          message: >
+            {{ [
+              "The Dishwasher has finished and is ready to be emptied.",
+              "The dishwasher is done, hope someone is ready to put dishes away.",
+              "I have clean dishes hot off the press, the dishwasher is done."
+              ] | random }}
+
+  # Say package is delivered
+  - alias: Say package is delivered
+
+    trigger: #Dummy Trigger
+      - platform: state
+        entity_id: input_select.dishwasher_status
+        to: 'Dead'
+
+    condition:
+      condition: and
+      conditions:
+        - condition: time
+          after: '08:00:00'
+          before: '20:00:00'
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: binary_sensor.user1_occupancy
+              state: 'on'
+            - condition: state
+              entity_id: binary_sensor.user2_occupancy
+              state: 'on'
+
+    action:
+      - service: notify.ga_broadcast
+        data_template:
+          message: >
+            {{ [
+              "A package has been delivered, hope its something good.",
+              "A delivery has been made, better grab it before a porch pirate does.",
+              "You can stop checking the front door, a package has been delivered."
+              ] | random }}
+
+  ## Welcome Home User1 Broadcast
+  - alias: Say welcome home user1
+
+    trigger:
+      - platform: template
+        value_template: '{{states.lock.front_door_handle_locked.attributes.lock_status == "Unlocked with Keypad by user 1"}}'
+
+    condition:
+      - condition: template
+        value_template: "{{ (as_timestamp(now())-as_timestamp(states.binary_sensor.user1_occupancy.last_changed)) < 240 }}"
+      - condition: time
+        after: '10:00:00'
+        before: '19:00:00'
+
+    action:
+      - delay: '00:00:05'
+      - service: notify.ga_broadcast
+        data_template:
+          message: !secret user1_phrase
+
+  # Espresso Notify
+  - alias: Espresso Notify
+
+    trigger:
+      platform: state
+      entity_id: switch.kitchen_outlet_switch
+      to: 'on'
+      for:
+        minutes: 30
+
+    action:
+      - service: notify.html5
+        data:
+          title: 'Espresso Ready - {{now().strftime("%l:%M %P")}}'
+          message: 'Espresso machine is warmed up.'
+          data:
+            requireInteraction: true
+      - service: notify.ga_broadcast
+        data_template:
+          message: >
+            {{ [
+              "Hey sleepy head, the espresso machine is all warmed up.",
+              "I hope there is a barista somewhere because the espresso machine is ready.",
+              "Someone start grinding the beans, the expresso machine is at tempature."
+              ] | random }}
+
+  - alias: haalert
+
+    initial_state: 'off'
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.user1_occupancy, binary_sensor.user3_occupancy, binary_sensor.user4_occupancy, binary_sensor.frontdoor_contact, binary_sensor.sidedoor_contact, binary_sensor.backdoor_contact
+        from: 'off'
+        to: 'on'
+
+    action:
+      - service: notify.html5
+        data:
+          title: 'HA Alert - {{now().strftime("%l:%M %P")}}'
+          message: 'HA Alert'
           data:
             requireInteraction: true

@@ -11,17 +11,7 @@ homeassistant:
   time_zone: America/Detroit
   packages: !include_dir_named packages/
 
-group: !include groups.yaml
-
 frontend:
-  extra_html_url:
-    - /local/custom_ui/state-card-tiles.html
-    - /local/custom_ui/state-card-custom_stereo.html
-    - /local/custom_ui/state-card-custom_tv.html
-    - /local/custom_ui/state-card-custom-ui.html
-  extra_html_url_es5:
-    - /local/custom_ui/state-card-tiles_es5.html
-    - /local/custom_ui/state-card-custom-ui-es5.html
   themes:
     dark:
       primary-color: '#36454f'
@@ -37,8 +27,9 @@ http:
   ip_ban_enabled: true
   login_attempts_threshold: 5
 
-updater:
-  reporting: False
+group:
+  default_view:
+    view: yes
 
 discovery:
   ignore:
@@ -50,7 +41,6 @@ recorder:
   include:
     domains:
       - alarm_control_panel
-      - device_tracker
       - binary_sensor
       - input_boolean
       - input_select
@@ -59,22 +49,28 @@ recorder:
       - switch
       - vacuum
       - lock
+      - automation
     entities:
-      - sensor.backdoor_contact
       - sensor.dishwasher_status
-      - sensor.frontdoor_contact
       - sensor.meter_outlet_current
       - sensor.meter_outlet_power
-      - sensor.sidedoor_contact
       - sensor.kwikset_touchpad_electronic_deadbolt_alarm_level_2
       - sensor.kwikset_touchpad_electronic_deadbolt_alarm_type_2
-
+      - sensor.dining_room_thermostat_temperature
+      - sensor.dining_room_thermostat_humidity
+      - sensor.home_assistant_release
+      - sensor.current_version
   exclude:
     entities:
-      - device_tracker.ipad
       - binary_sensor.backdoor_contact_sensor
       - binary_sensor.frontdoor_contact_sensor
       - binary_sensor.sidedoor_contact_sensor
+      - binary_sensor.mckinley_away
+      - binary_sensor.dining_room_thermostat_is_using_emergency_heat
+      - binary_sensor.dining_room_thermostat_online
+      - binary_sensor.dining_room_thermostat_is_locked
+      - binary_sensor.dining_room_thermostat_has_leaf
+      - binary_sensor.dining_room_thermostat_fan
       - light.hue_lamp_1
       - light.hue_lamp_2
       - light.hue_lamp_3
@@ -115,11 +111,7 @@ media_player:
     name: nadc338
     max_volume: -20
     min_volume: -70
-    volume_step: 2
     host: !secret nadtcp2host
-  - platform: mpd
-    name: 'Mopidy'
-    host: !secret mpdhost
 
 
 #################################################################
@@ -168,15 +160,23 @@ vacuum:
     host: !secret roombahost
     username: !secret roombausername
     password: !secret roombapassword
+    continuous: false
 
+google_keep:
+  username: !secret keepusername
+  password: !secret keeppassword
+  list_name: "Rob To Do"
+
+weather:
+  - platform: yweather
 
 #################################################################
-## Security
+## Security / Occupancy
 
 alarm_control_panel:
   platform: manual
   name: Main
-  pending_time: 30
+  pending_time: 15
   trigger_time: 99999999
 
 zoneminder:
@@ -184,12 +184,14 @@ zoneminder:
   path: /
   path_zms: /cgi-bin/nph-zms
   ssl: true
-  username: !secret zmusername
+  username: homeassistant
   password: !secret zmpassword
+
 camera:
   - platform: zoneminder
-sensor:
-  - platform: zoneminder
+  - platform: generic
+    still_image_url: https://icons.wxug.com/data/weather-maps/radar/united-states/cadillac-michigan-region-current-radar-animation.gif
+    name: Midwest Radar
 
 device_tracker:
   - platform: netgear
@@ -200,6 +202,11 @@ device_tracker:
     interval_seconds: 12
     new_device_defaults:
       track_new_devices: False
+
+mqtt:
+  broker: 127.0.0.1
+  username: homeassistant
+  password: !secret mqttpassword
 
 zone:
   name: Home
@@ -223,6 +230,13 @@ notify:
     platform: html5
     gcm_api_key: !secret gcpapikey
     gcm_sender_id: !secret gcpsenderid
+  - name: GA Broadcast
+    platform: rest
+    resource: http://127.0.0.1:5000/broadcast_message
+  - name: GA Command
+    platform: rest
+    resource: http://127.0.0.1:5000/command
+
 
 cloud:
   google_actions:
@@ -235,21 +249,20 @@ cloud:
         - light.bathroom_light_level
         - light.hallway_light_level
         - light.nightstand
+        - light.nightstand1
+        - light.nightstand2
         - switch.bedroom_outlet_switch_3
         - switch.kitchen_outlet_switch
-        - switch.nad_stereo
-        - switch.vizio_tv
+        - media_player.nadc338
+        - media_player.viziotv
         - scene.dinner
         - scene.watching_tv
         - scene.goodmorning
         - scene.bedtime
+        - scene.mia_bedtime
         - scene.all_things_off
         - script.roomba_on
         - script.cancel_alarm
-        - script.vizio_tv_volup
-        - script.vizio_tv_voldown
-        - script.nad_volup
-        - script.nad_voldown
         - script.playlist_stop
     entity_config:
       light.livingroom_light_level:
@@ -266,6 +279,10 @@ cloud:
         name: Hallway Lights
       light.nightstand:
         name: Nightstand Lights
+      light.nightstand1:
+        name: !secret user2ns
+      light.nightstand2:
+        name: !secret user1ns
       switch.bedroom_outlet_switch_3:
         name: Bedroom Fan Switch
         aliases:
@@ -277,12 +294,12 @@ cloud:
           - Espresso Machine
           - Coffee Machine
           - Kitchen Outlet
-      switch.nad_stereo:
+      media_player.nadc338:
         name: Stereo Switch
         aliases:
           - Stereo
           - Nad
-      switch.vizio_tv:
+      media_player.viziotv:
         name: TV Switch
         aliases:
           - TV
@@ -295,19 +312,13 @@ cloud:
         name: GoodMorning Scene
       scene.bedtime:
         name: Bedtime Scene
+      scene.mia_bedtime:
+        name: Mia Bedtime
       scene.all_things_off:
         name: All Things Off Scene
       script.roomba_on:
         name: Roomba
       script.cancel_alarm:
         name: Cancel Alarm
-      script.vizio_tv_volup:
-        name: Vizio volup
-      script.vizio_tv_voldown:
-        name: Vizio voldown
-      script.nad_volup:
-        name: Nad volup
-      script.nad_voldown:
-        name: Nad voldown
       script.playlist_stop:
         name: Playlist Stop

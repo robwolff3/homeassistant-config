@@ -1,164 +1,11 @@
 
 #################################################################
-## Customize
-homeassistant:
-  customize:
-
-    media_player.viziotv:
-      friendly_name: Vizio TV
-
-    media_player.nadc338:
-      friendly_name: NAD C 338 Receiver
-
-    media_player.living_room_tv:
-      friendly_name: Living Room TV - Chromecast Ultra
-
-    media_player.kitchen_stereo:
-      friendly_name: Kitchen Stereo - NAD C 338
-
-    media_player.bedroom_speaker:
-      friendly_name: Bedroom Speaker - JBL Link 20
-
-    media_player.kitchen_home:
-      friendly_name: Kitchen Home - Google Home
-
-    media_player.kitchenbedroom:
-      friendly_name: Kitchen/Bedroom - Cast Group
-
-    switch.vizio_tv:
-      friendly_name: TV
-      icon: mdi:monitor
-      custom_ui_state_card: state-card-custom_tv
-
-    switch.nad_stereo:
-      friendly_name: Stereo
-      icon: mdi:speaker
-      custom_ui_state_card: state-card-custom_stereo
-
-
-#################################################################
-## Scripts
-script:
-
-  vizio_tv_volup:
-    sequence:
-      service: media_player.volume_up
-      entity_id: media_player.viziotv
-
-  vizio_tv_voldown:
-    sequence:
-      service: media_player.volume_down
-      entity_id: media_player.viziotv
-
-  vizio_tv_ccinput:
-    sequence:
-      service: media_player.select_source
-      entity_id: media_player.viziotv
-      data:
-        source: HDMI-2
-
-  vizio_tv_xbinput:
-    sequence:
-      service: media_player.select_source
-      entity_id: media_player.viziotv
-      data:
-        source: HDMI-4
-
-  nad_volup:
-    sequence:
-      service: media_player.volume_up
-      entity_id: media_player.nadc338
-
-  nad_voldown:
-    sequence:
-      service: media_player.volume_down
-      entity_id: media_player.nadc338
-
-
-#################################################################
-## Sensors
-sensor:
-
-  - platform: template
-    sensors:
-      nadc338_input_status:
-        value_template: '{{ states.media_player.nadc338.attributes.source}}'
-
-  - platform: template
-    sensors:
-      media_players_active:
-        friendly_name: 'Active Media Players'
-        value_template: >
-          {{ states.media_player
-            | rejectattr('state', 'equalto', 'off')
-            | rejectattr('entity_id', 'equalto', 'media_player.nadc338')
-            | rejectattr('entity_id', 'equalto', 'media_player.viziotv')
-            | rejectattr('entity_id', 'equalto', 'media_player.muffin_stuffin')
-            | rejectattr('entity_id', 'equalto', 'media_player.upstairs_kitchen')
-            | rejectattr('entity_id', 'equalto', 'media_player.the_universe')
-            | map(attribute ='entity_id')
-            | join(', ')
-          }}
-
-
-#################################################################
-## Switch
-switch:
-
-  - platform: template
-    switches:
-      vizio_tv:
-        value_template: "{{ is_state('media_player.viziotv', 'on') }}"
-        turn_on:
-          service: media_player.turn_on
-          data:
-            entity_id: media_player.viziotv
-        turn_off:
-          service: media_player.turn_off
-          data:
-            entity_id: media_player.viziotv
-
-  - platform: template
-    switches:
-      nad_stereo:
-        value_template: "{{ is_state('media_player.nadc338', 'on') }}"
-        turn_on:
-          service: media_player.turn_on
-          data:
-            entity_id: media_player.nadc338
-        turn_off:
-          service: media_player.turn_off
-          data:
-            entity_id: media_player.nadc338
-
-
-#################################################################
 ## Automation
 automation:
 
-  ##### Media Player Visibility ######
-  - alias: Media Update Active Group
-
-    trigger:
-    - entity_id: sensor.media_players_active
-      platform: state
-
-    action:
-    - service: group.set
-      data_template:
-        object_id: media_players_active
-        visible: >
-          {{ trigger.to_state.state != '' }}
-        entities: >
-          {% if trigger.to_state.state != '' %}
-            {{ trigger.to_state.state }}
-          {% else %}
-            {{ states.group.media_players_active.entity_id }}
-          {% endif %}
-
   ##### Media Power Management ######
-  # Turn off living_room_tv when Vizio powered off
-  - alias: living_room_tv off with vizio
+  # Turn off living_room when Vizio powered off
+  - alias: living_room off with vizio
 
     trigger:
       - platform: state
@@ -167,30 +14,28 @@ automation:
 
     condition:
       - condition: template
-        value_template: "{{ not is_state('media_player.living_room_tv', 'off') }}"
+        value_template: "{{ not is_state('media_player.living_room', 'off') }}"
 
     action:
       - service: homeassistant.turn_off
-        entity_id: media_player.living_room_tv
+        entity_id: media_player.living_room
 
-  # Turn off vizio off if chrome cast idle 10 minutes
+  # Turn off vizio off if chrome cast idle 30 minutes
   - alias: vizio off with chromecast idle
 
     trigger:
       - platform: state
-        entity_id: media_player.living_room_tv
+        entity_id: media_player.living_room
         to: 'off'
         for:
-          minutes: 10
+          minutes: 30
 
     condition:
-      condition: and
-      conditions:
-        - condition: state
-          entity_id: media_player.viziotv
-          state: 'on'
-        - condition: template
-          value_template: '{{states.media_player.viziotv.attributes.source == "HDMI-2"}}'
+      - condition: state
+        entity_id: media_player.viziotv
+        state: 'on'
+      - condition: template
+        value_template: '{{ states.media_player.viziotv.attributes.source == "HDMI-2" }}'
 
     action:
       - service: homeassistant.turn_off
@@ -217,12 +62,12 @@ automation:
           entity_id: media_player.bedroom_speaker
           volume_level: 0.5
 
-  # Set bedroom_speaker volume when turned on kitchenbedroom
-  - alias: bedroom_speaker volume reset kitchenbedroom
+  # Set bedroom_speaker volume when turned on basement_group
+  - alias: bedroom_speaker volume reset basement_group
 
     trigger:
       - platform: state
-        entity_id: media_player.kitchenbedroom
+        entity_id: media_player.basement_group
         from: 'off'
 
     condition:
@@ -260,12 +105,10 @@ automation:
   - alias: nadc338 volume reset input changed
 
     trigger:
-      - platform: state
-        entity_id: sensor.nadc338_input_status
-        to: 'Wireless'
-      - platform: state
-        entity_id: sensor.nadc338_input_status
-        to: 'Stream'
+      - platform: template
+        value_template: '{{ states.media_player.nadc338.attributes.source == "Wireless" }}'
+      - platform: template
+        value_template: '{{ states.media_player.nadc338.attributes.source == "Stream" }}'
 
     condition:
       - condition: state
@@ -279,8 +122,8 @@ automation:
           volume_level: 0.65
 
 
-  # Reset living_room_tv volume everyday
-  - alias: living_room_tv volume reset
+  # Reset living_room volume everyday
+  - alias: living_room volume reset
 
     trigger:
       - platform: time
@@ -289,11 +132,11 @@ automation:
     action:
       - service: media_player.volume_set
         data:
-          entity_id: media_player.living_room_tv
+          entity_id: media_player.living_room
           volume_level: 1.0
 
-  # Reset Johnny2x4 volume everyday
-  - alias: johnny2x4 volume reset
+  # Reset kitchen_home volume everyday
+  - alias: kitchen_home volume reset
 
     trigger:
       - platform: time

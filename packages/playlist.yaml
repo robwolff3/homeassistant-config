@@ -1,76 +1,33 @@
 
-#################################################
-## Customize
-
-homeassistant:
-  customize:
-    script.playlist_remote:
-      custom_ui_state_card: state-card-tiles
-      config:
-        columns: 4
-        row_height: 40px
-        column_width: 60px
-        gap: 10px
-        entities:
-          - entity: script.playlist_action
-            icon: mdi:play
-            color: '#9a9fa8'
-            column: 1
-            row: 1
-          - entity: script.playlist_stop
-            icon: mdi:stop
-            color: '#9a9fa8'
-            column: 2
-            row: 1
-          - entity: script.playlist_voldown
-            icon: mdi:volume-medium
-            color: '#9a9fa8'
-            column: 3
-            row: 1
-          - entity: script.playlist_volup
-            icon: mdi:volume-high
-            color: '#9a9fa8'
-            column: 4
-            row: 1
-
-
-#################################################################
-## Groups
-group:
-
-  playlist_control:
-    name: Playlist Control
-    control: hidden
-    entities:
-    - input_select.playlist_content
-    - input_select.playlist_source
-    - script.playlist_remote
-
 #################################################################
 ## Inputs
 
 input_select:
   playlist_content:
-    name: 'Content:'
+    initial: Michigan Radio
     options:
-      - Michigan Radio
-      - "WRCJ 90.9 FM"
-      - Dinner
-      - Jazz
       - Chicago Blues
-      - Rob's Favorites
-      - Ocean Sounds
-    icon: mdi:playlist-play
+      - Late Night Jazz
+      - Jazzy Dinner
+      - Classical Essentials
+      - Morning Classical
+      - "Piano 100: Spotify Picks"
+      - Autumn Acoustic
+      - Essential Alternative
+      - This Is The Black Keys
+      - Your Favorite Coffeehouse
+      - Michigan Radio
+      - WRCJ
+      - The News
+      - Sleep Into The Ocean
 
   playlist_source:
-    name: 'Source:'
+    initial: Kitchen Stereo
     options:
       - Kitchen Stereo
       - Bedroom Speaker
-      - Living Room TV
-      - Kitchen/Bedroom
-    initial: Kitchen Stereo
-    icon: mdi:speaker-wireless
+      - Basement Group
+
 
 #################################################################
 ## Scripts
@@ -81,31 +38,34 @@ script:
 
   playlist_action:
     sequence:
+      service: notify.ga_command
+      data_template:
+        message: >
+          {% if is_state("input_select.playlist_content", "Chicago Blues") %} Shuffle Chicago Blues playlist on {{ states('input_select.playlist_source') }}
+          {% elif is_state("input_select.playlist_content", "Late Night Jazz") %} Shuffle Late Night Jazz playlist on {{ states('input_select.playlist_source') }}
+          {% elif is_state("input_select.playlist_content", "Jazzy Dinner") %} Shuffle Jazzy Dinner playlist on {{ states('input_select.playlist_source') }}
+          {% elif is_state("input_select.playlist_content", "Classical Essentials") %} Shuffle Classical Essentials playlist on {{ states('input_select.playlist_source') }}
+          {% elif is_state("input_select.playlist_content", "Morning Classical") %} Shuffle Morning Classical playlist on {{ states('input_select.playlist_source') }}
+          {% elif is_state("input_select.playlist_content", "Piano 100: Spotify Picks") %} "Shuffle Piano 100 Spotify Picks playlist on" {{ states('input_select.playlist_source') }}
+          {% elif is_state("input_select.playlist_content", "Autumn Acoustic") %} Shuffle Autumn Acoustic playlist on {{ states('input_select.playlist_source') }}
+          {% elif is_state("input_select.playlist_content", "Essential Alternative") %} Shuffle Essential Alternative playlist on {{ states('input_select.playlist_source') }}
+          {% elif is_state("input_select.playlist_content", "This Is The Black Keys") %} Shuffle This Is The Black Keys playlist on {{ states('input_select.playlist_source') }}
+          {% elif is_state("input_select.playlist_content", "Your Favorite Coffeehouse") %} Shuffle Your Favorite Coffeehouse playlist on {{ states('input_select.playlist_source') }}
+          {% elif is_state("input_select.playlist_content", "Michigan Radio") %} Cast Michigan Radio on {{ states('input_select.playlist_source') }}
+          {% elif is_state("input_select.playlist_content", "WRCJ") %} Cast WRCJ on {{ states('input_select.playlist_source') }}
+          {% elif is_state("input_select.playlist_content", "The News") %} Cast The News on {{ states('input_select.playlist_source') }}
+          {% elif is_state("input_select.playlist_content", "Sleep Into The Ocean") %} Shuffle Sleep Into The Ocean playlist on {{ states('input_select.playlist_source') }}
+          {% endif %}
 
-      - service: media_player.play_media
-        data_template:
-          entity_id: media_player.mopidy
-          media_content_type: 'audio/mp4'
-          media_content_id: >
-            {% if is_state("input_select.playlist_content", "Michigan Radio") %} tunein:station:s23407
-            {% elif is_state("input_select.playlist_content", "WRCJ 90.9 FM") %} tunein:station:s28356
-            {% elif is_state("input_select.playlist_content", "Dinner") %} !secret PLDinner
-            {% elif is_state("input_select.playlist_content", "Jazz") %} !secret PLJazz
-            {% elif is_state("input_select.playlist_content", "Chicago Blues") %} !secret PLBlues
-            {% elif is_state("input_select.playlist_content", "Rob's Favorites") %} !secret PLRobs
-            {% elif is_state("input_select.playlist_content", "Ocean Sounds") %} local:track:waves.mp3
-            {% endif %}
-      - delay: "00:00:02"
-      - service: media_player.play_media
-        data_template:
-          media_content_id: !secret PLAction
-          media_content_type: 'audio/mp4'
-          entity_id: >
-            {% if is_state("input_select.playlist_source", "Kitchen Stereo") %} media_player.kitchen_stereo
-            {% elif is_state("input_select.playlist_source", "Bedroom Speaker") %} media_player.bedroom_speaker
-            {% elif is_state("input_select.playlist_source", "Living Room TV") %} media_player.living_room_tv
-            {% elif is_state("input_select.playlist_source", "Kitchen/Bedroom") %} media_player.kitchenbedroom
-            {% endif %}
+  playlist_stop:
+    sequence:
+      service: homeassistant.turn_off
+      data_template:
+        entity_id: >
+          {% if is_state("input_select.playlist_source", "Kitchen Stereo") %} media_player.kitchen_stereo
+          {% elif is_state("input_select.playlist_source", "Bedroom Speaker") %} media_player.bedroom_speaker
+          {% elif is_state("input_select.playlist_source", "Basement Group") %} media_player.basement_group
+          {% endif %}
 
   playlist_volup:
     sequence:
@@ -114,8 +74,7 @@ script:
         entity_id: >
           {% if is_state("input_select.playlist_source", "Kitchen Stereo") %} media_player.nadc338
           {% elif is_state("input_select.playlist_source", "Bedroom Speaker") %} media_player.bedroom_speaker
-          {% elif is_state("input_select.playlist_source", "Living Room TV") %} media_player.living_room_tv
-          {% elif is_state("input_select.playlist_source", "Kitchen/Bedroom") %} media_player.kitchenbedroom
+          {% elif is_state("input_select.playlist_source", "Basement Group") %} media_player.basement_group
           {% endif %}
 
   playlist_voldown:
@@ -125,60 +84,5 @@ script:
         entity_id: >
           {% if is_state("input_select.playlist_source", "Kitchen Stereo") %} media_player.nadc338
           {% elif is_state("input_select.playlist_source", "Bedroom Speaker") %} media_player.bedroom_speaker
-          {% elif is_state("input_select.playlist_source", "Living Room TV") %} media_player.living_room_tv
-          {% elif is_state("input_select.playlist_source", "Kitchen/Bedroom") %} media_player.kitchenbedroom
+          {% elif is_state("input_select.playlist_source", "Basement Group") %} media_player.basement_group
           {% endif %}
-
-  playlist_stop:
-    sequence:
-      - service: homeassistant.turn_off
-        entity_id: media_player.mopidy
-      - service: homeassistant.turn_off
-        data_template:
-          entity_id: >
-            {% if is_state("input_select.playlist_source", "Kitchen Stereo") %} media_player.kitchen_stereo
-            {% elif is_state("input_select.playlist_source", "Bedroom Speaker") %} media_player.bedroom_speaker
-            {% elif is_state("input_select.playlist_source", "Living Room TV") %} media_player.living_room_tv
-            {% elif is_state("input_select.playlist_source", "Kitchen/Bedroom") %} media_player.kitchenbedroom
-            {% endif %}
-
-#################################################################
-## Automations
-automation:
-
-  # Turn off Mopidy when not in use
-  - alias: Mopidy turn off
-
-    trigger:
-      - platform: state
-        entity_id: media_player.kitchen_stereo
-        to: 'off'
-      - platform: state
-        entity_id: media_player.bedroom_speaker
-        to: 'off'
-      - platform: state
-        entity_id: media_player.living_room_tv
-        to: 'off'
-      - platform: state
-        entity_id: media_player.kitchenbedroom
-        to: 'off'
-
-    condition:
-      condition: and
-      conditions:
-        - condition: state
-          entity_id: media_player.kitchen_stereo
-          state: 'off'
-        - condition: state
-          entity_id: media_player.bedroom_speaker
-          state: 'off'
-        - condition: state
-          entity_id: media_player.living_room_tv
-          state: 'off'
-        - condition: state
-          entity_id: media_player.kitchenbedroom
-          state: 'off'
-
-    action:
-      - service: homeassistant.turn_off
-        entity_id: media_player.mopidy

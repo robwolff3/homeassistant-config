@@ -1,138 +1,34 @@
 
-#################################################################
-## Customize
-homeassistant:
-  customize:
+##################################################
+## Inputs
+input_boolean:
 
-    alarm_control_panel.main:
-      friendly_name: Status
-      icon: mdi:shield
-
-    device_tracker.user1:
-      friendly_name: !secret user1
-
-    device_tracker.user2:
-      friendly_name: !secret user2
-
-    device_tracker.user3:
-      friendly_name: !secret user3
-
-    device_tracker.user4:
-      friendly_name: !secret user4
-
-    binary_sensor.bathroom_motion_sensor:
-      friendly_name: Bathroom
-      icon: mdi:run
-    binary_sensor.hallway_motion1_sensor:
-      friendly_name: Hallway 1
-      icon: mdi:run
-    binary_sensor.hallway_motion2_sensor:
-      friendly_name: Hallway 2
-      icon: mdi:run
-    binary_sensor.uplivingroom_motion_sensor:
-      friendly_name: Up Living
-      icon: mdi:run
-    binary_sensor.upoffice_motion_sensor:
-      friendly_name: Up Office
-      icon: mdi:run
-    sensor.frontdoor_contact:
-      device_class: opening
-      icon: mdi:door
-    sensor.sidedoor_contact:
-      device_class: opening
-      icon: mdi:door
-    sensor.backdoor_contact:
-      device_class: opening
-      icon: mdi:door
-
-    lock.front_door_handle_locked:
-      friendly_name: Front Door Lock
-      icon: mdi:lock-smart
-
-    camera.frontdoor:
-      friendly_name: Frontdoor Camera
-  
-    camera.backdoor:
-      friendly_name: Backdoor Camera
-
-#################################################################
-## Groups
-group:
-
-  locks:
-    name: Locks
-    entities:
-      - lock.front_door_handle_locked
-
-  zmevents:
-    name: Camera Events
-    entities:
-      - sensor.backdoor_events
-      - sensor.frontdoor_events
-
-  sensors:
-    name: Sensors
-    entities:
-      - device_tracker.user1
-      - device_tracker.user2
-      - device_tracker.user3
-      - device_tracker.user4
-      - sensor.frontdoor_contact
-      - sensor.sidedoor_contact
-      - sensor.backdoor_contact
-      - binary_sensor.uplivingroom_motion_sensor
-      - binary_sensor.upoffice_motion_sensor
-      - binary_sensor.hallway_motion1_sensor
-      - binary_sensor.hallway_motion2_sensor
-      - binary_sensor.bathroom_motion_sensor
-
-  alarmcontrol:
-    name: Alarm Control
-    control: hidden
-    entities:
-      - alarm_control_panel.main
-      - input_boolean.enable_alarm_system
-      - input_boolean.enable_armed_home
-      - input_boolean.enable_armed_away
+  enable_alarm_system:
+    initial: on
 
 
 #################################################################
 ## Sensors
-sensor: 
+binary_sensor: 
 
 #Sensative Strips BS
   - platform: template
     sensors:
       frontdoor_contact:
-        friendly_name: Frontdoor
-        value_template: >-
-          {% if is_state("sensor.frontdoor_contact_access_control", "22") %}
-          open
-          {% else %}
-          closed
-          {% endif %}
+        device_class: opening
+        value_template: "{{ is_state('sensor.frontdoor_contact_access_control', '22') }}"
 
   - platform: template
     sensors:
       sidedoor_contact:
-        friendly_name: Sidedoor
-        value_template: >-
-          {% if is_state("sensor.sidedoor_contact_access_control", "22") %}
-          open
-          {% else %}
-          closed
-          {% endif %}
+        device_class: opening
+        value_template: "{{ is_state('sensor.sidedoor_contact_access_control', '22') }}"
 
   - platform: template
     sensors:
       backdoor_contact:
-        friendly_name: Backdoor
-        value_template: >-
-          {% if is_state("sensor.backdoor_contact_access_control", "22") %}
-          open
-          {% else %}
-          closed
-          {% endif %}
+        device_class: opening
+        value_template: "{{ is_state('sensor.backdoor_contact_access_control', '22') }}"
 
 
 #################################################################
@@ -152,25 +48,22 @@ automation:
         - condition: or
           conditions:
             - condition: state
-              entity_id: device_tracker.user1
-              state: 'home'
+              entity_id: binary_sensor.user1_occupancy
+              state: 'on'
             - condition: state
-              entity_id: device_tracker.user2
-              state: 'home'
+              entity_id: binary_sensor.user2_occupancy
+              state: 'on'
             - condition: state
-              entity_id: device_tracker.user3
-              state: 'home'
+              entity_id: binary_sensor.user3_occupancy
+              state: 'on'
             - condition: state
-              entity_id: device_tracker.user4
-              state: 'home'
+              entity_id: binary_sensor.user4_occupancy
+              state: 'on'
         - condition: state
           entity_id: alarm_control_panel.main
           state: disarmed
         - condition: state
           entity_id: input_boolean.enable_alarm_system
-          state: 'on'
-        - condition: state
-          entity_id: input_boolean.enable_armed_home
           state: 'on'
 
     action:
@@ -182,22 +75,17 @@ automation:
 
     trigger:
       - platform: state
-        entity_id: sensor.frontdoor_contact, sensor.sidedoor_contact, sensor.backdoor_contact
-        from: 'closed'
-        to: 'open'
+        entity_id: binary_sensor.frontdoor_contact, binary_sensor.sidedoor_contact, binary_sensor.backdoor_contact
+        from: 'off'
+        to: 'on'
 
     condition:
-      condition: and
-      conditions:
-        - condition: state
-          entity_id: input_boolean.enable_alarm_system
-          state: 'on'
-        - condition: state
-          entity_id: input_boolean.enable_armed_home
-          state: 'on'
-        - condition: state
-          entity_id: alarm_control_panel.main
-          state: armed_home
+      - condition: state
+        entity_id: input_boolean.enable_alarm_system
+        state: 'on'
+      - condition: state
+        entity_id: alarm_control_panel.main
+        state: armed_home
 
     action:
       service: alarm_control_panel.alarm_trigger
@@ -209,9 +97,9 @@ automation:
 
     trigger:
       - platform: state
-        entity_id: device_tracker.user1, device_tracker.user2, device_tracker.user3, device_tracker.user4
-        from: 'not_home'
-        to: 'home'
+        entity_id: binary_sensor.user1_occupancy, binary_sensor.user2_occupancy, binary_sensor.user3_occupancy, binary_sensor.user4_occupancy
+        from: 'off'
+        to: 'on'
 
     condition:
       condition: and
@@ -230,14 +118,19 @@ automation:
         - condition: state
           entity_id: input_boolean.enable_alarm_system
           state: 'on'
-        - condition: state
-          entity_id: input_boolean.enable_armed_home
-          state: 'on'
+        - condition: template
+          value_template: "{{ (as_timestamp(now())-as_timestamp(states.binary_sensor.user1_occupancy.last_changed)) > 600 }}"
+        - condition: template
+          value_template: "{{ (as_timestamp(now())-as_timestamp(states.binary_sensor.user2_occupancy.last_changed)) > 600 }}"
+        - condition: template
+          value_template: "{{ (as_timestamp(now())-as_timestamp(states.binary_sensor.user3_occupancy.last_changed)) > 600 }}"
+        - condition: template
+          value_template: "{{ (as_timestamp(now())-as_timestamp(states.binary_sensor.user4_occupancy.last_changed)) > 600 }}"
 
     action:
       - service: alarm_control_panel.alarm_disarm
         entity_id: alarm_control_panel.main
-      - delay: '00:10:00'
+      - delay: '00:01:00'
       - service: alarm_control_panel.alarm_arm_home
         entity_id: alarm_control_panel.main
 
@@ -249,17 +142,12 @@ automation:
         at: '05:00:00'
 
     condition:
-      condition: and
-      conditions:
-        - condition: state
-          entity_id: alarm_control_panel.main
-          state: armed_home
-        - condition: state
-          entity_id: input_boolean.enable_alarm_system
-          state: 'on'
-        - condition: state
-          entity_id: input_boolean.enable_armed_home
-          state: 'on'
+      - condition: state
+        entity_id: alarm_control_panel.main
+        state: armed_home
+      - condition: state
+        entity_id: input_boolean.enable_alarm_system
+        state: 'on'
 
     action:
       - service: alarm_control_panel.alarm_disarm
@@ -271,9 +159,9 @@ automation:
 
     trigger:
       - platform: state
-        entity_id: device_tracker.user1, device_tracker.user2, device_tracker.user3, device_tracker.user4
-        from: 'home'
-        to: 'not_home'
+        entity_id: binary_sensor.user1_occupancy, binary_sensor.user2_occupancy, binary_sensor.user3_occupancy, binary_sensor.user4_occupancy
+        from: 'on'
+        to: 'off'
 
     condition:
       condition: and
@@ -287,22 +175,19 @@ automation:
               entity_id: alarm_control_panel.main
               state: armed_home
         - condition: state
-          entity_id: device_tracker.user1
-          state: 'not_home'
+          entity_id: binary_sensor.user1_occupancy
+          state: 'off'
         - condition: state
-          entity_id: device_tracker.user2
-          state: 'not_home'
+          entity_id: binary_sensor.user2_occupancy
+          state: 'off'
         - condition: state
-          entity_id: device_tracker.user3
-          state: 'not_home'
+          entity_id: binary_sensor.user3_occupancy
+          state: 'off'
         - condition: state
-          entity_id: device_tracker.user4
-          state: 'not_home'
+          entity_id: binary_sensor.user4_occupancy
+          state: 'off'
         - condition: state
           entity_id: input_boolean.enable_alarm_system
-          state: 'on'
-        - condition: state
-          entity_id: input_boolean.enable_armed_away
           state: 'on'
 
     action:
@@ -314,26 +199,17 @@ automation:
 
     trigger:
       - platform: state
-        entity_id: sensor.frontdoor_contact, sensor.sidedoor_contact, sensor.backdoor_contact
-        from: 'closed'
-        to: 'open'
-      - platform: state
-        entity_id: binary_sensor.hallway_motion1_sensor, binary_sensor.hallway_motion2_sensor, binary_sensor.uplivingroom_motion_sensor, binary_sensor.upoffice_motion_sensor
+        entity_id: binary_sensor.frontdoor_contact, binary_sensor.sidedoor_contact, binary_sensor.backdoor_contact, binary_sensor.hallway_motion1_sensor, binary_sensor.hallway_motion2_sensor, binary_sensor.uplivingroom_motion_sensor, binary_sensor.upoffice_motion_sensor
         from: 'off'
         to: 'on'
 
     condition:
-      condition: and
-      conditions:
-        - condition: state
-          entity_id: input_boolean.enable_alarm_system
-          state: 'on'
-        - condition: state
-          entity_id: input_boolean.enable_armed_away
-          state: 'on'
-        - condition: state
-          entity_id: alarm_control_panel.main
-          state: armed_away
+      - condition: state
+        entity_id: input_boolean.enable_alarm_system
+        state: 'on'
+      - condition: state
+        entity_id: alarm_control_panel.main
+        state: armed_away
 
     action:
       service: alarm_control_panel.alarm_trigger
@@ -345,18 +221,15 @@ automation:
 
     trigger:
       - platform: state
-        entity_id: device_tracker.user1, device_tracker.user2, device_tracker.user3, device_tracker.user4
-        from: 'not_home'
-        to: 'home'
+        entity_id: binary_sensor.user1_occupancy, binary_sensor.user2_occupancy, binary_sensor.user3_occupancy, binary_sensor.user4_occupancy
+        from: 'off'
+        to: 'on'
 
     condition:
       condition: and
       conditions:
         - condition: state
           entity_id: input_boolean.enable_alarm_system
-          state: 'on'
-        - condition: state
-          entity_id: input_boolean.enable_armed_away
           state: 'on'
         - condition: or
           conditions:
@@ -366,6 +239,9 @@ automation:
             - condition: state
               entity_id: alarm_control_panel.main
               state: armed_away
+            - condition: state
+              entity_id: alarm_control_panel.main
+              state: triggered
 
     action:
       - service: alarm_control_panel.alarm_disarm
@@ -399,35 +275,6 @@ automation:
       - service: alarm_control_panel.alarm_disarm
         entity_id: alarm_control_panel.main
 
-
-# Notification when alarm pending
-#  - alias: Notify when alarm is pending
-#
-#    trigger:
-#      - platform: state
-#        entity_id: alarm_control_panel.main
-#        from: 'armed_away'
-#        to: 'pending'
-#      - platform: state
-#        entity_id: alarm_control_panel.main
-#        from: 'armed_home'
-#        to: 'pending'
-
-#    action:
-#      - service: notify.html5
-#        data:
-#          title: 'Alarm Pending'
-#          message: "Your home alarm is pending for an alarm."
-#          data:
-#            image: !secret frontdoorimage
-#            requireInteraction: true
-#            renotify: true
-#            tag: 'ha_alarm'
-#            url: '/states/group.security'
-#            actions:
-#              - action: 'disarm_ha'
-#                title: 'Disarm'
-
 # Notification when alarm triggerd
   - alias: Notify when alarm is triggered
 
@@ -440,7 +287,7 @@ automation:
     action:
       - service: notify.html5
         data:
-          title: 'ALARM!'
+          title: 'ALARM! - {{now().strftime("%l:%M %P")}}'
           message: "ALARM! Your home alarm has been triggered."
           data:
             image: !secret frontdoorimage
@@ -474,7 +321,7 @@ automation:
     action:
       - service: notify.html5
         data:
-          title: 'Disarmed'
+          title: 'Disarmed - {{now().strftime("%l:%M %P")}}'
           message: "Your home alarm has been disarmed."
           data:
             requireInteraction: false
@@ -483,23 +330,3 @@ automation:
             noscreen: true
             tag: 'ha_alarm'
             url: '/states/group.security'
-
-
-##################################################
-## Inputs
-input_boolean:
-
-  enable_alarm_system:
-    name: Alarm System Enabled
-    initial: on
-    icon: mdi:toggle-switch
-
-  enable_armed_home:
-    name: Home Armed Active
-    initial: on
-    icon: mdi:bell-ring
-
-  enable_armed_away:
-    name: Away Armed Active
-    initial: on
-    icon: mdi:bell-ring

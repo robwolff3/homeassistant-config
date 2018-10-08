@@ -1,0 +1,205 @@
+
+#################################################################
+## Automations
+automation:
+
+  # Scene Selector
+  - alias: Scene Selector
+
+    trigger:
+      platform: state
+      entity_id: input_select.scene_selector
+
+    action:
+      - service: scene.turn_on
+        data_template:
+          entity_id: scene.{{trigger.to_state.state}}
+      - delay: '00:00:30'
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.scene_selector
+          option: None
+
+
+#################################################################
+## Scenes
+
+scene:
+
+  - name: Dinner 
+    entities:
+      light.kitchen_light_level:
+        state: on
+        brightness: 255
+      light.diningroom_light_level:
+        state: on
+        brightness: 128
+      script.dinner_automusic: on
+
+  - name: Watching_TV
+    entities:
+      light.kitchen_light_level:
+        state: on
+        brightness: 70
+      light.livingroom_light_level:
+        state: on
+        brightness: 70
+      light.diningroom_light_level: off
+      media_player.viziotv: on
+
+  - name: GoodMorning
+    entities:
+      light.nightstand1:
+        state: on
+        brightness: 255
+      light.nightstand2:
+        state: on
+        brightness: 255
+      light.kitchen_light_level:
+        state: on
+        brightness: 150
+      switch.bedroom_outlet_switch_3: off
+      script.goodmorning_automusic: on
+
+  - name: Bedtime
+    entities:
+      light.nightstand1:
+        state: on
+        brightness: 45
+      light.nightstand2:
+        state: on
+        brightness: 45
+      switch.bedroom_outlet_switch_3: on
+      media_player.viziotv: off
+      media_player.nadc338: off
+      script.bedtime_autooff: on
+
+  - name: Mia Bedtime
+    entities:
+      light.nightstand1:
+        state: on
+        brightness: 30
+      light.nightstand2: off
+      light.bedroom_light_level: off
+      light.kitchen_light_level:
+        state: on
+        brightness: 70
+      switch.bedroom_outlet_switch_3: on
+      script.a_bedtime: on
+
+  - name: All_Things_Off
+    entities:
+      light.livingroom_light_level: off
+      light.kitchen_light_level: off
+      light.diningroom_light_level: off
+      light.bedroom_light_level: off
+      light.nightstand1: off
+      light.nightstand2: off
+      switch.bedroom_outlet_switch_3: off
+      media_player.viziotv: off
+      media_player.bedroom_speaker: off
+      media_player.nadc338: off
+      media_player.basement_group: off
+
+
+#################################################################
+## Scripts
+
+script:
+
+  bedtime_autooff:
+    sequence:
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.playlist_content
+          option: "Sleep Into The Ocean"
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.playlist_source
+          option: "Bedroom Speaker"
+      - service: script.turn_on
+        entity_id: script.playlist_action
+      - delay: '00:03:00'
+      - service: light.turn_on
+        entity_id: light.kitchen_light_level
+        data:
+          brightness: 50
+      - service: homeassistant.turn_off
+        entity_id: light.livingroom_light_level
+      - service: homeassistant.turn_off
+        entity_id: light.diningroom_light_level
+      - service: homeassistant.turn_off
+        entity_id: light.bedroom_light_level
+      - delay: '00:05:00'
+      - service: homeassistant.turn_off
+        entity_id: light.kitchen_light_level
+      - delay: '00:05:00'
+      - service: homeassistant.turn_off
+        entity_id: light.nightstand1
+      - service: homeassistant.turn_off
+        entity_id: light.nightstand2
+      - delay: '01:00:00'
+      - service: script.turn_on
+        entity_id: script.playlist_stop
+
+  a_bedtime:
+    sequence:
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.playlist_content
+          option: "Sleep Into The Ocean"
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.playlist_source
+          option: "Bedroom Speaker"
+      - service: script.turn_on
+        entity_id: script.playlist_action
+      - delay: '01:00:00'
+      - service: script.turn_on
+        entity_id: script.playlist_stop
+
+  dinner_automusic:
+    sequence:
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.playlist_content
+          option: "Jazzy Dinner"
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.playlist_source
+          option: "Kitchen Stereo"
+      - service: script.turn_on
+        entity_id: script.playlist_action
+
+  goodmorning_automusic:
+    sequence:
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.playlist_content
+          option: "WRCJ"
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.playlist_source
+          option: "Bedroom Speaker"
+      - service: script.turn_on
+        entity_id: script.playlist_action
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.bedroom_speaker
+          volume_level: 0.5
+
+
+#################################################################
+## Input Select
+
+input_select:
+  scene_selector:
+    initial: None
+    options:
+      - Dinner
+      - Watching_TV
+      - GoodMorning
+      - Bedtime
+      - Mia Bedtime
+      - All_Things_Off
+      - None
