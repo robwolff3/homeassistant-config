@@ -27,7 +27,7 @@ Here is my home automation project I have been improving since mid 2017. At that
 ### Custom Components
 
 * [hass-google_keep](https://github.com/aFrankLion/hass-google_keep) - To auto-add things to my to-do list
-* [nadtcp2](https://gitlab.com/mindig.marton/ha-nadtcp) - The nadtcp componect doesnt work with the Nad C 338
+* [nadtcp2](https://gitlab.com/mindig.marton/ha-nadtcp) - The [nadtcp](https://www.home-assistant.io/components/media_player.nadtcp/) component doesn't work with the Nad C 338
 
 ### Lovelace JavaScript Modules
 

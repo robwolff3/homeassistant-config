@@ -139,8 +139,8 @@ script:
       - service: homeassistant.turn_off
         entity_id: light.nightstand2
       - delay: '01:00:00'
-      - service: script.turn_on
-        entity_id: script.playlist_stop
+      - service: media_player.turn_off
+        entity_id: media_player.bedroom_speaker
 
   a_bedtime:
     sequence:
