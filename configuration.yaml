@@ -160,7 +160,6 @@ vacuum:
     host: !secret roombahost
     username: !secret roombausername
     password: !secret roombapassword
-    continuous: false
 
 google_keep:
   username: !secret keepusername

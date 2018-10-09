@@ -48,11 +48,8 @@ automation:
 
     trigger:
       - platform: state
-        entity_id: binary_sensor.hallway_motion1_sensor, binary_sensor.hallway_motion2_sensor
+        entity_id: binary_sensor.hallway_motion1_sensor, binary_sensor.hallway_motion2_sensor, binary_sensor.backdoor_contact
         to: 'on'
-      - platform: state
-        entity_id: sensor.backdoor_contact
-        to: 'open'
 
     condition:
       - condition: state
@@ -78,9 +75,6 @@ automation:
           minutes: 11
 
     condition:
-      - condition: state
-        entity_id: sensor.backdoor_contact
-        state: 'closed'
       - condition: state
         entity_id: binary_sensor.hallway_motion1_sensor
         state: 'off'
@@ -127,8 +121,8 @@ automation:
 
     trigger:
       platform: state
-      entity_id: sensor.backdoor_contact
-      to: 'open'
+      entity_id: binary_sensor.backdoor_contact
+      to: 'on'
 
     condition:
       - condition: state
