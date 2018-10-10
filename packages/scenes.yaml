@@ -72,6 +72,7 @@ scene:
       switch.bedroom_outlet_switch_3: on
       media_player.viziotv: off
       media_player.nadc338: off
+      script.a_bedtime: on
       script.bedtime_autooff: on
 
   - name: Mia Bedtime
@@ -109,21 +110,7 @@ script:
 
   bedtime_autooff:
     sequence:
-      - service: input_select.select_option
-        data:
-          entity_id: input_select.playlist_content
-          option: "Sleep Into The Ocean"
-      - service: input_select.select_option
-        data:
-          entity_id: input_select.playlist_source
-          option: "Bedroom Speaker"
-      - service: script.turn_on
-        entity_id: script.playlist_action
       - delay: '00:03:00'
-      - service: light.turn_on
-        entity_id: light.kitchen_light_level
-        data:
-          brightness: 50
       - service: homeassistant.turn_off
         entity_id: light.livingroom_light_level
       - service: homeassistant.turn_off
@@ -138,25 +125,19 @@ script:
         entity_id: light.nightstand1
       - service: homeassistant.turn_off
         entity_id: light.nightstand2
-      - delay: '01:00:00'
-      - service: media_player.turn_off
-        entity_id: media_player.bedroom_speaker
 
   a_bedtime:
     sequence:
       - service: input_select.select_option
         data:
           entity_id: input_select.playlist_content
-          option: "Sleep Into The Ocean"
+          option: "Ocean Sounds"
       - service: input_select.select_option
         data:
           entity_id: input_select.playlist_source
           option: "Bedroom Speaker"
       - service: script.turn_on
         entity_id: script.playlist_action
-      - delay: '01:00:00'
-      - service: script.turn_on
-        entity_id: script.playlist_stop
 
   dinner_automusic:
     sequence:

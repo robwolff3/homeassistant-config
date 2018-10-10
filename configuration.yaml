@@ -58,6 +58,7 @@ recorder:
       - sensor.kwikset_touchpad_electronic_deadbolt_alarm_type_2
       - sensor.dining_room_thermostat_temperature
       - sensor.dining_room_thermostat_humidity
+      - sensor.roomba_status
       - sensor.home_assistant_release
       - sensor.current_version
   exclude:
@@ -78,13 +79,8 @@ recorder:
       - light.hue_color_lamp_2
       - light.hue_color_lamp_3
       - light.hpmusicgroup
-      - switch.nad_ccinput
-      - switch.nad_power
-      - switch.nad_volume
       - input_boolean.alarmclock_cancel
       - media_player.muffin_stuffin
-      - input_boolean.manual_armed_away
-      - input_boolean.manual_armed_home
       - input_select.playlist_content
       - input_select.playlist_source
       - switch.livingroom_outlet_switch_3

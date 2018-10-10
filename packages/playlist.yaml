@@ -19,7 +19,7 @@ input_select:
       - Michigan Radio
       - WRCJ
       - The News
-      - Sleep Into The Ocean
+      - Ocean Sounds
 
   playlist_source:
     initial: Kitchen Stereo
@@ -38,24 +38,35 @@ script:
 
   playlist_action:
     sequence:
-      service: notify.ga_command
-      data_template:
-        message: >
-          {% if is_state("input_select.playlist_content", "Chicago Blues") %} Shuffle Chicago Blues playlist on {{ states('input_select.playlist_source') }}
-          {% elif is_state("input_select.playlist_content", "Late Night Jazz") %} Shuffle Late Night Jazz playlist on {{ states('input_select.playlist_source') }}
-          {% elif is_state("input_select.playlist_content", "Jazzy Dinner") %} Shuffle Jazzy Dinner playlist on {{ states('input_select.playlist_source') }}
-          {% elif is_state("input_select.playlist_content", "Classical Essentials") %} Shuffle Classical Essentials playlist on {{ states('input_select.playlist_source') }}
-          {% elif is_state("input_select.playlist_content", "Morning Classical") %} Shuffle Morning Classical playlist on {{ states('input_select.playlist_source') }}
-          {% elif is_state("input_select.playlist_content", "Piano 100: Spotify Picks") %} "Shuffle Piano 100 Spotify Picks playlist on" {{ states('input_select.playlist_source') }}
-          {% elif is_state("input_select.playlist_content", "Autumn Acoustic") %} Shuffle Autumn Acoustic playlist on {{ states('input_select.playlist_source') }}
-          {% elif is_state("input_select.playlist_content", "Essential Alternative") %} Shuffle Essential Alternative playlist on {{ states('input_select.playlist_source') }}
-          {% elif is_state("input_select.playlist_content", "This Is The Black Keys") %} Shuffle This Is The Black Keys playlist on {{ states('input_select.playlist_source') }}
-          {% elif is_state("input_select.playlist_content", "Your Favorite Coffeehouse") %} Shuffle Your Favorite Coffeehouse playlist on {{ states('input_select.playlist_source') }}
-          {% elif is_state("input_select.playlist_content", "Michigan Radio") %} Cast Michigan Radio on {{ states('input_select.playlist_source') }}
-          {% elif is_state("input_select.playlist_content", "WRCJ") %} Cast WRCJ on {{ states('input_select.playlist_source') }}
-          {% elif is_state("input_select.playlist_content", "The News") %} Cast The News on {{ states('input_select.playlist_source') }}
-          {% elif is_state("input_select.playlist_content", "Sleep Into The Ocean") %} Shuffle Sleep Into The Ocean playlist on {{ states('input_select.playlist_source') }}
-          {% endif %}
+      - service: notify.ga_command
+        data_template:
+          message: >
+            {% if is_state("input_select.playlist_content", "Chicago Blues") %} Shuffle Chicago Blues playlist on {{ states('input_select.playlist_source') }}
+            {% elif is_state("input_select.playlist_content", "Late Night Jazz") %} Shuffle Late Night Jazz playlist on {{ states('input_select.playlist_source') }}
+            {% elif is_state("input_select.playlist_content", "Jazzy Dinner") %} Shuffle Jazzy Dinner playlist on {{ states('input_select.playlist_source') }}
+            {% elif is_state("input_select.playlist_content", "Classical Essentials") %} Shuffle Classical Essentials playlist on {{ states('input_select.playlist_source') }}
+            {% elif is_state("input_select.playlist_content", "Morning Classical") %} Shuffle Morning Classical playlist on {{ states('input_select.playlist_source') }}
+            {% elif is_state("input_select.playlist_content", "Piano 100: Spotify Picks") %} "Shuffle Piano 100 Spotify Picks playlist on" {{ states('input_select.playlist_source') }}
+            {% elif is_state("input_select.playlist_content", "Autumn Acoustic") %} Shuffle Autumn Acoustic playlist on {{ states('input_select.playlist_source') }}
+            {% elif is_state("input_select.playlist_content", "Essential Alternative") %} Shuffle Essential Alternative playlist on {{ states('input_select.playlist_source') }}
+            {% elif is_state("input_select.playlist_content", "This Is The Black Keys") %} Shuffle This Is The Black Keys playlist on {{ states('input_select.playlist_source') }}
+            {% elif is_state("input_select.playlist_content", "Your Favorite Coffeehouse") %} Shuffle Your Favorite Coffeehouse playlist on {{ states('input_select.playlist_source') }}
+            {% elif is_state("input_select.playlist_content", "Michigan Radio") %} Cast Michigan Radio on {{ states('input_select.playlist_source') }}
+            {% elif is_state("input_select.playlist_content", "WRCJ") %} Cast WRCJ on {{ states('input_select.playlist_source') }}
+            {% elif is_state("input_select.playlist_content", "The News") %} Cast The News on {{ states('input_select.playlist_source') }}
+            {% endif %}
+
+      - service: media_player.play_media
+        data_template:
+          media_content_id: >
+            {% if is_state("input_select.playlist_content", "Ocean Sounds") %} https://www.gstatic.com/voice_delight/sounds/long/ocean.mp3
+            {% endif %}
+          media_content_type: 'audio/mp4'
+          entity_id: >
+            {% if is_state("input_select.playlist_source", "Kitchen Stereo") %} media_player.kitchen_stereo
+            {% elif is_state("input_select.playlist_source", "Bedroom Speaker") %} media_player.bedroom_speaker
+            {% elif is_state("input_select.playlist_source", "Basement Group") %} media_player.basement_group
+            {% endif %}
 
   playlist_stop:
     sequence:
