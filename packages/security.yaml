@@ -4,7 +4,6 @@
 input_boolean:
 
   enable_alarm_system:
-    initial: on
 
 
 #################################################################

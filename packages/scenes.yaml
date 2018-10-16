@@ -75,7 +75,7 @@ scene:
       script.a_bedtime: on
       script.bedtime_autooff: on
 
-  - name: Mia Bedtime
+  - name: Mia_Bedtime
     entities:
       light.nightstand1:
         state: on
@@ -181,6 +181,6 @@ input_select:
       - Watching_TV
       - GoodMorning
       - Bedtime
-      - Mia Bedtime
+      - Mia_Bedtime
       - All_Things_Off
       - None

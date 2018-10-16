@@ -42,14 +42,15 @@ recorder:
     domains:
       - alarm_control_panel
       - binary_sensor
+      - climate
       - input_boolean
       - input_select
+      - input_datetime
       - light
       - media_player
       - switch
       - vacuum
       - lock
-      - automation
     entities:
       - sensor.dishwasher_status
       - sensor.meter_outlet_current
@@ -78,7 +79,12 @@ recorder:
       - light.hue_color_lamp_1
       - light.hue_color_lamp_2
       - light.hue_color_lamp_3
+      - light.hue_color_light_1
+      - light.hue_color_light_1_2
       - light.hpmusicgroup
+      - light.group_for_wakeup
+      - light.living_room
+      - light.master
       - input_boolean.alarmclock_cancel
       - media_player.muffin_stuffin
       - input_select.playlist_content
@@ -94,6 +100,18 @@ logbook:
 sun:
 
 ios:
+
+sensor:
+  - platform: time_date
+    display_options:
+      - 'time'
+      - 'date'
+      - 'date_time'
+      - 'time_date'
+      - 'time_utc'
+      - 'beat'
+
+python_script:
 
 #################################################################
 ## Media Players

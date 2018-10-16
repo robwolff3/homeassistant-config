@@ -4,72 +4,118 @@
 
 input_boolean:
 
-  alarmclock_enabled:
-    initial: on
-
   alarmclock_cancel:
     initial: off
 
+  alarmclock_enabled_wd:
 
-input_number:
+  alarmclock_enabled_we:
 
-  alarmclock_hour:
-    initial: 7
-    min: 0
-    max: 23
-    step: 1
+  alarmclock_espresso:
 
-  alarmclock_minute:
-    initial: 05
-    min: 0
-    max: 55
-    step: 5
+input_datetime:
 
+  alarmclock_time_wd:
+    has_date: false
+    has_time: true
 
-##################################################
-## Sensors
-sensor:
+  alarmclock_time_we:
+    has_date: false
+    has_time: true
 
-  - platform: template
-    sensors:
-      alarmclock_time_template:
-        value_template: '{{ "%0.02d:%0.02d" | format(states("input_number.alarmclock_hour") | int, states("input_number.alarmclock_minute") | int) }}'
+input_select:
+
+  alarmclock_content:
+    options:
+      - Chicago Blues
+      - Late Night Jazz
+      - Jazzy Dinner
+      - Classical Essentials
+      - Morning Classical
+      - "Piano 100: Spotify Picks"
+      - Autumn Acoustic
+      - Essential Alternative
+      - This Is The Black Keys
+      - Your Favorite Coffeehouse
+      - Michigan Radio
+      - WRCJ
+      - The News
+      - Ocean Sounds
+      - None
 
 
 ##################################################
 ## Automations
 automation:
 
-  # Main Function
-  - alias: Alarm Clock
+  # Alarmclock weekDAY
+  - alias: Alarm Clock Weekday
     initial_state: 'on'
     trigger:
-      - platform: time
-        minutes: '/1'
-        seconds: 00
+      platform: template
+      value_template: "{{ states('sensor.time') == (((states.input_datetime.alarmclock_time_wd.attributes.timestamp | int) - 900) | timestamp_custom('%H:%M', False)) }}"
 
     condition:
-      - condition: template
-        value_template: '{{ now().time().strftime("%H:%M") == states.sensor.alarmclock_time_template.state }}'
-      - condition: state
-        entity_id: input_boolean.alarmclock_enabled
-        state: 'on'
-      - condition: state
-        entity_id: light.bedroom_light_level
-        state: 'off'
-      - condition: time
-        weekday:
-          - mon
-          - tue
-          - wed
-          - thu
-          - fri
-      - condition: state
-        entity_id: input_boolean.vacation_mode
-        state: 'off'
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.alarmclock_enabled_wd
+          state: 'on'
+        - condition: state
+          entity_id: light.bedroom_light_level
+          state: 'off'
+        - condition: time
+          weekday:
+            - mon
+            - tue
+            - wed
+            - thu
+            - fri
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: binary_sensor.user1_occupancy
+              state: 'on'
+            - condition: state
+              entity_id: binary_sensor.user2_occupancy
+              state: 'on'
 
     action:
-      - service: script.alarmclock_activate
+      - service: script.alarmclock_activate_wd
+      - service: script.alarmclock_espresso
+
+  # Alarmclock weekEND
+  - alias: Alarm Clock Weekend
+    initial_state: 'on'
+    trigger:
+      platform: template
+      value_template: "{{ states('sensor.time') == (((states.input_datetime.alarmclock_time_we.attributes.timestamp | int) - 900) | timestamp_custom('%H:%M', False)) }}"
+
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.alarmclock_enabled_we
+          state: 'on'
+        - condition: state
+          entity_id: light.bedroom_light_level
+          state: 'off'
+        - condition: time
+          weekday:
+            - sat
+            - sun
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: binary_sensor.user1_occupancy
+              state: 'on'
+            - condition: state
+              entity_id: binary_sensor.user2_occupancy
+              state: 'on'
+
+    action:
+      - service: script.alarmclock_activate_we
+      - service: script.alarmclock_espresso
 
   # Alarmclock Cancel
   - alias: Alarmclock Cancel
@@ -80,24 +126,46 @@ automation:
       to: 'on'
 
     condition:
-      - condition: state
-        entity_id: script.alarmclock_activate
-        state: 'on'
+      condition: or
+      conditions:
+        - condition: state
+          entity_id: script.alarmclock_activate_wd
+          state: 'on'
+        - condition: state
+          entity_id: script.alarmclock_activate_we
+          state: 'on'
 
     action:
       - service: homeassistant.turn_off
-        entity_id: script.alarmclock_activate
+        entity_id: script.alarmclock_activate_wd
+      - service: homeassistant.turn_off
+        entity_id: script.alarmclock_activate_we
       - service: light.turn_off
         entity_id: light.bedroom_light_level
+      - service: light.turn_off
+        entity_id: light.nightstand1
+      - service: light.turn_off
+        entity_id: light.nightstand2
       - service: light.turn_off
         entity_id: light.kitchen_light_level
       - service: light.turn_off
         entity_id: light.diningroom_light_level
       - service: homeassistant.turn_off
         entity_id: media_player.basement_group
+      - service: homeassistant.turn_off
+        entity_id: media_player.kitchen_stereo
+      - service: homeassistant.turn_off
+        entity_id: media_player.bedroom_speaker
       - service: input_boolean.turn_off
         data:
           entity_id: input_boolean.alarmclock_cancel
+      - service: script.restartha
+      - service: light.turn_off
+        entity_id: light.bedroom_light_level
+      - service: light.turn_off
+        entity_id: light.nightstand1
+      - service: light.turn_off
+        entity_id: light.nightstand2
 
 ##################################################
 ## Scripts
@@ -108,38 +176,28 @@ script:
       - service: automation.trigger
         entity_id: automation.alarmclock_cancel
 
-# Bedroom lights on over 30 minutes
-  alarmclock_activate:
+  alarmclock_espresso:
     sequence:
-      - service: light.turn_on
-        entity_id: light.bedroom_light_level
+      - condition: state
+        entity_id: input_boolean.alarmclock_espresso
+        state: 'on'
+      - service: homeassistant.turn_on
+        entity_id: switch.kitchen_outlet_switch
+      - service: input_boolean.turn_off
         data:
-          brightness: 25
-      - delay: "00:05:00"
-      - service: light.turn_on
-        entity_id: light.bedroom_light_level
+          entity_id: input_boolean.alarmclock_espresso
+
+# Weekday Bedroom lights on over 15 minutes
+  alarmclock_activate_wd:
+    sequence:
+      - service: python_script.fade_in_light
         data:
-          brightness: 50
-      - delay: "00:05:00"
-      - service: light.turn_on
-        entity_id: light.bedroom_light_level
-        data:
-          brightness: 75
-      - delay: "00:05:00"
-      - service: light.turn_on
-        entity_id: light.bedroom_light_level
-        data:
-          brightness: 100
-      - delay: "00:05:00"
-      - service: light.turn_on
-        entity_id: light.bedroom_light_level
-        data:
-          brightness: 125
-      - delay: "00:05:00"
-      - service: light.turn_on
-        entity_id: light.bedroom_light_level
-        data:
-          brightness: 150
+          entity_id: light.bedroom_light_level
+          delay_in_sec: 17
+          start_level_pct: 0
+          end_level_pct: 50
+          step_in_level_pct: 1
+      - delay: "00:15:00"
       - service: light.turn_on
         entity_id: light.kitchen_light_level
         data:
@@ -152,9 +210,9 @@ script:
         entity_id: switch.bedroom_outlet_switch_3
       # Cast media to cast group
       - service: input_select.select_option
-        data:
+        data_template:
           entity_id: input_select.playlist_content
-          option: "WRCJ"
+          option: "{{ states('input_select.alarmclock_content') }}"
       - service: input_select.select_option
         data:
           entity_id: input_select.playlist_source
@@ -162,11 +220,11 @@ script:
       - service: script.turn_on
         entity_id: script.playlist_action
       # Gradually increase radio volume
-      - delay: "00:00:04"
+      - delay: "00:00:01"
       - service: media_player.volume_set
         data:
           entity_id: media_player.bedroom_speaker
-          volume_level: 0.3
+          volume_level: 0.2
       - service: media_player.volume_set
         data:
           entity_id: media_player.nadc338
@@ -175,7 +233,7 @@ script:
       - service: media_player.volume_set
         data:
           entity_id: media_player.bedroom_speaker
-          volume_level: 0.4
+          volume_level: 0.3
       - service: media_player.volume_set
         data:
           entity_id: media_player.nadc338
@@ -184,29 +242,65 @@ script:
       - service: media_player.volume_set
         data:
           entity_id: media_player.bedroom_speaker
-          volume_level: 0.5
+          volume_level: 0.4
       - service: media_player.volume_set
         data:
           entity_id: media_player.nadc338
           volume_level: 0.5
-      # Cancel after 2 hours and disable alarmclock
-      - delay: "02:00:00"
-      - condition: and
-        conditions:
-          - condition: template
-            value_template: '{{states.light.bedroom_light_level.attributes.brightness < 153}}'
-          - condition: template
-            value_template: '{{states.light.bedroom_light_level.attributes.brightness > 147}}'
-          - condition: template
-            value_template: '{{states.light.kitchen_light_level.attributes.brightness < 153}}'
-          - condition: template
-            value_template: '{{states.light.kitchen_light_level.attributes.brightness > 147}}'
-          - condition: template
-            value_template: '{{states.light.diningroom_light_level.attributes.brightness < 103}}'
-          - condition: template
-            value_template: '{{states.light.diningroom_light_level.attributes.brightness > 97}}'
-      - service: automation.trigger
-        entity_id: automation.alarmclock_cancel
-      - service: input_boolean.turn_off
+
+# Weekend Bedroom lights on over 15 minutes
+  alarmclock_activate_we:
+    sequence:
+      - service: python_script.fade_in_light
         data:
-          entity_id: input_boolean.alarmclock_enabled
+          entity_id: light.nightstand
+          delay_in_sec: 7
+          start_level_pct: 0
+          end_level_pct: 100
+          step_in_level_pct: 1
+      - delay: "00:15:00"
+      - service: light.turn_on
+        entity_id: light.kitchen_light_level
+        data:
+          brightness: 150
+      - service: homeassistant.turn_off
+        entity_id: switch.bedroom_outlet_switch_3
+      # Cast media to cast group
+      - service: input_select.select_option
+        data_template:
+          entity_id: input_select.playlist_content
+          option: "{{ states('input_select.alarmclock_content') }}"
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.playlist_source
+          option: "Basement Group"
+      - service: script.turn_on
+        entity_id: script.playlist_action
+      # Gradually increase radio volume
+      - delay: "00:00:01"
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.bedroom_speaker
+          volume_level: 0.2
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.nadc338
+          volume_level: 0.3
+      - delay: "00:01:00"
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.bedroom_speaker
+          volume_level: 0.3
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.nadc338
+          volume_level: 0.4
+      - delay: "00:01:00"
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.bedroom_speaker
+          volume_level: 0.4
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.nadc338
+          volume_level: 0.5

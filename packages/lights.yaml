@@ -125,24 +125,20 @@ automation:
       to: 'on'
 
     condition:
-      - condition: state
-        entity_id: binary_sensor.hallway_motion1_sensor
-        state: 'off'
-      - condition: state
-        entity_id: light.livingroom_light_level
-        state: 'off'
-      - condition: state
-        entity_id: light.kitchen_light_level
-        state: 'off'
-      - condition: state
-        entity_id: light.diningroom_light_level
-        state: 'off'
-      - condition: state
-        entity_id: sun.sun
-        state: 'below_horizon'
-      - condition: time
-        after: '17:00:00'
-        before: '02:00:00'
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: sun.sun
+          state: 'below_horizon'
+        - condition: time
+          after: '17:00:00'
+          before: '02:00:00'
+        - condition: or
+          conditions:
+            - condition: template
+              value_template: "{{ (as_timestamp(now())-as_timestamp(states.binary_sensor.user1_occupancy.last_changed)) > 600 }}"
+            - condition: template
+              value_template: "{{ (as_timestamp(now())-as_timestamp(states.binary_sensor.user2_occupancy.last_changed)) > 600 }}"
 
     action:
       - service: homeassistant.turn_on

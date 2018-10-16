@@ -349,6 +349,8 @@ views:
           - entity: input_boolean.enable_alarm_system
             name: Alarm System Enabled
             icon: mdi:toggle-switch
+          - entity: alarm_control_panel.main
+            name: Alarm System Status
           - entity: switch.bedroom_outlet_switch_2
             name: Bedroom Outlet Left
             icon: mdi:power-socket-us
@@ -360,35 +362,48 @@ views:
         title: System Management
         show_header_toggle: false
         entities:
-          - entity: input_boolean.vacation_mode
-            name: Vacation Mode
-            icon: mdi:airplane-takeoff
           - script.updateha
           - script.restartha
           - script.rebootpi
           - script.restartmonitor
           - script.updatemonitor
 
-
       - type: entities
         title: Alarm Clock
         show_header_toggle: false
         entities:
-          - entity: sensor.alarmclock_time_template
-            name: 'Time'
+          - entity: input_boolean.alarmclock_enabled_wd
+            name: Weekday Enabled
+            icon: mdi:toggle-switch
+          - entity: input_datetime.alarmclock_time_wd
+            name: Weekday Time
             icon: mdi:alarm
-          - entity: input_boolean.alarmclock_enabled
+          - entity: input_boolean.alarmclock_enabled_we
+            name: Weekend Enabled
+            icon: mdi:toggle-switch
+          - entity: input_datetime.alarmclock_time_we
+            name: Weekend Time
+            icon: mdi:alarm
+          - entity: input_boolean.alarmclock_espresso
+            name: Turn On Espresso Machine
+            icon: mdi:toggle-switch
+          - entity: input_select.alarmclock_content
+            name: 'To Play:'
+            icon: mdi:playlist-play
+          - entity: input_boolean.alarmclock_cancel
+            name: Cancel Alarm
+            icon: mdi:cancel
+
+      - type: entities
+        title: Espresso Scheduler
+        show_header_toggle: false
+        entities:
+          - entity: input_boolean.espresso_enabled
             name: Enabled
             icon: mdi:toggle-switch
-          - entity: input_number.alarmclock_hour
-            name: Hour
-            icon: mdi:timer
-          - entity: input_number.alarmclock_minute
-            name: Minute
-            icon: mdi:timer
-          - entity: input_boolean.alarmclock_cancel
-            name: Cancel Alarmclock
-            icon: mdi:cancel
+          - entity: input_datetime.espresso_time
+            name: Time
+            icon: mdi:coffee
 
       - type: entities
         title: Media

@@ -8,20 +8,6 @@ script:
       - service: homeassistant.turn_on
         entity_id: vacuum.roomba
 
-  # Notify package delivered
-  package_notify:
-    sequence:
-      - service: notify.html5
-        data:
-          title: 'Package Delivered - {{now().strftime("%l:%M %P")}}'
-          message: 'A package has been delivered.'
-          data:
-            requireInteraction: true
-            renotify: true
-            tag: 'package_notify'
-      - service: automation.trigger
-        entity_id: automation.say_package_is_delivered
-
 
 #################################################################
 ## Sensors
@@ -51,6 +37,16 @@ input_select:
       - Drying
       - 'Off'
 
+input_boolean:
+
+  espresso_enabled:
+    initial: off
+
+input_datetime:
+
+  espresso_time:
+    has_date: false
+    has_time: true
 
 #################################################################
 ## Automations
@@ -74,9 +70,6 @@ automation:
           - fri
       - condition: template
         value_template: '{{states.vacuum.roomba.attributes.battery_level > 79}}'
-      - condition: state
-        entity_id: input_boolean.vacation_mode
-        state: 'off'
 
     action:
       - service: homeassistant.turn_on
@@ -376,6 +369,14 @@ automation:
               "A delivery has been made, better grab it before a porch pirate does.",
               "You can stop checking the front door, a package has been delivered."
               ] | random }}
+      - service: notify.html5
+        data:
+          title: 'Package Delivered - {{now().strftime("%l:%M %P")}}'
+          message: 'A package has been delivered.'
+          data:
+            requireInteraction: true
+            renotify: true
+            tag: 'package_notify'
 
   ## Welcome Home User1 Broadcast
   - alias: Say welcome home user1
@@ -396,6 +397,25 @@ automation:
       - service: notify.ga_broadcast
         data_template:
           message: !secret user1_phrase
+
+  # Espresso Scheduler
+  - alias: Espresso Scheduler
+
+    trigger:
+      - platform: template
+        value_template: "{{ states('sensor.time') == (states.input_datetime.espresso_time.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+
+    condition:
+      - condition: state
+        entity_id: input_boolean.espresso_enabled
+        state: 'on'
+
+    action:
+      - service: homeassistant.turn_on
+        entity_id: switch.kitchen_outlet_switch
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.espresso_enabled
 
   # Espresso Notify
   - alias: Espresso Notify

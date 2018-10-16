@@ -1,13 +1,5 @@
 
 ##################################################
-## Inputs
-input_boolean:
-
-  vacation_mode:
-    initial: off
-
-
-##################################################
 ## Commands
 shell_command:
   updateha: /home/homeassistant/.homeassistant/scripts/update_ha.sh
