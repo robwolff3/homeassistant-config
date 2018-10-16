@@ -1,7 +1,7 @@
 # Home Assistant
 
-My personal implementation of [Home Assistant](https://home-assistant.io) (version: 0.79.3).
-Configuration updated 10/07/2018. **Just changed my configuration over to lovelace**
+My personal implementation of [Home Assistant](https://home-assistant.io) (version: 0.80.1).
+Configuration updated 10/16/2018. **Just changed my configuration over to lovelace**
 
 ## Overview
 
