@@ -34,6 +34,7 @@ group:
 discovery:
   ignore:
     - plex_mediaserver
+    - igd
 
 recorder:
   purge_interval: 1
@@ -250,88 +251,87 @@ notify:
     platform: rest
     resource: http://127.0.0.1:5000/command
 
-
-cloud:
-  google_actions:
-    filter:
-      include_entities:
-        - light.livingroom_light_level
-        - light.kitchen_light_level
-        - light.diningroom_light_level
-        - light.bedroom_light_level
-        - light.bathroom_light_level
-        - light.hallway_light_level
-        - light.nightstand
-        - light.nightstand1
-        - light.nightstand2
-        - switch.bedroom_outlet_switch_3
-        - switch.kitchen_outlet_switch
-        - media_player.nadc338
-        - media_player.viziotv
-        - scene.dinner
-        - scene.watching_tv
-        - scene.goodmorning
-        - scene.bedtime
-        - scene.mia_bedtime
-        - scene.all_things_off
-        - script.roomba_on
-        - script.cancel_alarm
-        - script.playlist_stop
-    entity_config:
-      light.livingroom_light_level:
-        name: Living Room Lights
-      light.kitchen_light_level:
-        name: Kitchen Lights
-      light.diningroom_light_level:
-        name: Dining Room Lights
-      light.bedroom_light_level:
-        name: Bedroom Lights
-      light.bathroom_light_level:
-        name: Bathroom Lights
-      light.hallway_light_level:
-        name: Hallway Lights
-      light.nightstand:
-        name: Nightstand Lights
-      light.nightstand1:
-        name: !secret user2ns
-      light.nightstand2:
-        name: !secret user1ns
-      switch.bedroom_outlet_switch_3:
-        name: Bedroom Fan Switch
-        aliases:
-          - Bedroom Fan
-          - Fan
-      switch.kitchen_outlet_switch:
-        name: Espresso Machine Switch
-        aliases:
-          - Espresso Machine
-          - Coffee Machine
-          - Kitchen Outlet
-      media_player.nadc338:
-        name: Stereo Switch
-        aliases:
-          - Stereo
-          - Nad
-      media_player.viziotv:
-        name: TV Switch
-        aliases:
-          - TV
-          - Vizio
-      scene.dinner:
-        name: Dinner Scene
-      scene.watching_tv:
-        name: Watching TV Scene
-      scene.goodmorning:
-        name: GoodMorning Scene
-      scene.bedtime:
-        name: Bedtime Scene
-      scene.mia_bedtime:
-        name: Mia Bedtime
-      scene.all_things_off:
-        name: All Things Off Scene
-      script.roomba_on:
-        name: Roomba
-      script.cancel_alarm:
-        name: Cancel Alarm
-      script.playlist_stop:
-        name: Playlist Stop
+google_assistant:
+  expose_by_default: false
+  project_id: !secret ga_project_id
+  api_key: !secret ga_api_key
+  entity_config:
+    light.livingroom_light_level:
+      expose: true
+      name: Living Room Lights
+    light.kitchen_light_level:
+      expose: true
+      name: Kitchen Lights
+    light.diningroom_light_level:
+      expose: true
+      name: Dining Room Lights
+    light.bedroom_light_level:
+      expose: true
+      name: Bedroom Lights
+    light.bathroom_light_level:
+      expose: true
+      name: Bathroom Lights
+    light.hallway_light_level:
+      expose: true
+      name: Hallway Lights
+    light.nightstand:
+      expose: true
+      name: Nightstand Lights
+    light.nightstand1:
+      expose: true
+      name: !secret user2ns
+    light.nightstand2:
+      expose: true
+      name: !secret user1ns
+    switch.bedroom_outlet_switch_3:
+      expose: true
+      name: Bedroom Fan Switch
+      aliases:
+        - Bedroom Fan
+        - Fan
+    switch.kitchen_outlet_switch:
+      expose: true
+      name: Espresso Machine Switch
+      aliases:
+        - Espresso Machine
+        - Coffee Machine
+        - Kitchen Outlet
+    media_player.nadc338:
+      expose: true
+      name: Stereo Switch
+      aliases:
+        - Stereo
+        - Nad
+    media_player.viziotv:
+      expose: true
+      name: TV Switch
+      aliases:
+        - TV
+        - Vizio
+    scene.dinner:
+      expose: true
+      name: Dinner Scene
+    scene.watching_tv:
+      expose: true
+      name: Watching TV Scene
+    scene.goodmorning:
+      expose: true
+      name: GoodMorning Scene
+    scene.bedtime:
+      expose: true
+      name: Bedtime Scene
+    scene.mia_bedtime:
+      expose: true
+      name: Mia Bedtime
+    scene.all_things_off:
+      expose: true
+      name: All Things Off Scene
+    script.roomba_on:
+      expose: true
+      name: Roomba
+    script.cancel_alarm:
+      expose: true
+      name: Cancel Alarm
+    script.playlist_stop:
+      expose: true
+      name: Playlist Stop
