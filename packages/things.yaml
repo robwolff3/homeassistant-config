@@ -39,14 +39,10 @@ input_select:
 
 input_boolean:
 
-  espresso_enabled:
-    initial: off
-
-input_datetime:
-
-  espresso_time:
-    has_date: false
-    has_time: true
+  disable_roomba_schedule:
+  disable_bathroom_heater:
+  disable_bathroom_heater_schedule:
+  disable_nest:
 
 #################################################################
 ## Automations
@@ -55,6 +51,7 @@ automation:
 #Roomba logic
   # Sceduled Roobma!!
   - alias: Roomba On Weekdays
+    initial_state: True
 
     trigger:
       - platform: time
@@ -70,6 +67,9 @@ automation:
           - fri
       - condition: template
         value_template: '{{states.vacuum.roomba.attributes.battery_level > 79}}'
+      - condition: state
+        entity_id: input_boolean.disable_roomba_schedule
+        state: 'off'
 
     action:
       - service: homeassistant.turn_on
@@ -77,6 +77,7 @@ automation:
 
   # Notify when Roomba is stuck or stopped
   - alias: Roomba notify stuck or stopped
+    initial_state: True
 
     trigger:
       - platform: state
@@ -103,41 +104,19 @@ automation:
             renotify: true
             tag: 'roomba_notify'
 
-  # Notify when Roomba is finished
-  - alias: Roomba notify finished
-
-    trigger:
-      - platform: state
-        entity_id: sensor.roomba_status
-        from: 'User Docking'
-        to: 'Charging'
-      - platform: state
-        entity_id: sensor.roomba_status
-        from: 'Docking - End Mission'
-        to: 'Charging'
-
-    action:
-      - service: notify.html5
-        data:
-          title: 'Roomba Finished - {{now().strftime("%l:%M %P")}}'
-          message: 'Schmidt is finished and bin needs emptying.'
-          data:
-            requireInteraction: true
-            renotify: true
-            tag: 'roomba_notify'
-
   # Notify when Roomba battery very low
   - alias: Roomba notify battery very low
+    initial_state: True
 
     trigger:
       - platform: template
-        value_template: '{{states.vacuum.roomba.attributes.battery_level < 11}}'
+        value_template: '{{states.vacuum.roomba.attributes.battery_level < 5}}'
 
     action:
       - service: notify.html5
         data:
           title: 'Roomba Error - {{now().strftime("%l:%M %P")}}'
-          message: 'Schmidt battery is 10%.'
+          message: 'Schmidt battery is 5%.'
           data:
             requireInteraction: true
             renotify: true
@@ -146,6 +125,7 @@ automation:
 #Dishwasher logic
   # Dishwasher set running
   - alias: Set dishwasher active when power detected
+    initial_state: True
 
     trigger:
       - platform: numeric_state
@@ -165,6 +145,7 @@ automation:
 
   # Dishwasher set drying
   - alias: Set dishwasher drying when power drops
+    initial_state: True
 
     trigger:
       - platform: numeric_state
@@ -187,6 +168,7 @@ automation:
 
   # Dishwasher set off
   - alias: Set dishwasher off
+    initial_state: True
 
     trigger:
       - platform: numeric_state
@@ -208,6 +190,7 @@ automation:
 
   # Text and add to todo Dishwasher Alert when done
   - alias: Send text alert when dishwasher is done
+    initial_state: True
 
     trigger:
       - platform: state
@@ -217,17 +200,14 @@ automation:
     action:
       - service: notify.html5
         data:
-          title: 'Dishwasher Finished - {{now().strftime("%l:%M %P")}}'
+          title: 'Dishwasher Finished - {{now().strftime("%m/%d - %l:%M%P")}}'
           message: 'The Dishwasher has finished and is ready to be emptied.'
           data:
             requireInteraction: true
-      - service: google_keep.add_to_list
-        data_template:
-          title: 'Rob To Do'
-          items: 'Empty Dishwasher  - {{now().strftime("%l:%M %P")}}'
 
   # Check for things left on
   - alias: Check for things left on
+    initial_state: True
 
     trigger:
       - platform: state
@@ -286,13 +266,14 @@ automation:
           data:
             requireInteraction: true
             renotify: true
-            url: '/states'
+            url: '/lovelace/home'
             actions:
               - action: 'turn_off'
                 title: 'Turn off'
 
 # Turn off when notifcation clicked
   - alias: Turn off notifcation
+    initial_state: True
 
     trigger:
       - platform: event
@@ -306,10 +287,11 @@ automation:
 
   # Say Dishwasher Alert when done
   - alias: Say alert when dishwasher is done
+    initial_state: True
 
     trigger:
       - platform: state
-        entity_id: input_select.dishwashers_status
+        entity_id: input_select.dishwasher_status
         to: 'Off'
 
     condition:
@@ -329,16 +311,12 @@ automation:
 
     action:
       - service: notify.ga_broadcast
-        data_template:
-          message: >
-            {{ [
-              "The Dishwasher has finished and is ready to be emptied.",
-              "The dishwasher is done, hope someone is ready to put dishes away.",
-              "I have clean dishes hot off the press, the dishwasher is done."
-              ] | random }}
+        data:
+          message: "The Dishwasher has finished."
 
   # Say package is delivered
   - alias: Say package is delivered
+    initial_state: True
 
     trigger: #Dummy Trigger
       - platform: state
@@ -362,13 +340,8 @@ automation:
 
     action:
       - service: notify.ga_broadcast
-        data_template:
-          message: >
-            {{ [
-              "A package has been delivered, hope its something good.",
-              "A delivery has been made, better grab it before a porch pirate does.",
-              "You can stop checking the front door, a package has been delivered."
-              ] | random }}
+        data:
+          message: "A package has been delivered."
       - service: notify.html5
         data:
           title: 'Package Delivered - {{now().strftime("%l:%M %P")}}'
@@ -380,6 +353,7 @@ automation:
 
   ## Welcome Home User1 Broadcast
   - alias: Say welcome home user1
+    initial_state: True
 
     trigger:
       - platform: template
@@ -395,30 +369,12 @@ automation:
     action:
       - delay: '00:00:05'
       - service: notify.ga_broadcast
-        data_template:
-          message: !secret user1_phrase
-
-  # Espresso Scheduler
-  - alias: Espresso Scheduler
-
-    trigger:
-      - platform: template
-        value_template: "{{ states('sensor.time') == (states.input_datetime.espresso_time.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
-
-    condition:
-      - condition: state
-        entity_id: input_boolean.espresso_enabled
-        state: 'on'
-
-    action:
-      - service: homeassistant.turn_on
-        entity_id: switch.kitchen_outlet_switch
-      - service: input_boolean.turn_off
         data:
-          entity_id: input_boolean.espresso_enabled
+          message: !secret user1_phrase
 
   # Espresso Notify
   - alias: Espresso Notify
+    initial_state: True
 
     trigger:
       platform: state
@@ -431,31 +387,125 @@ automation:
       - service: notify.html5
         data:
           title: 'Espresso Ready - {{now().strftime("%l:%M %P")}}'
-          message: 'Espresso machine is warmed up.'
+          message: 'The espresso machine is warmed up.'
           data:
             requireInteraction: true
       - service: notify.ga_broadcast
-        data_template:
-          message: >
-            {{ [
-              "Hey sleepy head, the espresso machine is all warmed up.",
-              "I hope there is a barista somewhere because the espresso machine is ready.",
-              "Someone start grinding the beans, the expresso machine is at tempature."
-              ] | random }}
+        data:
+          message: "The expresso machine is warmed up."
 
-  - alias: haalert
+# Keep nest from going into eco mode when people are home
+  - alias: antiecomode
+    initial_state: True
 
-    initial_state: 'off'
     trigger:
       - platform: state
-        entity_id: binary_sensor.user1_occupancy, binary_sensor.user3_occupancy, binary_sensor.user4_occupancy, binary_sensor.frontdoor_contact, binary_sensor.sidedoor_contact, binary_sensor.backdoor_contact
-        from: 'off'
-        to: 'on'
+        entity_id: climate.dining_room
+        to: 'eco'
+
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.disable_nest
+          state: 'off'
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: binary_sensor.user1_occupancy
+              state: 'on'
+            - condition: state
+              entity_id: binary_sensor.user2_occupancy
+              state: 'on'
+            - condition: state
+              entity_id: binary_sensor.user3_occupancy
+              state: 'on'
+            - condition: state
+              entity_id: binary_sensor.user4_occupancy
+              state: 'on'
 
     action:
-      - service: notify.html5
+      - delay: '00:00:30'
+      - service: climate.set_operation_mode
         data:
-          title: 'HA Alert - {{now().strftime("%l:%M %P")}}'
-          message: 'HA Alert'
-          data:
-            requireInteraction: true
+          entity_id: climate.dining_room
+          operation_mode: auto
+
+  # Bathroom heater on with motion
+  - alias: Heater - Bathroom Motion On
+    initial_state: True
+
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.bathroom_motion_sensor
+        to: 'on'
+      - platform: state
+        entity_id: light.bathroom_light_level
+        to: 'on'
+
+    condition:
+      - condition: state
+        entity_id: switch.livingroom_outlet_switch_3
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.disable_bathroom_heater
+        state: 'off'
+      - condition: template
+        value_template: '{{states.weather.dark_sky.attributes.temperature < 40}}'
+      - condition: template
+        value_template: '{{states.weather.dark_sky.attributes.temperature > 10}}'
+
+    action:
+      service: homeassistant.turn_on
+      entity_id: switch.livingroom_outlet_switch_3
+
+  - alias: Heater - Bathroom Motion Off
+    initial_state: True
+
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.bathroom_motion_sensor
+        to: 'off'
+        from: 'on'
+        for:
+          minutes: 6
+      - platform: state
+        entity_id: light.bathroom_light_level
+        to: 'off'
+
+    condition:
+      - condition: state
+        entity_id: input_boolean.disable_bathroom_heater
+        state: 'off'
+      - condition: template
+        value_template: '{{states.weather.dark_sky.attributes.temperature < 40}}'
+      - condition: template
+        value_template: '{{states.weather.dark_sky.attributes.temperature > 10}}'
+
+    action:
+      service: homeassistant.turn_off
+      entity_id: switch.livingroom_outlet_switch_3
+
+  # Bathroom heater frezing manual schedule
+  - alias: Heater - Manual Schedule
+    initial_state: True
+
+    trigger:
+      - platform: time_pattern
+        hours: '/1'
+        minutes: 0
+        seconds: 0
+
+    condition:
+      - condition: state
+        entity_id: input_boolean.disable_bathroom_heater_schedule
+        state: 'off'
+      - condition: template
+        value_template: '{{states.weather.dark_sky.attributes.temperature < 11}}'
+
+    action:
+      - service: homeassistant.turn_on
+        entity_id: switch.livingroom_outlet_switch_3
+      - delay: 00:30:00
+      - service: homeassistant.turn_off
+        entity_id: switch.livingroom_outlet_switch_3

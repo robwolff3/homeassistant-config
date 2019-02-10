@@ -12,6 +12,7 @@ homeassistant:
   packages: !include_dir_named packages/
 
 frontend:
+  javascript_version: latest
   themes:
     dark:
       primary-color: '#36454f'
@@ -23,13 +24,16 @@ http:
   api_password: !secret api_password
   base_url: !secret base_url
   use_x_forwarded_for: true
-  trusted_proxies: 127.0.0.1
+  trusted_proxies: !secret trusted_proxies
   ip_ban_enabled: true
   login_attempts_threshold: 5
 
 group:
   default_view:
     view: yes
+
+lovelace:
+  mode: yaml
 
 discovery:
   ignore:
@@ -98,9 +102,19 @@ history:
 
 logbook:
 
-sun:
+logger:
+  default: info
+  logs:
+    homeassistant.components.roomba: error
+    homeassistant.components.device_tracker.netgear: fatal
+    pynetgear: warn
+    pychromecast.socket_client: fatal
+    pychromecast: fatal
+    socket_client: fatal
+    homeassistant.components.light.hue: fatal
+    roomba.roomba.Roomba: warn
 
-ios:
+sun:
 
 sensor:
   - platform: time_date
@@ -122,6 +136,7 @@ media_player:
     name: viziotv
     host: !secret viziohost
     access_token: !secret vizioaccess_token
+    suppress_warning: true
   - platform: nadtcp2
     name: nadc338
     max_volume: -20
@@ -133,8 +148,6 @@ media_player:
 ## Lights
 
 zwave:
-  usb_path: "/dev/ttyACM0"
-  network_key: !secret network_key
   polling_interval: 30000
   device_config:
     light.livingroom_light_level:
@@ -158,7 +171,6 @@ zwave:
 
 light:
   - platform: hue
-    host: !secret huehost
     allow_unreachable: true
     allow_hue_groups: true
 
@@ -166,23 +178,19 @@ light:
 #################################################################
 ## Things
 
-nest:
-  client_id: !secret nestclient_id
-  client_secret: !secret nestclient_secret
-
 vacuum:
   - platform: roomba
     host: !secret roombahost
     username: !secret roombausername
     password: !secret roombapassword
 
-google_keep:
-  username: !secret keepusername
-  password: !secret keeppassword
-  list_name: "Rob To Do"
-
 weather:
-  - platform: yweather
+  - platform: darksky
+    api_key: !secret darksky
+
+nest:
+  client_id: !secret nestclient_id
+  client_secret: !secret nestclient_secret
 
 #################################################################
 ## Security / Occupancy
@@ -195,8 +203,6 @@ alarm_control_panel:
 
 zoneminder:
   host: !secret zmhost
-  path: /
-  path_zms: /cgi-bin/nph-zms
   ssl: true
   username: homeassistant
   password: !secret zmpassword
@@ -216,11 +222,6 @@ device_tracker:
     interval_seconds: 12
     new_device_defaults:
       track_new_devices: False
-
-mqtt:
-  broker: 127.0.0.1
-  username: homeassistant
-  password: !secret mqttpassword
 
 zone:
   name: Home
@@ -244,12 +245,12 @@ notify:
     platform: html5
     gcm_api_key: !secret gcpapikey
     gcm_sender_id: !secret gcpsenderid
-  - name: GA Broadcast
+  - name: ga_broadcast
     platform: rest
-    resource: http://127.0.0.1:5000/broadcast_message
-  - name: GA Command
+    resource: !secret ga_broadcast
+  - name: ga_command
     platform: rest
-    resource: http://127.0.0.1:5000/command
+    resource: !secret ga_command
 
 google_assistant:
   expose_by_default: false
@@ -326,9 +327,6 @@ google_assistant:
     scene.all_things_off:
       expose: true
       name: All Things Off Scene
-    script.roomba_on:
-      expose: true
-      name: Roomba
     script.cancel_alarm:
       expose: true
       name: Cancel Alarm

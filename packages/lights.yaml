@@ -1,10 +1,19 @@
 
+##################################################
+## Inputs
+input_boolean:
+
+  disable_bathroom_lights:
+  disable_hallway_lights:
+  disable_kitchen_lights:
+
 #################################################################
 ## Automations
 automation:
 
-  # Bathroom lights on with motion
-  - alias: Motion Bathroom Lights On 20min
+  # Bathroom lights on with motion 20min
+  - alias: Lights - Bathroom Motion On
+    initial_state: True
 
     trigger:
       platform: state
@@ -14,6 +23,9 @@ automation:
     condition:
       - condition: state
         entity_id: light.bathroom_light_level
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.disable_bathroom_lights
         state: 'off'
 
     action:
@@ -29,12 +41,14 @@ automation:
             253
           {%- endif %}
 
-  - alias: Bathroom Lights Off After 20min
+  - alias: Lights - Bathroom Motion Off
+    initial_state: True
 
     trigger:
       - platform: state
         entity_id: binary_sensor.bathroom_motion_sensor
         to: 'off'
+        from: 'on'
         for:
           minutes: 21
 
@@ -43,8 +57,9 @@ automation:
       entity_id: light.bathroom_light_level
 
 
-  # Hallway lights on from motion or door
-  - alias: Motion Hallway Lights On 15min
+  # Hallway lights on from motion or door 15min
+  - alias: Lights - Hallway Motion On
+    initial_state: True
 
     trigger:
       - platform: state
@@ -57,7 +72,9 @@ automation:
         state: 'off'
         for:
           minutes: 1
-
+      - condition: state
+        entity_id: input_boolean.disable_hallway_lights
+        state: 'off'
 
     action:
       service: homeassistant.turn_on
@@ -65,7 +82,8 @@ automation:
       data:
         brightness: 100
 
-  - alias: Hallway Lights Off After 15min
+  - alias: Lights - Hallway Motion Off
+    initial_state: True
 
     trigger:
       - platform: state
@@ -86,38 +104,9 @@ automation:
       service: homeassistant.turn_off
       entity_id: light.hallway_light_level
 
-
-  # Turn on Kitchen lights at entry
-  - alias: Turn on Kitchen lights at entry
-
-    trigger:
-      - platform: template
-        value_template: '{{states.lock.front_door_handle_locked.attributes.lock_status == "Unlocked with Keypad by user 1"}}'
-
-    condition:
-      - condition: state
-        entity_id: light.livingroom_light_level
-        state: 'off'
-      - condition: state
-        entity_id: light.kitchen_light_level
-        state: 'off'
-      - condition: state
-        entity_id: light.diningroom_light_level
-        state: 'off'
-
-    action:
-      - service: homeassistant.turn_on
-        entity_id: light.kitchen_light_level
-        data:
-          brightness: 150
-      - service: homeassistant.turn_on
-        entity_id: light.diningroom_light_level
-        data:
-          brightness: 80
-
-
   # Dark arrive home lights
-  - alias: Dark Arrive Home Lights
+  - alias: Lights - Arrive Kitchen Lights
+    initial_state: True
 
     trigger:
       platform: state
@@ -128,32 +117,27 @@ automation:
       condition: and
       conditions:
         - condition: state
-          entity_id: sun.sun
-          state: 'below_horizon'
-        - condition: time
-          after: '17:00:00'
-          before: '02:00:00'
+          entity_id: input_boolean.disable_kitchen_lights
+          state: 'off'
+        - condition: state
+          entity_id: light.kitchen_light_level
+          state: 'off'
+        - condition: state
+          entity_id: light.diningroom_light_level
+          state: 'off'
         - condition: or
           conditions:
             - condition: template
-              value_template: "{{ (as_timestamp(now())-as_timestamp(states.binary_sensor.user1_occupancy.last_changed)) > 600 }}"
+              value_template: "{{ (as_timestamp(now())-as_timestamp(states.binary_sensor.user1_occupancy.last_changed)) < 300 }}"
             - condition: template
-              value_template: "{{ (as_timestamp(now())-as_timestamp(states.binary_sensor.user2_occupancy.last_changed)) > 600 }}"
+              value_template: "{{ (as_timestamp(now())-as_timestamp(states.binary_sensor.user2_occupancy.last_changed)) < 300 }}"
 
     action:
       - service: homeassistant.turn_on
         entity_id: light.kitchen_light_level
         data:
-          brightness: 200
+          brightness: 175
       - service: homeassistant.turn_on
         entity_id: light.diningroom_light_level
         data:
-          brightness: 120
-      - service: homeassistant.turn_on
-        entity_id: light.nightstand1
-        data:
-          brightness: 120
-      - service: homeassistant.turn_on
-        entity_id: light.nightstand2
-        data:
-          brightness: 120
+          brightness: 100

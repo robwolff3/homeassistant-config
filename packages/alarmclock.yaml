@@ -33,10 +33,6 @@ input_select:
       - Classical Essentials
       - Morning Classical
       - "Piano 100: Spotify Picks"
-      - Autumn Acoustic
-      - Essential Alternative
-      - This Is The Black Keys
-      - Your Favorite Coffeehouse
       - Michigan Radio
       - WRCJ
       - The News
@@ -50,7 +46,7 @@ automation:
 
   # Alarmclock weekDAY
   - alias: Alarm Clock Weekday
-    initial_state: 'on'
+    initial_state: True
     trigger:
       platform: template
       value_template: "{{ states('sensor.time') == (((states.input_datetime.alarmclock_time_wd.attributes.timestamp | int) - 900) | timestamp_custom('%H:%M', False)) }}"
@@ -86,7 +82,7 @@ automation:
 
   # Alarmclock weekEND
   - alias: Alarm Clock Weekend
-    initial_state: 'on'
+    initial_state: True
     trigger:
       platform: template
       value_template: "{{ states('sensor.time') == (((states.input_datetime.alarmclock_time_we.attributes.timestamp | int) - 900) | timestamp_custom('%H:%M', False)) }}"
@@ -119,6 +115,7 @@ automation:
 
   # Alarmclock Cancel
   - alias: Alarmclock Cancel
+    initial_state: True
 
     trigger:
       platform: state
@@ -166,6 +163,8 @@ automation:
         entity_id: light.nightstand1
       - service: light.turn_off
         entity_id: light.nightstand2
+      - service: homeassistant.turn_off
+        entity_id: switch.kitchen_outlet_switch
 
 ##################################################
 ## Scripts
@@ -178,11 +177,17 @@ script:
 
   alarmclock_espresso:
     sequence:
+      - delay: "00:15:00"
       - condition: state
         entity_id: input_boolean.alarmclock_espresso
         state: 'on'
       - service: homeassistant.turn_on
         entity_id: switch.kitchen_outlet_switch
+      - condition: time
+        weekday:
+          - fri
+          - sat
+          - sun
       - service: input_boolean.turn_off
         data:
           entity_id: input_boolean.alarmclock_espresso
@@ -225,6 +230,7 @@ script:
         data:
           entity_id: media_player.bedroom_speaker
           volume_level: 0.2
+      - delay: "00:00:06"
       - service: media_player.volume_set
         data:
           entity_id: media_player.nadc338
@@ -282,6 +288,7 @@ script:
         data:
           entity_id: media_player.bedroom_speaker
           volume_level: 0.2
+      - delay: "00:00:06"
       - service: media_player.volume_set
         data:
           entity_id: media_player.nadc338

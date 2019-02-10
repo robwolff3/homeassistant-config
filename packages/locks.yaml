@@ -1,0 +1,97 @@
+
+##################################################
+## Inputs
+input_boolean:
+
+  disable_lock_automation:
+
+#################################################################
+## Automations
+automation:
+
+
+        ## Lock Doors at 10p
+  - alias: Locks - Lock Doors at 10p
+    initial_state: True
+
+    trigger:
+      - platform: time
+        at: '22:00'
+
+    condition:
+      - condition: state
+        entity_id: input_boolean.disable_lock_automation
+        state: 'off'
+
+    action:
+      - service: lock.lock
+        entity_id: lock.front_door_handle_locked
+
+
+        ## Auto Relock Doors between 10p-7a
+  - alias: Locks - Auto Reock Doors Between 10p 7a
+    initial_state: True
+
+    trigger:
+      - platform: state
+        entity_id: lock.front_door_handle_locked
+        to: 'unlocked'
+
+    condition:
+      - condition: state
+        entity_id: input_boolean.disable_lock_automation
+        state: 'off'
+      - condition: time
+        after: '22:01'
+        before: '06:59'
+
+    action:
+      - delay: '00:10:00'
+      - service: lock.lock
+        entity_id: lock.front_door_handle_locked
+
+
+        ## Auto Lock Doors on departure
+  - alias: Locks - Auto Lock Doors On Departure
+    initial_state: True
+
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.user1_occupancy, binary_sensor.user2_occupancy
+        from: 'on'
+        to: 'off'
+
+    condition:
+      - condition: state
+        entity_id: binary_sensor.user1_occupancy
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.user2_occupancy
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.disable_lock_automation
+        state: 'off'
+
+    action:
+      - service: lock.lock
+        entity_id: lock.front_door_handle_locked
+
+
+        ## Auto Unlock Doors on arrival
+  - alias: Locks - Auto Unlock Doors On Arrival
+    initial_state: True
+
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.user1_occupancy, binary_sensor.user2_occupancy
+        from: 'off'
+        to: 'on'
+
+    condition:
+      - condition: state
+        entity_id: input_boolean.disable_lock_automation
+        state: 'off'
+
+    action:
+      - service: lock.unlock
+        entity_id: lock.front_door_handle_locked

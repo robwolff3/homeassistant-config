@@ -4,15 +4,11 @@
 
 resources:
   - url: /local/lovelace-slider-entity-row/slider-entity-row.js
-    type: module
+    type: js
   - url: /local/custom-lovelace/alarm_control_panel-card/alarm_control_panel-card.js
     type: module
-  - url: /local/mini-media-player/mini-media-player.js?v=0.8.3
+  - url: /local/mini-media-player-bundle.js?v=0.9.8
     type: module
-  - url: /local/button-card.js
-    type: module
-  - url: /local/custom_ui/weather-card.js
-    type: js
 
 
 title: Home Assistant
@@ -23,79 +19,51 @@ views:
 ## Home
 
   - title: Home
-    id: home
+    path: home
     cards:
 
       - type: entities
         title: Lights
         show_header_toggle: false
         entities:
-          - entity: light.livingroom_light_level
-            name: Living Room
-            icon: mdi:sofa
-            type: custom:slider-entity-row
-            hide_toggle: true
-          - entity: light.kitchen_light_level
-            name: Kitchen
-            icon: mdi:fridge
-            type: custom:slider-entity-row
-            hide_toggle: true
-          - entity: light.diningroom_light_level
-            name: Dining Room
-            icon: mdi:silverware-variant
-            type: custom:slider-entity-row
-            hide_toggle: true
-          - entity: light.bedroom_light_level
-            name: Bedroom
-            icon: mdi:hotel
-            type: custom:slider-entity-row
-            hide_toggle: true
-          - entity: light.bathroom_light_level
-            name: Bathroom
-            icon: mdi:water-pump
-            type: custom:slider-entity-row
-            hide_toggle: true
-          - entity: light.hallway_light_level
-            name: Hallway
-            icon: mdi:ceiling-light
-            type: custom:slider-entity-row
-            hide_toggle: true
-          - entity: light.nightstand1
-            name: !secret user2ns
-            icon: mdi:lamp
-            type: custom:slider-entity-row
-            hide_toggle: true
-          - entity: light.nightstand2
-            name: !secret user1ns
-            icon: mdi:lamp
-            type: custom:slider-entity-row
-            hide_toggle: true
+          - type: custom:slider-entity-row
+            entity: light.livingroom_light_level
+            toggle: true
+          - type: custom:slider-entity-row
+            entity: light.kitchen_light_level
+            toggle: true
+          - type: custom:slider-entity-row
+            entity: light.diningroom_light_level
+            toggle: true
+          - type: custom:slider-entity-row
+            entity: light.bedroom_light_level
+            toggle: true
+          - type: custom:slider-entity-row
+            entity: light.bathroom_light_level
+            toggle: true
+          - type: custom:slider-entity-row
+            entity: light.hallway_light_level
+            toggle: true
+          - type: custom:slider-entity-row
+            entity: light.nightstand1
+            toggle: true
+          - type: custom:slider-entity-row
+            entity: light.nightstand2
+            toggle: true
 
       - type: entities
         title: Things
         show_header_toggle: false
         entities:
-          - entity: input_select.scene_selector
-            name: Scenes
-            icon: mdi:creation
-          - entity: switch.bedroom_outlet_switch_3
-            name: Bedroom Fan
-            icon: mdi:fan
-          - entity: switch.kitchen_outlet_switch
-            name: Espresso Machine
-            icon: mdi:coffee
-          - entity: sensor.dishwasher_status
-            name: Dishwasher
-            icon: mdi:washing-machine
-          - entity: vacuum.roomba
-            name: Roomba
-            icon: mdi:robot-vacuum-variant
-          - entity: climate.dining_room
-            name: Nest
+          - input_select.scene_selector
+          - switch.bedroom_outlet_switch_3
+          - switch.kitchen_outlet_switch
+          - switch.livingroom_outlet_switch_3
+          - sensor.dishwasher_status
+          - vacuum.roomba
+          - climate.dining_room
           - entity: media_player.viziotv
             type: "custom:mini-media-player"
-            name: Vizio TV
-            icon: mdi:monitor
             show_source: small
             hide_controls: true
             hide_mute: true
@@ -104,8 +72,6 @@ views:
             group: true
           - entity: media_player.nadc338
             type: "custom:mini-media-player"
-            name: NAD Stereo
-            icon: mdi:speaker
             show_source: small
             hide_controls: true
             hide_mute: true
@@ -117,72 +83,74 @@ views:
         cards:
           - type: entities
             title: Playlist Control
+            show_header_toggle: false
             entities:
-              - entity: input_select.playlist_content
-                name: 'Content:'
-                icon: mdi:playlist-play
-              - entity: input_select.playlist_source
-                name: 'Source:'
-                icon: mdi:speaker-wireless
+              - input_select.playlist_content
+              - input_select.playlist_source
           - type: horizontal-stack
             cards:
-              - type: "custom:button-card"
-                color_type: blank-card
-              - type: "custom:button-card"
-                color_type: card
-                color: '#9a9fa8'
-                size: 19px
-                icon: mdi:play
-                action: service
-                service:
-                  domain: script
-                  action: turn_on
-                  data:
+              - type: entity-button
+                name: Play
+                tap_action:
+                  action: call-service
+                  service: script.turn_on
+                  service_data:
                     entity_id: script.playlist_action
-              - type: "custom:button-card"
-                color_type: card
-                color: '#9a9fa8'
-                size: 19px
-                icon: mdi:stop
-                action: service
-                service:
-                  domain: script
-                  action: turn_on
-                  data:
+                icon: mdi-blank
+                entity: script.playlist_action
+              - type: entity-button
+                name: Stop
+                tap_action:
+                  action: call-service
+                  service: script.turn_on
+                  service_data:
                     entity_id: script.playlist_stop
-              - type: "custom:button-card"
-                color_type: card
-                color: '#9a9fa8'
-                size: 19px
-                icon: mdi:volume-medium
-                action: service
-                service:
-                  domain: script
-                  action: turn_on
-                  data:
+                icon: mdi-blank
+                entity: script.playlist_stop
+              - type: entity-button
+                name: Vol Down
+                tap_action:
+                  action: call-service
+                  service: script.turn_on
+                  service_data:
                     entity_id: script.playlist_voldown
-              - type: "custom:button-card"
-                color_type: card
-                color: '#9a9fa8'
-                size: 19px
-                icon: mdi:volume-high
-                action: service
-                service:
-                  domain: script
-                  action: turn_on
-                  data:
+                icon: mdi-blank
+                entity: script.playlist_voldown
+              - type: entity-button
+                name: Vol Up
+                tap_action:
+                  action: call-service
+                  service: script.turn_on
+                  service_data:
                     entity_id: script.playlist_volup
-              - type: "custom:button-card"
-                color_type: blank-card
+                icon: mdi-blank
+                entity: script.playlist_volup
 
       - type: conditional
         conditions:
           - entity: media_player.living_room
             state_not: "off"
+          - entity: media_player.living_room
+            state_not: "unavailable"
         card:
           type: custom:mini-media-player
           entity: media_player.living_room
-          name: Living Room
+          artwork: cover
+          short_info: true
+          power_color: true
+          show_progress: true
+          hide_mute: true
+          volume_stateless: true
+
+      - type: conditional
+        conditions:
+          - entity: media_player.kitchen_hub
+            state_not: "off"
+          - entity: media_player.kitchen_hub
+            state_not: "unavailable"
+        card:
+          type: custom:mini-media-player
+          entity: media_player.kitchen_hub
           artwork: cover
           short_info: true
           power_color: true
@@ -194,10 +162,11 @@ views:
         conditions:
           - entity: media_player.kitchen_stereo
             state_not: "off"
+          - entity: media_player.kitchen_stereo
+            state_not: "unavailable"
         card:
           type: custom:mini-media-player
           entity: media_player.kitchen_stereo
-          name: Kitchen Stereo
           artwork: cover
           short_info: true
           power_color: true
@@ -209,10 +178,11 @@ views:
         conditions:
           - entity: media_player.bedroom_speaker
             state_not: "off"
+          - entity: media_player.bedroom_speaker
+            state_not: "unavailable"
         card:
           type: custom:mini-media-player
           entity: media_player.bedroom_speaker
-          name: Bedroom Speaker
           artwork: cover
           short_info: true
           power_color: true
@@ -229,7 +199,6 @@ views:
         card:
           type: custom:mini-media-player
           entity: media_player.basement_group
-          name: Basement Audio Group
           artwork: cover
           short_info: true
           power_color: true
@@ -237,21 +206,19 @@ views:
           hide_mute: true
           volume_stateless: true
 
-      - type: custom:weather-card
-        entity_weather: weather.yweather
-        entity_sun: sun.sun
+#      - type: weather-forecast
+#        entity: weather.dark_sky
 
-      - type: picture-entity
-        name: Midwest Radar
-        entity: camera.midwest_radar
-        show_state: false
+#      - type: picture-entity
+#        entity: camera.midwest_radar
+#        show_state: false
 
 
 #################################################################
 ## Security
 
   - title: Security
-    id: security
+    path: security
     cards:
 
       - type: custom:alarm_control_panel-card
@@ -266,147 +233,83 @@ views:
 
       - type: entities
         title: Locks
+        show_header_toggle: false
         entities:
-          - entity: lock.front_door_handle_locked
-            name: Frontdoor Lock
-            icon: mdi:lock-smart
+          - lock.front_door_handle_locked
 
       - type: glance
         title: Occupancy Sensors
         entities:
-          - entity: binary_sensor.user1_occupancy
-            name: !secret user1
-            icon: mdi:account
-          - entity: binary_sensor.user2_occupancy
-            name: !secret user2
-            icon: mdi:account
-          - entity: binary_sensor.user3_occupancy
-            name: !secret user3
-            icon: mdi:account
-          - entity: binary_sensor.user4_occupancy
-            name: !secret user4
-            icon: mdi:account
+          - binary_sensor.user1_occupancy
+          - binary_sensor.user2_occupancy
+          - binary_sensor.user3_occupancy
+          - binary_sensor.user4_occupancy
 
       - type: glance
         title: Door Sensors
         entities:
-          - entity: binary_sensor.frontdoor_contact
-            name: Frontdoor
-            icon: mdi:door
-          - entity: binary_sensor.sidedoor_contact
-            name: Sidedoor
-            icon: mdi:door
-          - entity: binary_sensor.backdoor_contact
-            name: Backdoor
-            icon: mdi:door
+          - binary_sensor.frontdoor_contact
+          - binary_sensor.sidedoor_contact
+          - binary_sensor.backdoor_contact
 
       - type: glance
         title: Motion Sensors
         entities:
-          - entity: binary_sensor.uplivingroom_motion_sensor
-            name: Up Living
-            icon: mdi:run
-          - entity: binary_sensor.upoffice_motion_sensor
-            name: Up Office
-            icon: mdi:run
-          - entity: binary_sensor.hallway_motion1_sensor
-            name: Hallway 1
-            icon: mdi:run
-          - entity: binary_sensor.hallway_motion2_sensor
-            name: Hallway 2
-            icon: mdi:run
-          - entity: binary_sensor.bathroom_motion_sensor
-            name: Bathroom
-            icon: mdi:run
+          - binary_sensor.uplivingroom_motion_sensor
+          - binary_sensor.upoffice_motion_sensor
+          - binary_sensor.hallway_motion1_sensor
+          - binary_sensor.hallway_motion2_sensor
+          - binary_sensor.bathroom_motion_sensor
 
       - type: picture-entity
-        name: Frontdoor Camera
         entity: camera.frontdoor
         show_state: false
       - type: picture-entity
-        name: Backdoor Camera
         entity: camera.backdoor
         show_state: false
 
 
 #################################################################
-## Override
+## Settings
 
-  - title: Override
-    id: override
+  - title: Settings
+    path: settings
     cards:
 
       - type: entities
-        title: Override
+        title: Automation Override
         show_header_toggle: false
         entities:
-          - automation.motion_bathroom_lights_on_20min
-          - automation.motion_hallway_lights_on_15min
-          - automation.dark_arrive_home_lights
-          - automation.turn_on_kitchen_lights_at_entry
-          - automation.roomba_on_weekdays
-          - automation.haalert
-          - entity: input_boolean.enable_alarm_system
-            name: Alarm System Enabled
-            icon: mdi:toggle-switch
-          - entity: alarm_control_panel.main
-            name: Alarm System Status
-          - entity: switch.bedroom_outlet_switch_2
-            name: Bedroom Outlet Left
-            icon: mdi:power-socket-us
-          - entity: switch.meter_outlet_switch
-            name: Dishwasher Switch
-            icon: mdi:washing-machine
-
-      - type: entities
-        title: System Management
-        show_header_toggle: false
-        entities:
-          - script.updateha
-          - script.restartha
-          - script.rebootpi
-          - script.restartmonitor
-          - script.updatemonitor
+          - input_boolean.disable_bathroom_lights
+          - input_boolean.disable_hallway_lights
+          - input_boolean.disable_kitchen_lights
+          - input_boolean.disable_bathroom_heater
+          - input_boolean.disable_nest
+          - input_boolean.disable_roomba_schedule
+          - input_boolean.disable_bathroom_heater_schedule
+          - input_boolean.disable_lock_automation
+          - input_boolean.disable_alarm_system
+          - alarm_control_panel.main
+          - switch.bedroom_outlet_switch_2
+          - switch.livingroom_outlet_switch_2
 
       - type: entities
         title: Alarm Clock
         show_header_toggle: false
         entities:
-          - entity: input_boolean.alarmclock_enabled_wd
-            name: Weekday Enabled
-            icon: mdi:toggle-switch
-          - entity: input_datetime.alarmclock_time_wd
-            name: Weekday Time
-            icon: mdi:alarm
-          - entity: input_boolean.alarmclock_enabled_we
-            name: Weekend Enabled
-            icon: mdi:toggle-switch
-          - entity: input_datetime.alarmclock_time_we
-            name: Weekend Time
-            icon: mdi:alarm
-          - entity: input_boolean.alarmclock_espresso
-            name: Turn On Espresso Machine
-            icon: mdi:toggle-switch
-          - entity: input_select.alarmclock_content
-            name: 'To Play:'
-            icon: mdi:playlist-play
-          - entity: input_boolean.alarmclock_cancel
-            name: Cancel Alarm
-            icon: mdi:cancel
+          - input_boolean.alarmclock_enabled_wd
+          - input_datetime.alarmclock_time_wd
+          - type: section
+          - input_boolean.alarmclock_enabled_we
+          - input_datetime.alarmclock_time_we
+          - type: section
+          - input_boolean.alarmclock_espresso
+          - input_select.alarmclock_content
+          - input_boolean.alarmclock_cancel
 
       - type: entities
-        title: Espresso Scheduler
+        title: Media Override
         show_header_toggle: false
-        entities:
-          - entity: input_boolean.espresso_enabled
-            name: Enabled
-            icon: mdi:toggle-switch
-          - entity: input_datetime.espresso_time
-            name: Time
-            icon: mdi:coffee
-
-      - type: entities
-        title: Media
         entities:
           - media_player.viziotv
           - media_player.basement_group
@@ -414,4 +317,24 @@ views:
           - media_player.kitchen_stereo
           - media_player.nadc338
           - media_player.bedroom_speaker
-          - media_player.kitchen_home
+          - media_player.kitchen_hub
+
+      - type: entities
+        title: Sensors
+        show_header_toggle: false
+        entities:
+          - sensor.user1_bedroom
+          - sensor.user1_office
+          - sensor.user1_upstairs
+          - type: section
+          - sensor.user2_bedroom
+          - sensor.user2_office
+          - sensor.user2_upstairs
+          - type: section
+          - sensor.user3_bedroom
+          - sensor.user3_office
+          - sensor.user3_upstairs
+          - type: section
+          - sensor.user4_bedroom
+          - sensor.user4_office
+          - sensor.user4_upstairs

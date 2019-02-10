@@ -6,6 +6,7 @@ automation:
   ##### Media Power Management ######
   # Turn off living_room when Vizio powered off
   - alias: living_room off with vizio
+    initial_state: True
 
     trigger:
       - platform: state
@@ -22,6 +23,7 @@ automation:
 
   # Turn off vizio off if chrome cast idle 30 minutes
   - alias: vizio off with chromecast idle
+    initial_state: True
 
     trigger:
       - platform: state
@@ -45,6 +47,7 @@ automation:
   ##### Volume setting ######
   # Set bedroom_speaker volume when turned on
   - alias: bedroom_speaker volume reset
+    initial_state: True
 
     trigger:
       - platform: state
@@ -53,7 +56,13 @@ automation:
 
     condition:
       - condition: state
-        entity_id: script.alarmclock_activate
+        entity_id: script.alarmclock_activate_wd
+        state: 'off'
+      - condition: state
+        entity_id: script.alarmclock_activate_we
+        state: 'off'
+      - condition: state
+        entity_id: script.a_bedtime
         state: 'off'
 
     action:
@@ -64,6 +73,7 @@ automation:
 
   # Set bedroom_speaker volume when turned on basement_group
   - alias: bedroom_speaker volume reset basement_group
+    initial_state: True
 
     trigger:
       - platform: state
@@ -72,8 +82,14 @@ automation:
 
     condition:
       - condition: state
-        entity_id: script.alarmclock_activate
+        entity_id: script.alarmclock_activate_wd
         state: 'off'
+      - condition: state
+        entity_id: script.alarmclock_activate_we
+        state: 'off'
+      - condition: state
+        entity_id: media_player.basement_group
+        state: 'unavailable'
 
     action:
       - service: media_player.volume_set
@@ -83,6 +99,7 @@ automation:
 
   # Set nadc338 volume when turned on
   - alias: nadc338 volume reset
+    initial_state: True
 
     trigger:
       - platform: state
@@ -91,10 +108,14 @@ automation:
 
     condition:
       - condition: state
-        entity_id: script.alarmclock_activate
+        entity_id: script.alarmclock_activate_wd
+        state: 'off'
+      - condition: state
+        entity_id: script.alarmclock_activate_we
         state: 'off'
 
     action:
+      - delay: "00:00:07"
       - service: media_player.volume_set
         data:
           entity_id: media_player.nadc338
@@ -103,6 +124,7 @@ automation:
 
   # Set nadc338 volume when input changed
   - alias: nadc338 volume reset input changed
+    initial_state: True
 
     trigger:
       - platform: template
@@ -112,7 +134,10 @@ automation:
 
     condition:
       - condition: state
-        entity_id: script.alarmclock_activate
+        entity_id: script.alarmclock_activate_wd
+        state: 'off'
+      - condition: state
+        entity_id: script.alarmclock_activate_we
         state: 'off'
 
     action:
@@ -124,6 +149,7 @@ automation:
 
   # Reset living_room volume everyday
   - alias: living_room volume reset
+    initial_state: True
 
     trigger:
       - platform: time
@@ -135,8 +161,9 @@ automation:
           entity_id: media_player.living_room
           volume_level: 1.0
 
-  # Reset kitchen_home volume everyday
-  - alias: kitchen_home volume reset
+  # Reset kitchen_hub volume everyday
+  - alias: kitchen_hub volume reset
+    initial_state: True
 
     trigger:
       - platform: time
@@ -145,5 +172,5 @@ automation:
     action:
       - service: media_player.volume_set
         data:
-          entity_id: media_player.kitchen_home
+          entity_id: media_player.kitchen_hub
           volume_level: 0.5

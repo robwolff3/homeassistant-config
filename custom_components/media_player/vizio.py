@@ -20,7 +20,7 @@ from homeassistant.const import (
     STATE_UNKNOWN)
 from homeassistant.helpers import config_validation as cv
 
-REQUIREMENTS = ['pyvizio==0.0.3']
+REQUIREMENTS = [ 'https://github.com/photinus/pyvizio/zipball/master#pyvizio==0.0.4' ]
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -181,7 +181,7 @@ class VizioDevice(MediaPlayerDevice):
 
     def validate_setup(self):
         """Validate if host is available and key is correct."""
-        return True
+        return self._device.get_current_volume() is not None
 
     def set_volume_level(self, volume):
         """Set volume level."""

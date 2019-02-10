@@ -5,6 +5,7 @@ automation:
 
   # Scene Selector
   - alias: Scene Selector
+    initial_state: True
 
     trigger:
       platform: state
@@ -136,6 +137,11 @@ script:
         data:
           entity_id: input_select.playlist_source
           option: "Bedroom Speaker"
+      - delay: "00:00:01"
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.bedroom_speaker
+          volume_level: 0.4
       - service: script.turn_on
         entity_id: script.playlist_action
 

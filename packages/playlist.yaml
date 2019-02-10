@@ -12,10 +12,6 @@ input_select:
       - Classical Essentials
       - Morning Classical
       - "Piano 100: Spotify Picks"
-      - Autumn Acoustic
-      - Essential Alternative
-      - This Is The Black Keys
-      - Your Favorite Coffeehouse
       - Michigan Radio
       - WRCJ
       - The News
@@ -48,10 +44,6 @@ script:
             {% elif is_state("input_select.playlist_content", "Classical Essentials") %} Shuffle Classical Essentials playlist on {{ states('input_select.playlist_source') }}
             {% elif is_state("input_select.playlist_content", "Morning Classical") %} Shuffle Morning Classical playlist on {{ states('input_select.playlist_source') }}
             {% elif is_state("input_select.playlist_content", "Piano 100: Spotify Picks") %} "Shuffle Piano 100 Spotify Picks playlist on" {{ states('input_select.playlist_source') }}
-            {% elif is_state("input_select.playlist_content", "Autumn Acoustic") %} Shuffle Autumn Acoustic playlist on {{ states('input_select.playlist_source') }}
-            {% elif is_state("input_select.playlist_content", "Essential Alternative") %} Shuffle Essential Alternative playlist on {{ states('input_select.playlist_source') }}
-            {% elif is_state("input_select.playlist_content", "This Is The Black Keys") %} Shuffle This Is The Black Keys playlist on {{ states('input_select.playlist_source') }}
-            {% elif is_state("input_select.playlist_content", "Your Favorite Coffeehouse") %} Shuffle Your Favorite Coffeehouse playlist on {{ states('input_select.playlist_source') }}
             {% elif is_state("input_select.playlist_content", "Michigan Radio") %} Cast Michigan Radio on {{ states('input_select.playlist_source') }}
             {% elif is_state("input_select.playlist_content", "WRCJ") %} Cast WRCJ on {{ states('input_select.playlist_source') }}
             {% elif is_state("input_select.playlist_content", "The News") %} Cast The News on {{ states('input_select.playlist_source') }}

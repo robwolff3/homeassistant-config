@@ -1,22 +1,20 @@
 # Home Assistant
 
-My personal implementation of [Home Assistant](https://home-assistant.io) (version: 0.80.1).
-Configuration updated 10/16/2018. **Just changed my configuration over to lovelace**
+My personal implementation of [Home Assistant](https://home-assistant.io) (version: 0.87.0). Configuration last updated 2/10/2019.
 
 ## Overview
 
-Here is my home automation project I have been improving since mid 2017. At that time I had switched from Samsung SmartThings and I could not be more happy with my decision. I take a firm minimalism approach to my layout, hence why the number of things are essential and concise.
+Here is my home automation project I have been improving since mid 2017. At that time I had switched from Samsung SmartThings and I could not be more happy with my decision. I take a firm minimalism approach to my layout, hence the number of things are essential and concise.
 
 ### In-front of Home Assistant
 
-* HA is running in a Virtual Environment on Raspberry Pi 3 running Debian Stretch (I highly recommend running HA on a RasPi with a Z-stick). I tried Hassbian and other deployment methods, but wasn't satisfied with the level of control over the things I mention below until I provisioned HA on my Debian myself.
+* HA is running on a docker container on a collective docker host I run in my homelab. For z-wave there a Z-stick plugged into the host. When I first started I tried Hassbian and other deployment methods, but wasn't satisfied with the level of control over the access and administration. HA in a Virtual Environment on a Debian Raspberry Pi 3 host is what I ran for awhile until last year when I upgraded my homelab to a single docker host. Docker is defiantly the way to go for easy of use, administration and updating.
 * Connecting to HA externally, I use my own domain through Google Domains with a Dynamic DNS record setup on a sub domain. To solve the internal/external connection problem, I have a Host Override setup on my pfSense router that forwards my HA sub domain to the local IP address of HA when I'm on my local network.
-* For connection security and certificate management I use Nginx to reverse proxy the connections to HA on the RaspberryPi. My Nginx config is pretty strict and I have a certificate setup through [Let's Encrypt](https://letsencrypt.org/) that auto-renews to secure my traffic internally and externally.
+* For connection security and certificate management I use the [linuxserver/letsencrypt](https://hub.docker.com/r/linuxserver/letsencrypt/) Docker container which has Nginx and [Let's Encrypt](https://letsencrypt.org/) packaged together. Nginx to reverse proxies the connections to HA and Let's Encrypt auto-renews to secure my traffic internally and externally.
 
 ### High Level Components and Ideas
 
 * Google Assistant Commands - To get around a few limitations like casting Spotify and the mediocre native TTS I am using emulated google assistant SDK on my RaspberryPi. Following a post form [chocomega](https://community.home-assistant.io/u/chocomega) [here](https://community.home-assistant.io/t/community-hass-io-add-on-google-assistant-webserver-broadcast-messages-without-interrupting-music/37274/234) he walks you though setting it up. You can find the config in [configuration.yaml](configuration.yaml), the spotify/playlist selector here [playlist.yaml](packages/playlist.yaml) and broadcast notifications here [things.yaml](packages/things.yaml).
-* Presence Detection - Before I was just using a Netgear integration for Orbi. I stumbled across this cool project by [andrewjfreyer](https://community.home-assistant.io/u/andrewjfreyer) written as a simple bash script called Monitor that uses bluetooth to track presence. It doesn't require the devices to be paired, its a lot faster and more reliable when other presence detection methods when setup to run on a few nodes. I combine the presence date from both Netgear and Monitor together to get the best of both words. You can find the project here [Monitor](https://community.home-assistant.io/t/monitor-reliable-multi-user-distributed-bluetooth-occupancy-presence-detection/68505) and my implementation here [occupancy.yaml](packages/occupancy.yaml)
 * Dishwasher Status/Notification - [phil1019](https://www.reddit.com/user/phil1019) shared his write up with me about monitoring dumb home devices power consumption to assume their state. I used the dishwasher portion of his setup, it can be found [here](https://philhawthorne.com/making-dumb-dishwashers-and-washing-machines-smart-alerts-when-the-dishes-and-clothes-are-cleaned/).
 * Auto hide media devices when not in-use - Before I used a self made method, now lovelace has more native functionality through a [Conditional Card](https://www.home-assistant.io/lovelace/conditional/). I didn't like the clutter of 6 media devices on my main page when they are not playing anything.
 * Light Alarm Clock - My bedroom lights slowly turn on, and the radio cast(s) instead of an immediate audible alarm. I used [this example](https://community.home-assistant.io/t/creating-an-alarm-clock-updated/15195) on the community forum by [hokagegano](https://community.home-assistant.io/u/hokagegano).
@@ -26,21 +24,17 @@ Here is my home automation project I have been improving since mid 2017. At that
 
 ### Custom Components
 
-* [hass-google_keep](https://github.com/aFrankLion/hass-google_keep) - To auto-add things to my to-do list
-* [nadtcp2](https://gitlab.com/mindig.marton/ha-nadtcp) - The [nadtcp](https://www.home-assistant.io/components/media_player.nadtcp/) component doesn't work with the Nad C 338
+* [nadtcp2](https://gitlab.com/mindig.marton/ha-nadtcp) - The [nad](https://www.home-assistant.io/components/media_player.nad/) component doesn't work with the Nad C 338. This is a workaround.
 
 ### Lovelace JavaScript Modules
 
 * [Alarm Control Panel Card](https://github.com/ciotlosm/custom-lovelace/tree/master/alarm_control_panel-card)
-* [Button Card](https://github.com/kuuji/button-card)
 * [Mini Media Player](https://github.com/kalkih/mini-media-player)
 * [Slider Entity Row](https://github.com/thomasloven/lovelace-slider-entity-row)
-* [Animated Weather Card](https://community.home-assistant.io/t/custom-animated-weather-card-for-lovelace/58338)
 
 ## Devices
 
-* Raspberry Pi 3
-* Raspberry Pi Zero W - 2
+* Raspberry Pi 3 #############
 * Aeotec Z-Stick Gen5
 * DIY [pfSense](https://www.pfsense.org/) router
 * Netgear Orbi (Set in AP mode)
@@ -59,7 +53,7 @@ Here is my home automation project I have been improving since mid 2017. At that
 ### Media and Other Devices
 
 * Hikvision Cameras - 2
-* Google Home
+* Google Hub
 * Chromecast Ultra
 * JBL Link 20
 * Vizio 4k TV

@@ -1,0 +1,205 @@
+
+homeassistant:
+  customize:
+
+
+## Home
+
+    light.livingroom_light_level:
+      friendly_name: Living Room
+      icon: mdi:sofa
+    light.kitchen_light_level:
+      friendly_name: Kitchen
+      icon: mdi:fridge
+    light.diningroom_light_level:
+      friendly_name: Dining Room
+      icon: mdi:silverware-variant
+    light.bedroom_light_level:
+      friendly_name: Bedroom
+      icon: mdi:hotel
+    light.bathroom_light_level:
+      friendly_name: Bathroom
+      icon: mdi:water-pump
+    light.hallway_light_level:
+      friendly_name: Hallway
+      icon: mdi:ceiling-light
+    light.nightstand1:
+      friendly_name: Rob Nightstand
+      icon: mdi:lamp
+    light.nightstand2:
+      friendly_name: Amelia Nightstand
+      icon: mdi:lamp
+
+    input_select.scene_selector:
+      friendly_name: Scenes
+      icon: mdi:creation
+    switch.bedroom_outlet_switch_3:
+      friendly_name: Bedroom Fan
+      icon: mdi:fan
+    switch.kitchen_outlet_switch:
+      friendly_name: Espresso Machine
+      icon: mdi:coffee
+    switch.livingroom_outlet_switch_3:
+      friendly_name: Bathroom Heater
+      icon: mdi:radiator
+    sensor.dishwasher_status:
+      friendly_name: Dishwasher
+      icon: mdi:washing-machine
+    vacuum.roomba:
+      friendly_name: Roomba
+      icon: mdi:robot-vacuum-variant
+    climate.dining_room:
+      friendly_name: Nest
+    media_player.viziotv:
+      friendly_name: Vizio TV
+      icon: mdi:monitor
+    media_player.nadc338:
+      friendly_name: NAD Stereo
+      icon: mdi:speaker
+
+    input_select.playlist_content:
+      friendly_name: 'Content:'
+      icon: mdi:playlist-play
+    input_select.playlist_source:
+      friendly_name: 'Source:'
+      icon: mdi:speaker-wireless
+
+    media_player.living_room:
+      friendly_name: Living Room
+    media_player.kitchen_stereo:
+      friendly_name: Kitchen Stereo
+    media_player.bedroom_speaker:
+      friendly_name: Bedroom Speaker
+    media_player.basement_group:
+      friendly_name: Basement Audio Group
+    camera.midwest_radar:
+      friendly_name: Midwest Radar
+
+
+# Security
+
+    lock.front_door_handle_locked:
+      friendly_name: Frontdoor Lock
+      icon: mdi:lock-smart
+
+    binary_sensor.user1_occupancy:
+      friendly_name: Amelia
+      icon: mdi:account
+    binary_sensor.user2_occupancy:
+      friendly_name: Rob
+      icon: mdi:account
+    binary_sensor.user3_occupancy:
+      friendly_name: Nathan
+      icon: mdi:account
+    binary_sensor.user4_occupancy:
+      friendly_name: Jared
+      icon: mdi:account
+
+    binary_sensor.frontdoor_contact:
+      friendly_name: Frontdoor
+      icon: mdi:door
+    binary_sensor.sidedoor_contact:
+      friendly_name: Sidedoor
+      icon: mdi:door
+    binary_sensor.backdoor_contact:
+      friendly_name: Backdoor
+      icon: mdi:door
+
+    binary_sensor.uplivingroom_motion_sensor:
+      friendly_name: Up Living
+      icon: mdi:run
+    binary_sensor.upoffice_motion_sensor:
+      friendly_name: Up Office
+      icon: mdi:run
+    binary_sensor.hallway_motion1_sensor:
+      friendly_name: Hallway 1
+      icon: mdi:run
+    binary_sensor.hallway_motion2_sensor:
+      friendly_name: Hallway 2
+      icon: mdi:run
+    binary_sensor.bathroom_motion_sensor:
+      friendly_name: Bathroom
+      icon: mdi:run
+
+    camera.frontdoor:
+      friendly_name: Frontdoor Camera
+    camera.backdoor:
+      friendly_name: Backdoor Camera
+
+
+# Settings
+
+    input_boolean.disable_bathroom_lights:
+      friendly_name: Disable Bathroom Lights Automation
+      icon: mdi:water-pump
+    input_boolean.disable_hallway_lights:
+      friendly_name: Disable Hallway Lights Automation
+      icon: mdi:ceiling-light
+    input_boolean.disable_kitchen_lights:
+      friendly_name: Disable Kitchen Lights Automation
+      icon: mdi:fridge
+    input_boolean.disable_bathroom_heater:
+      friendly_name: Disable Bathroom Heater Automation
+      icon: mdi:radiator
+    input_boolean.disable_bathroom_heater_schedule:
+      friendly_name: Disable Bathroom Heater Schedule
+      icon: mdi:radiator
+    input_boolean.disable_nest:
+      friendly_name: Disable Nest Automation
+      icon: mdi:thermostat
+    input_boolean.disable_roomba_schedule:
+      friendly_name: Disable Roomba Schedule
+      icon: mdi:robot-vacuum-variant
+    input_boolean.disable_lock_automation:
+      friendly_name: Disable Lock Automation
+      icon: mdi:lock-smart
+    input_boolean.disable_alarm_system:
+      friendly_name: Disable Alarm System
+      icon: mdi:security
+    alarm_control_panel.main:
+      friendly_name: Alarm System Status
+      icon: mdi:security
+    switch.bedroom_outlet_switch_2:
+      friendly_name: Bedroom Outlet Left
+      icon: mdi:power-socket-us
+    switch.livingroom_outlet_switch_2:
+      friendly_name: Bathroom Outlet Right
+      icon: mdi:power-socket-us
+
+
+    script.updateha:
+      friendly_name: Update Home Assistant
+      icon: mdi:cellphone-arrow-down
+    script.restartha:
+      friendly_name: Restart Home Assistant
+      icon: mdi:restart
+
+
+    input_boolean.alarmclock_enabled_wd:
+      friendly_name: Weekday Enabled
+      icon: mdi:toggle-switch
+    input_datetime.alarmclock_time_wd:
+      friendly_name: Weekday Time
+      icon: mdi:alarm
+    input_boolean.alarmclock_enabled_we:
+      friendly_name: Weekend Enabled
+      icon: mdi:toggle-switch
+    input_datetime.alarmclock_time_we:
+      friendly_name: Weekend Time
+      icon: mdi:alarm
+    input_boolean.alarmclock_espresso:
+      friendly_name: Turn On Espresso Machine
+      icon: mdi:toggle-switch
+    input_select.alarmclock_content:
+      friendly_name: 'To Play:'
+      icon: mdi:playlist-play
+    input_boolean.alarmclock_cancel:
+      friendly_name: Cancel Alarm
+      icon: mdi:cancel
+
+    input_boolean.espresso_enabled:
+      friendly_name: Enabled
+      icon: mdi:toggle-switch
+    input_datetime.espresso_time:
+      friendly_name: Time
+      icon: mdi:coffee

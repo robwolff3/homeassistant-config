@@ -3,7 +3,7 @@
 ## Inputs
 input_boolean:
 
-  enable_alarm_system:
+  disable_alarm_system:
 
 
 #################################################################
@@ -36,6 +36,7 @@ automation:
 
 # Auto set status for Armed Home
   - alias: Auto Status - Armed Home
+    initial_state: True
 
     trigger:
       - platform: time
@@ -62,8 +63,8 @@ automation:
           entity_id: alarm_control_panel.main
           state: disarmed
         - condition: state
-          entity_id: input_boolean.enable_alarm_system
-          state: 'on'
+          entity_id: input_boolean.disable_alarm_system
+          state: 'off'
 
     action:
       service: alarm_control_panel.alarm_arm_home
@@ -71,6 +72,7 @@ automation:
 
 # Trigger for Alarm Home
   - alias: Alarm - Armed Home
+    initial_state: True
 
     trigger:
       - platform: state
@@ -80,8 +82,8 @@ automation:
 
     condition:
       - condition: state
-        entity_id: input_boolean.enable_alarm_system
-        state: 'on'
+        entity_id: input_boolean.disable_alarm_system
+        state: 'off'
       - condition: state
         entity_id: alarm_control_panel.main
         state: armed_home
@@ -93,6 +95,7 @@ automation:
 
 # Auto rearm for Armed Home (when someone comes home)
   - alias: Auto Status - Rearm Home
+    initial_state: True
 
     trigger:
       - platform: state
@@ -115,8 +118,8 @@ automation:
               entity_id: alarm_control_panel.main
               state: armed_home
         - condition: state
-          entity_id: input_boolean.enable_alarm_system
-          state: 'on'
+          entity_id: input_boolean.disable_alarm_system
+          state: 'off'
         - condition: template
           value_template: "{{ (as_timestamp(now())-as_timestamp(states.binary_sensor.user1_occupancy.last_changed)) > 600 }}"
         - condition: template
@@ -135,6 +138,7 @@ automation:
 
 # Auto Disarm for Armed Home
   - alias: Auto Status - Disarm Home
+    initial_state: True
 
     trigger:
       - platform: time
@@ -145,8 +149,8 @@ automation:
         entity_id: alarm_control_panel.main
         state: armed_home
       - condition: state
-        entity_id: input_boolean.enable_alarm_system
-        state: 'on'
+        entity_id: input_boolean.disable_alarm_system
+        state: 'off'
 
     action:
       - service: alarm_control_panel.alarm_disarm
@@ -155,6 +159,7 @@ automation:
 
 # Auto set status for Armed Away
   - alias: Auto Status - Armed Away
+    initial_state: True
 
     trigger:
       - platform: state
@@ -186,8 +191,8 @@ automation:
           entity_id: binary_sensor.user4_occupancy
           state: 'off'
         - condition: state
-          entity_id: input_boolean.enable_alarm_system
-          state: 'on'
+          entity_id: input_boolean.disable_alarm_system
+          state: 'off'
 
     action:
       service: alarm_control_panel.alarm_arm_away
@@ -195,6 +200,7 @@ automation:
 
 # Trigger for Alarm Away
   - alias: Alarm - Armed Away
+    initial_state: True
 
     trigger:
       - platform: state
@@ -204,8 +210,8 @@ automation:
 
     condition:
       - condition: state
-        entity_id: input_boolean.enable_alarm_system
-        state: 'on'
+        entity_id: input_boolean.disable_alarm_system
+        state: 'off'
       - condition: state
         entity_id: alarm_control_panel.main
         state: armed_away
@@ -217,6 +223,7 @@ automation:
 
 # Auto disarm for Armed Away
   - alias: Auto Status - Disarmed Away
+    initial_state: True
 
     trigger:
       - platform: state
@@ -228,8 +235,8 @@ automation:
       condition: and
       conditions:
         - condition: state
-          entity_id: input_boolean.enable_alarm_system
-          state: 'on'
+          entity_id: input_boolean.disable_alarm_system
+          state: 'off'
         - condition: or
           conditions:
             - condition: state
@@ -249,12 +256,13 @@ automation:
 
 # Disable alarm
   - alias: Disable Alarm System
+    initial_state: True
 
     trigger:
       - platform: state
-        entity_id: input_boolean.enable_alarm_system
-        from: 'on'
-        to: 'off'
+        entity_id: input_boolean.disable_alarm_system
+        from: 'off'
+        to: 'on'
 
     action:
       - service: alarm_control_panel.alarm_disarm
@@ -263,6 +271,7 @@ automation:
 
 # Disarm when notifcation clicked
   - alias: Notifcation Disarm
+    initial_state: True
 
     trigger:
       - platform: event
@@ -276,6 +285,7 @@ automation:
 
 # Notification when alarm triggerd
   - alias: Notify when alarm is triggered
+    initial_state: True
 
     trigger:
       - platform: state
@@ -293,7 +303,7 @@ automation:
             requireInteraction: true
             renotify: true
             tag: 'ha_alarm'
-            url: '/states/group.security'
+            url: '/lovelace/security'
             actions:
               - action: 'disarm_ha'
                 title: 'Disarm'
@@ -305,6 +315,7 @@ automation:
 
 # Notification when alarm disarmed
   - alias: Notify when alarm is disarmed
+    initial_state: True
 
     trigger:
       - platform: state
@@ -314,8 +325,8 @@ automation:
 
     condition:
       - condition: state
-        entity_id: input_boolean.enable_alarm_system
-        state: 'on'
+        entity_id: input_boolean.disable_alarm_system
+        state: 'off'
 
     action:
       - service: notify.html5
@@ -328,4 +339,4 @@ automation:
             silent: true
             noscreen: true
             tag: 'ha_alarm'
-            url: '/states/group.security'
+            url: '/lovelace/security'

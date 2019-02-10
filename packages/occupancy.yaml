@@ -9,34 +9,22 @@ binary_sensor:
       user1_occupancy:
         device_class: presence
         value_template: >-
-          {{ is_state('device_tracker.user1', 'home')
-              or states('sensor.user1_office')|float > 9
-              or states('sensor.user1_bedroom')|float > 9
-              or states('sensor.user1_upstairs')|float > 9 }}
+          {{ is_state('device_tracker.user1', 'home') }}
 
       user2_occupancy:
         device_class: presence
         value_template: >-
-          {{ is_state('device_tracker.user2', 'home')
-              or states('sensor.user2_office')|float > 9
-              or states('sensor.user2_bedroom')|float > 9
-              or states('sensor.user2_upstairs')|float > 9 }}
+          {{ is_state('device_tracker.user2', 'home') }}
 
       user3_occupancy:
         device_class: presence
         value_template: >-
-          {{ is_state('device_tracker.user3', 'home')
-              or states('sensor.user3_office')|float > 9
-              or states('sensor.user3_bedroom')|float > 9
-              or states('sensor.user3_upstairs')|float > 9 }}
+          {{ is_state('device_tracker.user3', 'home') }}
 
       user4_occupancy:
         device_class: presence
         value_template: >-
-          {{ is_state('device_tracker.user4', 'home')
-              or states('sensor.user4_office')|float > 9
-              or states('sensor.user4_bedroom')|float > 9
-              or states('sensor.user4_upstairs')|float > 9 }}
+          {{ is_state('device_tracker.user4', 'home') }}
 
 
 sensor:
@@ -124,6 +112,7 @@ automation:
 
 ## Publish Message - Arrival Scan
   - alias: Publish Message - Arrival Scan
+    initial_state: True
 
     trigger:
       - platform: state
@@ -153,6 +142,7 @@ automation:
 
 ## Publish Message - Departure Scan
   - alias: Publish Message - Departure Scan
+    initial_state: True
 
     trigger:
       - platform: state
@@ -181,4 +171,23 @@ automation:
       - service: mqtt.publish
         data_template:
           topic: "home/scan/DEPART"
+          payload: 'null'
+      - delay: '00:01:00'
+      - service: mqtt.publish
+        data_template:
+          topic: "home/scan/DEPART"
+          payload: 'null'
+
+## Publish Message - Update MQTT sensors on startup
+  - alias: Publish Message - Update MQTT sensors on startup
+    initial_state: True
+
+    trigger:
+      - platform: homeassistant
+        event: start
+
+    action:
+      - service: mqtt.publish
+        data:
+          topic: "home/scan/restart"
           payload: 'null'
