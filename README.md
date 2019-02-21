@@ -9,6 +9,7 @@ Here is my home automation project I have been improving since mid 2017. At that
 ### In-front of Home Assistant
 
 * HA is running on a docker container on a collective docker host I run in my homelab. For z-wave there a Z-stick plugged into the host. When I first started I tried Hassbian and other deployment methods, but wasn't satisfied with the level of control over the access and administration. HA in a Virtual Environment on a Debian Raspberry Pi 3 host is what I ran for awhile until last year when I upgraded my homelab to a single docker host. Docker is defiantly the way to go for easy of use, administration and updating.
+* Interested in [Docker](https://www.docker.com/) but never used it before? Checkout my blog post: [Docker In Your HomeLab - Getting Started](https://borked.io/2019/02/13/docker-in-your-homelab.html).
 * Connecting to HA externally, I use my own domain through Google Domains with a Dynamic DNS record setup on a sub domain. To solve the internal/external connection problem, I have a Host Override setup on my pfSense router that forwards my HA sub domain to the local IP address of HA when I'm on my local network.
 * For connection security and certificate management I use the [linuxserver/letsencrypt](https://hub.docker.com/r/linuxserver/letsencrypt/) Docker container which has Nginx and [Let's Encrypt](https://letsencrypt.org/) packaged together. Nginx to reverse proxies the connections to HA and Let's Encrypt auto-renews to secure my traffic internally and externally.
 
