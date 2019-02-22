@@ -1,6 +1,6 @@
 # Home Assistant
 
-My personal implementation of [Home Assistant](https://home-assistant.io) (version: 0.87.0). Configuration last updated 2/10/2019.
+My personal implementation of [Home Assistant](https://home-assistant.io) (version: 0.88.0). Configuration last updated 2/22/2019.
 
 ## Overview
 
@@ -35,7 +35,7 @@ Here is my home automation project I have been improving since mid 2017. At that
 
 ## Devices
 
-* Raspberry Pi 3 #############
+* Docker Host - SSD based
 * Aeotec Z-Stick Gen5
 * DIY [pfSense](https://www.pfsense.org/) router
 * Netgear Orbi (Set in AP mode)
@@ -66,6 +66,6 @@ Here is my home automation project I have been improving since mid 2017. At that
 
 ## Interface
 
-![UI](images/ha_home.png)
-![UI](images/ha_security.png)
-![UI](images/ha_override.png)
+![UI](images/ha1_home.jpg)
+![UI](images/ha1_security.jpg)
+![UI](images/ha1_override.jpg)
